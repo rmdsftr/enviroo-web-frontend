@@ -1,0 +1,842 @@
+/* =========================================================
+   Registrasi BSI — Form Page
+   ========================================================= */
+
+/* ── Page wrapper ── */
+.regis-bsi {
+    padding: 8px 24px 40px 24px;
+    max-width: 1100px;
+    animation: fadeInUp 0.5s ease both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Header card ── */
+.regis-header {
+    background: linear-gradient(135deg, #013236 0%, #025a50 50%, #4EA771 100%);
+    border-radius: 18px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.regis-header::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    right: -20%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(78, 167, 113, 0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.regis-header::after {
+    content: "";
+    position: absolute;
+    bottom: -40%;
+    left: -10%;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(193, 230, 186, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.regis-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.regis-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+}
+
+.regis-header p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+}
+
+/* ── Form card (main white card) ── */
+.regis-form-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 0;
+    box-shadow: 0 2px 16px rgba(1, 50, 54, 0.06);
+    border: 1px solid rgba(78, 167, 113, 0.08);
+    overflow: hidden;
+}
+
+/* ── Section inside the form card ── */
+.regis-section {
+    padding: 28px 32px;
+    border-bottom: 1px solid #eef6f0;
+    position: relative;
+}
+
+.regis-section:last-child {
+    border-bottom: none;
+}
+
+/* Row wrapper for 2-column sections */
+.regis-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #eef6f0;
+}
+
+.regis-form-row > .regis-section {
+    border-bottom: none;
+}
+
+.regis-form-row > .regis-section:first-child {
+    border-right: 1px solid #eef6f0;
+}
+
+.regis-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.regis-section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.regis-section:hover .regis-section-icon {
+    transform: scale(1.05);
+}
+
+.regis-section-icon.icon-info {
+    background: linear-gradient(135deg, #EAF8E7, #C1E6BA);
+    color: #2e7d52;
+}
+
+.regis-section-icon.icon-photo {
+    background: linear-gradient(135deg, #e7f1f8, #bdd8e6);
+    color: #2e5f7d;
+}
+
+.regis-section-icon.icon-location {
+    background: linear-gradient(135deg, #f8ede7, #e6c8ba);
+    color: #7d4a2e;
+}
+
+.regis-section-icon.icon-map {
+    background: linear-gradient(135deg, #f0e7f8, #d4bae6);
+    color: #5e2e7d;
+}
+
+.regis-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #013236;
+    margin-bottom: 2px;
+}
+
+.regis-section-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #7a9e8a;
+}
+
+/* ── Form fields ── */
+.regis-form-group {
+    margin-bottom: 18px;
+}
+
+.regis-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.regis-label {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #2a5f4a;
+    margin-bottom: 8px;
+    letter-spacing: 0.2px;
+}
+
+.regis-label .required {
+    color: #e04a4a;
+    margin-left: 2px;
+}
+
+/* Textarea */
+.regis-textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 14px 18px;
+    border: 1px solid #d1d9d4;
+    border-radius: 12px;
+    background-color: #ffffff; /* Neutral */
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #013236;
+    resize: none;
+    outline: 2px solid transparent;
+    outline-offset: 0;
+    transition: outline-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    line-height: 1.6;
+}
+
+.regis-textarea::placeholder {
+    color: #8fa89a;
+    font-weight: 400;
+}
+
+.regis-textarea:focus {
+    outline-color: #4EA771;
+    box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15);
+    border-color: transparent;
+}
+
+/* Neutral input override */
+.input-wrapper.regis-input-neutral {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d9d4 !important;
+}
+
+.input-wrapper.regis-input-neutral:focus-within {
+    border-color: transparent !important;
+}
+
+/* ── Photo upload area ── */
+.regis-upload-area {
+    border: 2px dashed #c1dece;
+    border-radius: 16px;
+    padding: 36px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: linear-gradient(180deg, rgba(234, 248, 231, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.regis-upload-area:hover {
+    border-color: #4EA771;
+    background: linear-gradient(180deg, rgba(234, 248, 231, 0.7) 0%, rgba(255, 255, 255, 0) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(78, 167, 113, 0.1);
+}
+
+.regis-upload-area.dragging {
+    border-color: #4EA771;
+    background: rgba(234, 248, 231, 0.6);
+    box-shadow: 0 0 0 4px rgba(78, 167, 113, 0.12);
+}
+
+.regis-upload-area.has-file {
+    border-style: solid;
+    border-color: #4EA771;
+    padding: 20px;
+}
+
+.regis-upload-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #EAF8E7, #C1E6BA);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #4EA771;
+    transition: transform 0.3s ease;
+}
+
+.regis-upload-area:hover .regis-upload-icon-wrapper {
+    transform: scale(1.08);
+}
+
+.regis-upload-text {
+    text-align: center;
+}
+
+.regis-upload-text p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #2a5f4a;
+    margin-bottom: 4px;
+}
+
+.regis-upload-text span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    color: #8fa89a;
+}
+
+.regis-upload-text .upload-browse {
+    color: #4EA771;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: rgba(78, 167, 113, 0.3);
+    cursor: pointer;
+}
+
+.regis-upload-input {
+    display: none;
+}
+
+/* Preview image */
+.regis-upload-preview {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.regis-preview-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 14px;
+    object-fit: cover;
+    border: 2px solid #C1E6BA;
+    box-shadow: 0 2px 8px rgba(78, 167, 113, 0.12);
+}
+
+.regis-preview-info {
+    flex: 1;
+}
+
+.regis-preview-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    margin-bottom: 4px;
+    word-break: break-all;
+}
+
+.regis-preview-size {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    color: #7a9e8a;
+    margin-bottom: 10px;
+}
+
+.regis-preview-remove {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #fce8e8;
+    color: #c0392b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.regis-preview-remove:hover {
+    background: #f5c6c6;
+    transform: translateY(-1px);
+}
+
+/* ── Map container ── */
+.regis-map-container {
+    width: 100%;
+    height: 360px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #d5ead8;
+    box-shadow: 0 2px 12px rgba(1, 50, 54, 0.06);
+    transition: box-shadow 0.2s ease;
+}
+
+.regis-map-container:hover {
+    box-shadow: 0 4px 20px rgba(1, 50, 54, 0.1);
+}
+
+.regis-map-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(234, 248, 231, 0.6);
+    border-radius: 10px;
+    border-left: 3px solid #4EA771;
+}
+
+.regis-map-hint svg {
+    font-size: 14px;
+    color: #4EA771;
+    flex-shrink: 0;
+}
+
+.regis-map-hint span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #2a5f4a;
+}
+
+/* Coordinate chips */
+.regis-coords {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.regis-coord-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #EAF8E7;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.regis-coord-chip .coord-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.regis-coord-chip .coord-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #013236;
+}
+
+/* ── Footer actions ── */
+.regis-footer {
+    padding: 24px 32px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid #eef6f0;
+    background: linear-gradient(180deg, rgba(234, 248, 231, 0.3) 0%, #ffffff 100%);
+    border-radius: 0 0 18px 18px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .regis-bsi {
+        padding: 8px 12px 28px 12px;
+    }
+
+    .regis-header {
+        padding: 24px 20px;
+        border-radius: 14px;
+    }
+
+    .regis-header h1 {
+        font-size: 18px;
+    }
+
+    .regis-section {
+        padding: 22px 18px;
+    }
+
+    .regis-coords {
+        flex-direction: column;
+    }
+
+    .regis-coord-chip {
+        min-width: unset;
+    }
+
+    .regis-map-container {
+        height: 280px;
+    }
+
+    .regis-footer {
+        padding: 18px;
+        flex-direction: column;
+    }
+
+    .regis-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 900px) {
+    .regis-form-row {
+        grid-template-columns: 1fr;
+    }
+    .regis-form-row > .regis-section:first-child {
+        border-right: none;
+        border-bottom: 1px solid #eef6f0;
+    }
+}
+
+/* ── Step Indicator ── */
+.regis-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 0 0 20px 0;
+    padding: 0 4px;
+}
+
+.regis-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.regis-step-number {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: #e8f0ed;
+    color: #a0b8ac;
+    border: 2px solid #d1dfd8;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.regis-step.active .regis-step-number {
+    background: linear-gradient(135deg, #4EA771, #2e7d52);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(78, 167, 113, 0.35);
+}
+
+.regis-step.completed .regis-step-number {
+    background: linear-gradient(135deg, #4EA771, #2e7d52);
+    color: #ffffff;
+    border-color: transparent;
+    font-size: 12px;
+}
+
+.regis-step-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #a0b8ac;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+.regis-step.active .regis-step-label {
+    color: #013236;
+    font-weight: 600;
+}
+
+.regis-step.completed .regis-step-label {
+    color: #4EA771;
+}
+
+.regis-step-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, #d1dfd8, #e8f0ed);
+    margin: 0 14px;
+    border-radius: 2px;
+    min-width: 40px;
+}
+
+/* ── Admin icon badge ── */
+.regis-section-icon.icon-admin {
+    background: linear-gradient(135deg, #f0e7f8, #d4bae6);
+    color: #5e2e7d;
+}
+
+/* ── Admin selection info chip ── */
+.regis-admin-selection-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0132361c;
+    color: #013236aa;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.regis-admin-selection-info svg {
+    font-size: 11px;
+    color: #013236;
+}
+
+/* ── Admin table wrapper ── */
+.regis-admin-table-wrapper {
+    border: 1px solid #e5ede8;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(1, 50, 54, 0.04);
+}
+
+/* ── Admin table ── */
+.regis-admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+}
+
+.regis-admin-table thead tr {
+    background: linear-gradient(180deg, #f5faf6 0%, #eef6f0 100%);
+    border-bottom: 1px solid #e0ece3;
+}
+
+.regis-admin-table thead th {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #4a7a5c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    text-align: left;
+}
+
+.regis-admin-table tbody tr {
+    border-bottom: 1px solid #f0f5f2;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.regis-admin-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.regis-admin-table tbody tr:hover {
+    background-color: #f7fbf8;
+}
+
+.regis-admin-table tbody tr.selected {
+    background-color: #eaf8e7;
+}
+
+.regis-admin-table tbody tr.selected:hover {
+    background-color: #dff3da;
+}
+
+.regis-admin-table tbody td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: #3d5a48;
+    vertical-align: middle;
+}
+
+/* ── Custom Checkbox ── */
+.regis-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.regis-checkbox-wrapper input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.regis-checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #c1d9c9;
+    border-radius: 5px;
+    background: #fff;
+    display: inline-block;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.regis-checkbox-wrapper input[type="checkbox"]:checked + .regis-checkbox-custom {
+    background: linear-gradient(135deg, #4EA771, #2e7d52);
+    border-color: transparent;
+    box-shadow: 0 2px 6px rgba(78, 167, 113, 0.4);
+}
+
+.regis-checkbox-wrapper input[type="checkbox"]:checked + .regis-checkbox-custom::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+}
+
+.regis-checkbox-wrapper:hover .regis-checkbox-custom {
+    border-color: #4EA771;
+    box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.1);
+}
+
+/* ── Admin Avatar ── */
+.regis-admin-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #06C0C9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    border: 2px solid white;
+    flex-shrink: 0;
+}
+
+.regis-admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ── Admin table cell text styles ── */
+.regis-admin-userid {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7a9e8a;
+    font-family: 'Courier New', monospace;
+    background: #f0f5f2;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.regis-admin-name {
+    font-weight: 600;
+    color: #013236;
+    font-size: 13px;
+}
+
+.regis-admin-email {
+    font-size: 12.5px;
+    color: #5a7a68;
+}
+
+/* ── Modal Daftarkan Admin ── */
+.regis-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(1, 50, 54, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+.regis-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 10px 40px rgba(1, 50, 54, 0.15);
+    overflow: hidden;
+    animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.regis-modal-header {
+    padding: 24px;
+    border-bottom: 1px solid #eef6f0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    background: linear-gradient(180deg, #f9fbf9, #ffffff);
+}
+
+.regis-modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0 0 4px 0;
+}
+
+.regis-modal-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+
+.regis-modal-body {
+    padding: 24px;
+}
+
+.regis-modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid #eef6f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #f9fbf9;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

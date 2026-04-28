@@ -1,0 +1,182 @@
+/* =========================================================
+   Table
+   ========================================================= */
+.table-wrapper {
+    background: var(--c-surface);
+    border-radius: var(--r-xl);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--sh-sm);
+    overflow: hidden;
+    width: 100%;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--ff-sans);
+}
+
+/* ── Header ── */
+.table thead tr {
+    background: var(--c-surface-soft);
+    border-bottom: 1px solid var(--c-border);
+}
+
+.table th {
+    padding: 14px 18px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* ── Body rows ── */
+.table tbody tr {
+    border-bottom: 1px solid var(--c-border-soft);
+    transition: background-color var(--t-fast);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody tr:hover {
+    background-color: var(--c-surface-soft);
+}
+
+.table td {
+    padding: 14px 18px;
+    font-size: 12.5px;
+    color: var(--c-text);
+    vertical-align: middle;
+}
+
+/* Empty state */
+.table-empty {
+    text-align: center !important;
+    padding: 56px 16px !important;
+    color: var(--c-text-faint);
+    font-size: 13px;
+}
+
+/* ── Cell: Avatar ── */
+.table-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--c-primary), var(--c-primary-600));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid var(--c-surface);
+    box-shadow: 0 0 0 1px var(--c-border);
+}
+
+.table-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.table-avatar-fallback {
+    font-family: var(--ff-sans);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* ── Cell: Name (clickable) ── */
+.table-name {
+    font-weight: 600;
+    color: var(--c-text);
+    cursor: pointer;
+    transition: color var(--t-fast);
+    white-space: nowrap;
+}
+
+.table-name:hover {
+    color: var(--c-primary);
+    text-decoration: underline;
+    text-decoration-color: rgba(78, 167, 113, 0.4);
+    text-underline-offset: 3px;
+}
+
+/* ── Cell: Badge (status) ── */
+.table-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: var(--r-pill);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.table-badge--active {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+
+.table-badge--active .table-badge-dot {
+    background: var(--c-primary);
+    box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.18);
+}
+
+.table-badge--inactive {
+    background: var(--c-danger-bg);
+    color: var(--c-danger-600);
+}
+
+.table-badge--inactive .table-badge-dot {
+    background: var(--c-danger);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+}
+
+/* ── Cell: Action button ── */
+.table-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--c-border);
+    background: var(--c-surface-muted);
+    color: var(--c-primary);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--t-fast), border-color var(--t-fast),
+        color var(--t-fast), transform var(--t-fast);
+}
+
+.table-action-btn:hover {
+    background: var(--c-primary);
+    border-color: var(--c-primary);
+    color: #ffffff;
+    transform: scale(1.06);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .table th,
+    .table td {
+        padding: 12px 14px;
+    }
+}

@@ -1,0 +1,737 @@
+/* =========================================================
+   Katalog Page — Sampah & Sembako Catalog
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+    --k-dark:   #013236;
+    --k-green:  #4EA771;
+    --k-lime:   #94DF0C;
+    --k-dark:   #013236;
+    --k-green:  #4EA771;
+    --k-lime:   #94DF0C;
+    --k-bg:     #f8faf9;
+    --k-white:  #ffffff;
+    --k-muted:  #6b9080;
+    --k-border: rgba(1,50,54,0.07);
+}
+
+/* ── Page Shell ── */
+.katalog-page {
+    padding: 24px 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 100vh;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+    animation: katalogFadeIn 0.35s ease both;
+}
+
+@keyframes katalogFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+
+/* =========================================================
+   HEADER ROW (tabs left, filters right)
+   ========================================================= */
+
+/* Description area */
+.katalog-desc-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 14px 0 20px;
+}
+
+.katalog-desc {
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--k-muted);
+    margin: 0;
+    line-height: 1.75;
+    max-width: 640px;
+}
+
+.katalog-divider {
+    border: none;
+    border-top: 1px dashed rgba(1,50,54,0.1);
+    margin: 0;
+}
+
+
+/* =========================================================
+   FILTER BAR (header-level: bank dropdown + count)
+   ========================================================= */
+.katalog-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+/* Item count */
+.katalog-count {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--k-dark);
+    background: #e2ebe6; /* slightly more prominent than f0f4f2 since it's a label */
+    padding: 6px 14px;
+    border-radius: 50px;
+    user-select: none;
+}
+
+
+/* =========================================================
+   ACTION ROW (count + add button)
+   ========================================================= */
+.katalog-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* =========================================================
+   TWO-COLUMN CONTENT LAYOUT (cards 3/4, filter sidebar 1/4)
+   ========================================================= */
+.katalog-content-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+}
+
+.katalog-content-layout.has-sidebar {
+    grid-template-columns: 3fr 1fr;
+}
+
+.katalog-side-col {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.katalog-content-main {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   CARD GRID
+   ========================================================= */
+.katalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+.katalog-card {
+    background: var(--k-white);
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid var(--k-border);
+    box-shadow: 0 4px 16px rgba(1,50,54,0.03);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+/* ── Utility: Hide Number Input Spinners ── */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.katalog-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 32px rgba(1,50,54,0.08);
+    border-color: rgba(78,167,113,0.3);
+}
+
+/* Image area */
+.katalog-card-img {
+    position: relative;
+    height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Subtle inner highlight on image zone */
+.katalog-card-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 55%, rgba(255,255,255,0.45));
+    pointer-events: none;
+}
+
+.katalog-card-emoji {
+    font-size: 58px;
+    line-height: 1;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12));
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.katalog-card:hover .katalog-card-emoji {
+    transform: scale(1.15) translateY(-4px);
+}
+
+/* Card body */
+.katalog-card-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.katalog-card-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--k-dark);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.katalog-card-desc {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--k-muted);
+    margin: 0;
+}
+
+/* Price Tag — redesigned */
+.katalog-price-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.price-uang {
+    background: rgba(14, 165, 233, 0.15); /* Premium Sky Blue Background */
+    color: #0284c7; /* Sky 600 Text */
+}
+
+.price-poin {
+    background: rgba(249, 115, 22, 0.12); /* Orange 500 */
+    color: #c2410c; /* Orange 700 */
+}
+
+.katalog-satuan {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.65;
+}
+
+/* Bank info row */
+.katalog-card-bank {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--k-muted);
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--k-border);
+}
+
+.katalog-card-bank svg { font-size: 10px; flex-shrink: 0; color: var(--k-green); }
+
+
+/* =========================================================
+   FILTER SIDEBAR
+   ========================================================= */
+.katalog-filter-sidebar {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--k-border);
+    border-radius: 22px;
+    padding: 22px 20px 26px;
+    box-shadow: 0 4px 24px rgba(1,50,54,0.03);
+    animation: katalogFadeIn 0.3s ease both;
+}
+
+/* Filter group */
+.kf-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kf-group-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--k-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+.katalog-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 80px 0;
+    color: #aac4b5;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.katalog-empty svg {
+    font-size: 40px;
+    opacity: 0.35;
+    color: var(--k-green);
+}
+
+
+/* =========================================================
+   ADD CATALOG MODAL
+   ========================================================= */
+.katalog-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: katalogFadeIn 0.2s ease;
+}
+
+.katalog-modal-content {
+    background: var(--k-white);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 960px;
+    box-shadow: 0 12px 48px rgba(1, 50, 54, 0.15);
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh;
+    overflow-y: auto;
+    animation: katalogFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.km-header {
+    padding: 24px 28px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--k-border);
+}
+
+.km-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--k-dark);
+    margin: 0 0 6px 0;
+}
+
+.km-subtitle {
+    font-size: 12px;
+    color: var(--k-muted);
+    margin: 0;
+}
+
+
+.km-body {
+    padding-top: 25px;
+    padding-bottom: 40px;
+    padding-left: 30px;
+    padding-right: 30px;
+    overflow: visible;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 32px;
+}
+
+.km-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.km-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.km-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Neutral input theme override */
+.km-input-neutral .input-field {
+    background-color: #ffffff;
+}
+
+.km-input-neutral {
+    background-color: #ffffff !important;
+    border: 1.5px solid #d1d9d4 !important;
+    box-shadow: none !important;
+}
+
+.km-input-neutral:focus-within {
+    outline-color: #4EA771 !important;
+    border-color: transparent !important;
+    box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15) !important;
+}
+
+/* Hide spin buttons for number inputs */
+.km-body input[type="number"]::-webkit-outer-spin-button,
+.km-body input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+.km-body input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.km-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--k-dark);
+}
+
+.km-req {
+    color: #e11d48;
+}
+
+/* File Upload Area */
+.km-file-area {
+    border: 2px dashed rgba(1, 50, 54, 0.15);
+    border-radius: 16px;
+    background: var(--k-bg);
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.km-file-area:hover, .km-file-area.dragging {
+    border-color: var(--k-green);
+    background: rgba(78, 167, 113, 0.04);
+}
+
+.km-file-area.has-file {
+    border-style: solid;
+    border-color: transparent;
+    background: var(--k-white);
+    padding: 0;
+}
+
+.km-preview-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.km-preview-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.km-preview-actions {
+    position: absolute;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.km-preview-container:hover .km-preview-actions {
+    opacity: 1;
+}
+
+.km-btn-remove {
+    background: #fff;
+    color: #e11d48;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.km-upload-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--k-muted);
+}
+
+.km-upload-icon {
+    font-size: 32px;
+    color: rgba(1, 50, 54, 0.2);
+    margin-bottom: 4px;
+}
+
+.km-upload-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--k-dark);
+}
+
+.km-upload-hint {
+    font-size: 11px;
+}
+
+/* Radio Buttons */
+.km-radio-group {
+    display: flex;
+    gap: 12px;
+}
+
+.km-radio-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--k-border);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--k-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.km-radio-btn input {
+    display: none;
+}
+
+.km-radio-btn.active {
+    border-color: var(--k-green);
+    background: rgba(78, 167, 113, 0.08);
+    color: var(--k-green);
+}
+
+.km-radio-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f1f5f9;
+}
+
+/* Footer */
+.km-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 28px 24px;
+    border-top: 1px solid var(--k-border);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+
+@media (max-width: 768px) {
+    .katalog-page { padding: 16px 16px 36px; }
+
+    .katalog-filter-bar { margin-left: 0; }
+    .katalog-count { display: none; }
+
+    .katalog-content-layout,
+    .katalog-content-layout:has(.katalog-filter-sidebar) {
+        grid-template-columns: 1fr;
+    }
+
+    .katalog-filter-sidebar {
+        position: static;
+        order: -1;
+    }
+
+    .km-body {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .katalog-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .katalog-card-img { height: 110px; }
+    .katalog-card-emoji { font-size: 44px; }
+}
+
+/* ── Detial Modal Timeline ── */
+.kd-stat-card {
+    background: #f8fafc;
+    border: 1px solid var(--k-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.kd-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--k-dark);
+}
+
+.kd-stat-label {
+    color: var(--k-muted);
+}
+
+.kd-timeline-wrap {
+    margin-top: 8px;
+}
+
+.kd-timeline {
+    position: relative;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-left: 2px solid var(--k-border);
+}
+
+.kd-timeline-empty {
+    font-size: 13px;
+    color: var(--k-muted);
+    text-align: center;
+    padding: 24px 0;
+    background: #f8fafc;
+    border: 1px dashed var(--k-border);
+    border-radius: 12px;
+}
+
+.kd-timeline-item {
+    position: relative;
+}
+
+.kd-timeline-dot {
+    position: absolute;
+    left: -25px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--k-primary);
+    box-shadow: 0 0 0 4px var(--k-white);
+}
+
+.kd-timeline-date {
+    display: block;
+    font-size: 11px;
+    color: var(--k-muted);
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.kd-timeline-content {
+    background: #f8fafc;
+    border: 1px solid var(--k-border);
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.kd-timeline-content:hover {
+    background: #fff;
+    border-color: rgba(78, 167, 113, 0.3);
+}
+
+.kd-timeline-price {
+    font-size: 13.5px;
+    color: #1a7a4a;
+    font-weight: 700;
+}
+
+.kd-timeline-price s {
+    color: var(--k-muted);
+    font-weight: 500;
+    margin-right: 6px;
+}
+
+.kd-timeline-admin {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--k-muted);
+}

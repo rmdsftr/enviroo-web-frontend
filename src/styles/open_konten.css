@@ -1,0 +1,565 @@
+/* =====================
+   Open Konten — Article Viewer (Two-column)
+   ===================== */
+
+.ok-page {
+    padding: 24px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Header Row ── */
+.ok-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ok-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a7a6a;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 6px 12px;
+    margin-left: -12px;
+    border-radius: 8px;
+}
+
+.ok-back-btn:hover {
+    color: #4EA771;
+    background: rgba(78, 167, 113, 0.06);
+}
+
+.ok-back-btn svg {
+    font-size: 11px;
+}
+
+.ok-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ok-status {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    width: fit-content;
+}
+
+.ok-status::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.ok-status.published {
+    background: rgba(78, 167, 113, 0.1);
+    color: #1a7a4a;
+}
+
+.ok-status.published::before {
+    background: #4EA771;
+}
+
+.ok-status.draft {
+    background: rgba(1, 50, 54, 0.06);
+    color: #6b9080;
+}
+
+.ok-status.draft::before {
+    background: #9bbfab;
+}
+
+/* ── Action Buttons ── */
+.ok-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ok-action-btn svg {
+    font-size: 11px;
+}
+
+.ok-edit-btn {
+    background: rgba(78, 167, 113, 0.1);
+    color: #1a7a4a;
+}
+
+.ok-edit-btn:hover {
+    background: rgba(78, 167, 113, 0.2);
+}
+
+.ok-delete-btn {
+    background: rgba(220, 53, 69, 0.08);
+    color: #c0392b;
+}
+
+.ok-delete-btn:hover {
+    background: rgba(220, 53, 69, 0.16);
+}
+
+/* ── Two-column Layout ── */
+.ok-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.ok-main {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Main Card ── */
+.ok-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(1, 50, 54, 0.05);
+    box-shadow: 0 2px 12px rgba(1, 50, 54, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Banner ── */
+.ok-banner {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #c8edcb 0%, #EAF8E7 100%);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ok-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ok-banner-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ok-banner-placeholder span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 64px;
+    font-weight: 800;
+    color: rgba(148, 223, 12, 0.15);
+    text-transform: uppercase;
+}
+
+.ok-banner .ok-status {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: #ffffff; /* Override transparent backgrounds for better contrast on images */
+}
+
+.ok-banner .ok-status.published {
+    color: #1a7a4a;
+    background: #e8f5ed;
+}
+
+.ok-banner .ok-status.draft {
+    color: #6b9080;
+    background: #fcfdfc;
+}
+
+.ok-banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 36px 20px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+}
+
+.ok-banner-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ok-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #4EA771;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.ok-avatar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.ok-avatar-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.ok-avatar-date {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ok-avatar-date svg {
+    font-size: 8px;
+}
+
+/* ── Content Area ── */
+.ok-content {
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ok-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #013236;
+    line-height: 1.35;
+    margin-bottom: 6px;
+}
+
+.ok-lead {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    color: #6b9080;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.ok-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(1, 50, 54, 0.06);
+    margin: 16px 0;
+}
+
+/* ── Body Blocks ── */
+.ok-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ok-paragraph {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #223d30;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.ok-figure {
+    width: 100%;
+    margin: 4px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f4f9f6;
+    border: 1px solid rgba(1, 50, 54, 0.04);
+}
+
+.ok-figure img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* ── Footer ── */
+.ok-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(1, 50, 54, 0.05);
+    background: #fcfdfc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ok-footer-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ok-footer-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+.ok-footer-author {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.2;
+}
+
+.ok-footer-author svg {
+    color: #4EA771;
+    font-size: 12px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ok-footer-date {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    color: #6b9080;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.2;
+}
+
+.ok-footer-date svg {
+    font-size: 11px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ok-footer .ok-status {
+    margin-bottom: 0;
+    margin-left: 8px;
+}
+
+.ok-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ══════════════════════════════════
+   Right Sidebar
+   ══════════════════════════════════ */
+.ok-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+}
+
+.ok-sidebar-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(1, 50, 54, 0.05);
+    box-shadow: 0 2px 10px rgba(1, 50, 54, 0.03);
+    overflow: hidden;
+}
+
+.ok-sidebar-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+.ok-sidebar-empty {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9bbfab;
+    text-align: center;
+    padding: 24px 16px;
+}
+
+.ok-sidebar-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ok-sidebar-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.03);
+}
+
+.ok-sidebar-item:last-child {
+    border-bottom: none;
+}
+
+.ok-sidebar-item:hover {
+    background: rgba(78, 167, 113, 0.04);
+}
+
+.ok-sidebar-item-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0fdf4, #eaf8e7);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ok-sidebar-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ok-sidebar-item-thumb span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: rgba(148, 223, 12, 0.3);
+    text-transform: uppercase;
+}
+
+.ok-sidebar-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    justify-content: center;
+}
+
+.ok-sidebar-item-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ok-sidebar-item-date {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    color: #9bbfab;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ok-sidebar-item-date svg {
+    font-size: 10px;
+}
+
+/* ── Loading ── */
+.ok-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    width: 100%;
+    color: #4EA771;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+}
+
+.ok-spinner {
+    font-size: 22px;
+    animation: ok-spin 1s linear infinite;
+}
+
+@keyframes ok-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .ok-layout {
+        flex-direction: column;
+    }
+
+    .ok-sidebar {
+        width: 100%;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .ok-page {
+        padding: 16px 16px 32px;
+    }
+
+    .ok-banner {
+        height: 160px;
+    }
+
+    .ok-content {
+        padding: 16px 16px 20px;
+    }
+
+    .ok-title {
+        font-size: 16px;
+    }
+
+    .ok-paragraph {
+        font-size: 12.5px;
+    }
+}

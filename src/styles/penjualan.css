@@ -1,0 +1,260 @@
+/* ══════════════════════════════════════════
+   Penjualan Page
+   ══════════════════════════════════════════ */
+
+/* ── Hero Header ── */
+.penjualan-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 28px 24px 20px 24px;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.penjualan-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.penjualan-hero-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f1f15;
+    margin: 0;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.penjualan-hero-desc {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 520px;
+}
+
+.penjualan-hero-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── Error Banner ── */
+.penjualan-error-banner {
+    margin: 0 24px 16px;
+    padding: 12px 16px;
+    background: rgba(224, 82, 82, 0.08);
+    border: 1px solid rgba(224, 82, 82, 0.2);
+    border-radius: 10px;
+    color: #b33030;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ── Content Section ── */
+.penjualan-section {
+    padding: 0 24px 28px;
+}
+
+/* ── Placeholder / coming-soon card ── */
+.penjualan-placeholder {
+    background: var(--c-surface, #ffffff);
+    border: 1.5px dashed var(--c-border, #d6ded9);
+    border-radius: var(--r-2xl, 18px);
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.penjualan-placeholder-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--c-primary-50, #eff7f1);
+    color: var(--c-primary, #4EA771);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.penjualan-placeholder h3 {
+    font-family: var(--ff-sans, 'Poppins', sans-serif);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--c-text-soft, #3c4a43);
+    margin: 0;
+}
+
+.penjualan-placeholder p {
+    font-size: 13px;
+    color: var(--c-text-muted, #6a7c72);
+    margin: 0;
+    max-width: 380px;
+    line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════
+   Penjualan Create New Page
+   ══════════════════════════════════════════ */
+
+.penjualan-new-page {
+    padding-bottom: 40px;
+}
+
+/* Hero section (same style as nasabah) */
+.penjualan-new-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 28px 24px 20px 24px;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.penjualan-new-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.penjualan-new-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f1f15;
+    margin: 0;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.penjualan-new-desc {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 520px;
+}
+
+.penjualan-new-hero-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── Divider between sections ── */
+.penjualan-section-divider {
+    height: 1px;
+    background: rgba(1, 50, 54, 0.06);
+    margin: 4px 24px 0;
+}
+
+/* ── Other form section placeholder ── */
+.penjualan-form-section {
+    margin: 0 24px 24px;
+    background: var(--c-surface, #ffffff);
+    border: 1.5px solid var(--c-border-soft, #e7edea);
+    border-radius: var(--r-2xl, 18px);
+    padding: 24px;
+    box-shadow: var(--sh-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
+}
+
+.penjualan-form-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--c-text, #0f1f15);
+    margin: 0 0 6px;
+}
+
+.penjualan-form-section-desc {
+    font-size: 12.5px;
+    color: var(--c-text-muted, #6a7c72);
+    margin: 0 0 20px;
+}
+
+.penjualan-form-placeholder {
+    height: 80px;
+    background: var(--c-surface-muted, #f7f9f7);
+    border: 1px dashed var(--c-border, #d6ded9);
+    border-radius: var(--r-lg, 12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text-faint, #9aaaa2);
+    font-size: 12.5px;
+}
+
+/* ── Action footer ── */
+.penjualan-action-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--c-border-soft, #e7edea);
+    background: #fafdf9;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .penjualan-hero,
+    .penjualan-new-hero {
+        padding: 20px 16px 16px 16px;
+    }
+
+    .penjualan-hero-title,
+    .penjualan-new-title {
+        font-size: 22px;
+    }
+
+    .penjualan-section,
+    .penjualan-form-section {
+        padding: 0 16px 20px;
+    }
+
+    .penjualan-form-section {
+        margin: 0 16px 20px;
+    }
+
+    .penjualan-section-divider {
+        margin: 4px 16px 0;
+    }
+
+    .penjualan-action-footer {
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .penjualan-hero-right,
+    .penjualan-new-hero-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .penjualan-action-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+}

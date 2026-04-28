@@ -1,0 +1,84 @@
+/* =========================================================
+   Skeleton Table — shimmer loader
+   ========================================================= */
+.skeleton-table-wrapper {
+    background: var(--c-surface);
+    border-radius: var(--r-xl);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--sh-sm);
+    overflow: hidden;
+    width: 100%;
+}
+
+.skeleton-table {
+    width: 100%;
+}
+
+.skeleton-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--c-border-soft);
+    gap: 18px;
+}
+
+.skeleton-row:last-child {
+    border-bottom: none;
+}
+
+.skeleton-header {
+    background: var(--c-surface-soft);
+    border-bottom: 1px solid var(--c-border);
+}
+
+.skeleton-cell {
+    flex: 1;
+    min-width: 0;
+}
+
+.skeleton-cell:first-child {
+    flex: 0 0 48px;
+}
+
+.skeleton-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(110deg, #e6efea 30%, #f3f8f5 50%, #e6efea 70%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-bar {
+    height: 12px;
+    border-radius: var(--r-xs);
+    background: linear-gradient(110deg, #e6efea 30%, #f3f8f5 50%, #e6efea 70%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-bar--header {
+    height: 10px;
+    width: 55%;
+    background: linear-gradient(110deg, #d7e4dc 30%, #e6efea 50%, #d7e4dc 70%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-row:nth-child(2) .skeleton-bar,
+.skeleton-row:nth-child(2) .skeleton-avatar { animation-delay: 0.1s; }
+.skeleton-row:nth-child(3) .skeleton-bar,
+.skeleton-row:nth-child(3) .skeleton-avatar { animation-delay: 0.2s; }
+.skeleton-row:nth-child(4) .skeleton-bar,
+.skeleton-row:nth-child(4) .skeleton-avatar { animation-delay: 0.3s; }
+.skeleton-row:nth-child(5) .skeleton-bar,
+.skeleton-row:nth-child(5) .skeleton-avatar { animation-delay: 0.4s; }
+.skeleton-row:nth-child(6) .skeleton-bar,
+.skeleton-row:nth-child(6) .skeleton-avatar { animation-delay: 0.5s; }
+.skeleton-row:nth-child(7) .skeleton-bar,
+.skeleton-row:nth-child(7) .skeleton-avatar { animation-delay: 0.6s; }
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

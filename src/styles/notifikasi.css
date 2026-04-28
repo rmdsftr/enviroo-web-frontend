@@ -1,0 +1,286 @@
+/* =========================================================
+   Notifikasi Page
+   Palette: #013236 (dark) · #4EA771 (green) · #94DF0C (lime)
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --n-dark:   #013236;
+    --n-green:  #4EA771;
+    --n-lime:   #94DF0C;
+    --n-bg:     #f2f6f4;
+    --n-white:  #ffffff;
+    --n-muted:  #6b9080;
+    --n-border: rgba(1,50,54,0.08);
+}
+
+/* ── Page Shell ── */
+.notif-page {
+    padding: 24px 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 100vh;
+    background: var(--n-bg);
+    font-family: 'Poppins', sans-serif;
+    animation: notifFadeIn 0.35s ease both;
+}
+
+@keyframes notifFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+/* =========================================================
+   FILTER CHIPS  (matches reference image)
+   ========================================================= */
+.notif-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.notif-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #7a9e8a;
+    background: #e4ece7;
+    border: none;
+    border-radius: 50px;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.notif-chip:hover {
+    background: #d5e6db;
+    color: var(--n-dark);
+}
+
+.notif-chip.active {
+    background: var(--n-lime);
+    color: var(--n-dark);
+    box-shadow: 0 4px 14px rgba(148,223,12,0.35);
+}
+
+/* unread count in chip */
+.notif-chip-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--n-dark);
+    color: var(--n-lime);
+    border-radius: 20px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+}
+
+.notif-chip.active .notif-chip-badge {
+    background: var(--n-dark);
+    color: var(--n-lime);
+}
+
+
+/* =========================================================
+   NOTIFICATION LIST
+   ========================================================= */
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--n-white);
+    border-radius: 18px;
+    border: 1px solid var(--n-border);
+    box-shadow: 0 2px 14px rgba(1,50,54,0.05);
+    overflow: hidden;
+}
+
+
+/* ── Single Item ── */
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--n-border);
+    background: var(--n-white);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    position: relative;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item:hover {
+    background: rgba(1,50,54,0.02);
+}
+
+.notif-item.unread {
+    background: rgba(148,223,12,0.04);
+}
+
+.notif-item.unread:hover {
+    background: rgba(148,223,12,0.08);
+}
+
+
+/* ── Icon wrap ── */
+.notif-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.notif-icon-sistem {
+    background: rgba(2,132,199,0.1);
+    color: #0284c7;
+}
+
+.notif-icon-aktivitas {
+    background: rgba(78,167,113,0.12);
+    color: var(--n-green);
+}
+
+.notif-icon-peringatan {
+    background: rgba(234,88,12,0.1);
+    color: #ea580c;
+}
+
+
+/* ── Content ── */
+.notif-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notif-content-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.notif-judul {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--n-dark);
+    line-height: 1.3;
+}
+
+/* Small category tag */
+.notif-kategori-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.notif-cat-sistem {
+    background: rgba(2,132,199,0.1);
+    color: #0369a1;
+}
+
+.notif-cat-aktivitas {
+    background: rgba(78,167,113,0.12);
+    color: #166534;
+}
+
+.notif-cat-peringatan {
+    background: rgba(234,88,12,0.1);
+    color: #c2410c;
+}
+
+.notif-pesan {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--n-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.notif-waktu {
+    font-size: 11px;
+    font-weight: 500;
+    color: #a3bfb0;
+    margin-top: 2px;
+}
+
+
+/* ── Unread dot ── */
+.notif-unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--n-lime);
+    box-shadow: 0 0 0 2px rgba(148,223,12,0.25);
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+
+/* ── Empty State ── */
+.notif-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 80px 0;
+    color: #a3bfb0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notif-empty svg {
+    font-size: 40px;
+    opacity: 0.35;
+    color: var(--n-lime);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .notif-page { padding: 16px 16px 36px; }
+
+    .notif-header { flex-direction: column; align-items: flex-start; }
+    .notif-mark-all-btn { width: 100%; justify-content: center; }
+
+    .notif-filters { gap: 8px; }
+    .notif-chip { font-size: 10.5px; padding: 8px 16px; }
+
+    .notif-item { padding: 14px 16px; gap: 12px; }
+    .notif-icon-wrap { width: 36px; height: 36px; font-size: 13px; }
+    .notif-judul { font-size: 12.5px; }
+    .notif-pesan { font-size: 11.5px; }
+}

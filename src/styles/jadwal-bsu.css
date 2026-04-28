@@ -1,0 +1,815 @@
+/* =========================================================
+   Jadwal BSU — Dedicated Schedule Dashboard
+   ========================================================= */
+
+.jbsu {
+    padding: 0 24px 40px;
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    animation: jbsuFadeIn 0.4s ease both;
+}
+
+@keyframes jbsuFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.jbsu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.jbsu-header-left h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #013236;
+    margin: 0;
+}
+
+.jbsu-header-left p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 4px 0 0;
+}
+
+
+/* ── Main Grid: Calendar Left + Schedule Right ── */
+.jbsu-main-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .jbsu-main-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Shared Card ── */
+.jbsu-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px 24px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 14px rgba(1, 50, 54, 0.05);
+}
+
+.jbsu-card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.jbsu-card-title-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.jbsu-card-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+.jbsu-calendar {
+    background: #013236;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 6px 20px rgba(1, 50, 54, 0.2);
+}
+
+.jbsu-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.jbsu-cal-header h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.jbsu-cal-header button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94DF0C;
+    padding: 5px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.jbsu-cal-header button:hover {
+    background: rgba(148, 223, 12, 0.15);
+}
+
+.jbsu-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.jbsu-cal-dayname {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #4EA771;
+    margin-bottom: 6px;
+}
+
+.jbsu-cal-day {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    padding: 8px 0 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.jbsu-cal-day:hover:not(.empty) {
+    background: rgba(148, 223, 12, 0.18);
+    color: #94DF0C;
+}
+
+.jbsu-cal-day.empty { visibility: hidden; pointer-events: none; }
+
+.jbsu-cal-day.today {
+    font-weight: 700;
+    color: #94DF0C;
+    border: 1px dashed rgba(148, 223, 12, 0.5);
+}
+
+.jbsu-cal-day.selected {
+    background: #94DF0C;
+    color: #013236;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(148, 223, 12, 0.35);
+}
+
+.jbsu-cal-dots {
+    display: flex;
+    gap: 3px;
+    height: 4px;
+}
+
+.jbsu-cal-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+.jbsu-cal-dot.penimbangan { background: #94DF0C; }
+.jbsu-cal-dot.pengangkutan { background: #f59e0b; }
+
+.jbsu-cal-day.selected .jbsu-cal-dot.penimbangan { background: #013236; }
+.jbsu-cal-day.selected .jbsu-cal-dot.pengangkutan { background: #7c4700; }
+
+/* ── Selected date detail (below calendar) ── */
+.jbsu-selected-detail {
+    background: #4EA771;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 16px rgba(78, 167, 113, 0.25);
+}
+
+.jbsu-sel-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.jbsu-sel-icon {
+    color: #ffffff;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.jbsu-sel-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.jbsu-sel-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: rgba(255,255,255,0.75);
+    margin: 2px 0 0;
+}
+
+.jbsu-sel-empty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    text-align: center;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.jbsu-sel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.jbsu-sel-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.jbsu-sel-item-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #013236;
+    background: rgba(255,255,255,0.85);
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.jbsu-sel-item-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jbsu-sel-item-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.jbsu-sel-item-badge.penimbangan {
+    background: rgba(148, 223, 12, 0.25);
+    color: #dfffab;
+}
+
+.jbsu-sel-item-badge.pengangkutan {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fde68a;
+}
+
+/* =========================================================
+   RIGHT COLUMN — Stacked sections
+   ========================================================= */
+.jbsu-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* ── Section Header Row ── */
+.jbsu-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.jbsu-section-header-right {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+/* ── Jadwal List (shared for penimbangan & pengangkutan) ── */
+.jbsu-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.jbsu-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(1, 50, 54, 0.07);
+    transition: all 0.15s;
+    background: #fff;
+}
+
+.jbsu-row:hover {
+    border-color: rgba(1, 50, 54, 0.12);
+    box-shadow: 0 2px 8px rgba(1, 50, 54, 0.04);
+}
+
+.jbsu-row-day {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #013236;
+    min-width: 60px;
+}
+
+.jbsu-row-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #4EA771;
+    min-width: 100px;
+}
+
+.jbsu-row-week {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #94a3b8;
+    flex: 1;
+}
+
+.jbsu-row-note {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #5a7a68;
+    flex: 1;
+    font-style: italic;
+}
+
+.jbsu-row-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.jbsu-row-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.jbsu-row-btn.edit {
+    background: rgba(78, 167, 113, 0.1);
+    color: #4EA771;
+}
+.jbsu-row-btn.edit:hover {
+    background: #4EA771;
+    color: #fff;
+}
+
+.jbsu-row-btn.delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+.jbsu-row-btn.delete:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.jbsu-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 28px 0;
+    color: #a3bfb0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+}
+
+/* ── Type Badge (small inline) ── */
+.jbsu-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+}
+
+.jbsu-badge.insidental {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+/* =========================================================
+   RIWAYAT SECTION
+   ========================================================= */
+
+/* ── 2-column grid untuk 2 card riwayat sejajar ── */
+.jbsu-riwayat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .jbsu-riwayat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Row accent untuk pengangkutan ── */
+.jbsu-riwayat-row.angkut .jbsu-riwayat-time {
+    color: #d97706;
+}
+
+/* ── Filter btn variant untuk pengangkutan ── */
+.jbsu-filter-btn.angkut.active {
+    background: #f59e0b;
+    color: #fff;
+    border-color: #f59e0b;
+}
+
+.jbsu-filter-btn.angkut:hover:not(.active) {
+    border-color: #f59e0b;
+    color: #d97706;
+}
+
+.jbsu-riwayat-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.jbsu-filter-btn {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(1, 50, 54, 0.1);
+    background: #fff;
+    color: #5a7a68;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.jbsu-filter-btn.active {
+    background: #013236;
+    color: #94DF0C;
+    border-color: #013236;
+}
+
+.jbsu-filter-btn:hover:not(.active) {
+    border-color: #4EA771;
+    color: #4EA771;
+}
+
+.jbsu-riwayat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.jbsu-riwayat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(1, 50, 54, 0.07);
+    background: #fff;
+}
+
+.jbsu-riwayat-date {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #013236;
+    min-width: 90px;
+}
+
+.jbsu-riwayat-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #5a7a68;
+    min-width: 100px;
+}
+
+.jbsu-riwayat-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+    flex: 1;
+}
+
+.jbsu-status-pill {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.jbsu-status-pill.selesai {
+    background: rgba(78, 167, 113, 0.12);
+    color: #4EA771;
+}
+.jbsu-status-pill.berlangsung {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+.jbsu-status-pill.dibatalkan {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+.jbsu-status-pill.mendatang {
+    background: rgba(1, 50, 54, 0.06);
+    color: #94a3b8;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .jbsu {
+        padding: 0 16px 24px;
+    }
+
+    .jbsu-card {
+        padding: 16px;
+    }
+
+    .jbsu-row {
+        flex-wrap: wrap;
+    }
+
+    .jbsu-riwayat-row {
+        flex-wrap: wrap;
+    }
+
+}
+
+/* =========================================================
+   JADWAL MODAL
+   ========================================================= */
+.jmodal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: jmodalOverlayIn 0.2s ease both;
+}
+
+@keyframes jmodalOverlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.jmodal-box {
+    background: #ffffff;
+    border-radius: 22px;
+    width: 100%;
+    max-width: 480px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(1, 50, 54, 0.25);
+    animation: jmodalBoxIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes jmodalBoxIn {
+    from { opacity: 0; transform: scale(0.92) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.jmodal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.jmodal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #013236;
+    margin: 0;
+}
+
+.jmodal-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #7a9e8a;
+    margin: 3px 0 0;
+}
+
+.jmodal-close {
+    background: rgba(1, 50, 54, 0.07);
+    border: none;
+    border-radius: 9px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #013236;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.jmodal-close:hover { background: rgba(1, 50, 54, 0.12); }
+
+/* Toggle */
+.jmodal-type-toggle {
+    display: flex;
+    background: rgba(1, 50, 54, 0.06);
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+}
+
+.jmodal-type-btn {
+    flex: 1;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #5a7a68;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.jmodal-type-btn.active {
+    background: #013236;
+    color: #94DF0C;
+    box-shadow: 0 2px 8px rgba(1, 50, 54, 0.2);
+}
+
+/* Toggle */
+.jmodal-type-toggle {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+}
+
+.jmodal-type-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    padding: 7px 0;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jmodal-type-btn:hover {
+    color: #013236;
+}
+
+.jmodal-type-btn.active {
+    background: #ffffff;
+    color: #013236;
+    box-shadow: 0 3px 8px rgba(1, 50, 54, 0.08);
+}
+
+/* Form layout */
+.jmodal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.jmodal-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.jmodal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.jmodal-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+}
+
+/* Neutral input override for the form fields */
+.jmodal-field .input-wrapper {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d9d4 !important;
+}
+
+.jmodal-field .input-wrapper:focus-within {
+    border-color: transparent !important;
+}
+
+.jmodal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(1, 50, 54, 0.07);
+}
+
+.jmodal-error {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    margin: 0;
+}
+
+.jmodal-type-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

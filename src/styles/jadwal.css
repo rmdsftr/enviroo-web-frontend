@@ -1,0 +1,830 @@
+/* =========================================================
+   Jadwal Page — 3-Section Schedule Dashboard
+   ========================================================= */
+
+.jadwal-page {
+    padding: 0 24px 32px;
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: jadwalFadeIn 0.4s ease both;
+}
+
+@keyframes jadwalFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page Header / Tabs ── */
+.jadwal-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+
+/* =========================================================
+   TOP GRID: Section 1 (timeline) + Section 3 (calendar)
+   ========================================================= */
+.jadwal-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 310px;
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .jadwal-top-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ── Shared Card ── */
+.jadwal-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px 24px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 14px rgba(1, 50, 54, 0.05);
+}
+
+.jadwal-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.jadwal-card-header-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.bsi-bg { background: #013236; }
+.bsm-bg { background: #0284c7; }
+.bsu-bg { background: #ea580c; }
+
+.jadwal-card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.jadwal-card-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+}
+
+
+/* =========================================================
+   SECTION 1 — Today's Hourly Timeline
+   ========================================================= */
+.jadwal-today-section {
+    overflow: hidden;
+}
+
+.jadwal-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.jadwal-tl-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    min-height: 36px;
+    transition: background 0.15s;
+}
+
+.jadwal-tl-row.has-items {
+    min-height: 54px;
+    padding: 6px 0;
+}
+
+.jadwal-tl-row:not(:last-child) {
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+.jadwal-tl-hour {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    width: 48px;
+    flex-shrink: 0;
+    padding-top: 10px;
+}
+
+.jadwal-tl-line {
+    width: 1px;
+    min-height: 36px;
+    background: rgba(1, 50, 54, 0.08);
+    flex-shrink: 0;
+    margin-right: 14px;
+    align-self: stretch;
+}
+
+.jadwal-tl-content {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 0;
+    align-content: center;
+}
+
+/* Timeline chips */
+.jadwal-tl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    cursor: default;
+}
+
+.jadwal-tl-chip.bt-bsi { background: #013236; }
+.jadwal-tl-chip.bt-bsm { background: #0284c7; }
+.jadwal-tl-chip.bt-bsu { background: #ea580c; }
+
+.jadwal-tl-chip-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+.jadwal-tl-chip-time {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+}
+
+/* Status dot */
+.jadwal-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.jadwal-status-dot.st-menunggu      { background: #94a3b8; }
+.jadwal-status-dot.st-menuju_lokasi { background: #3b82f6; }
+.jadwal-status-dot.st-berlangsung   { background: #f59e0b; }
+.jadwal-status-dot.st-selesai       { background: #4EA771; }
+.jadwal-status-dot.st-dibatalkan    { background: #ef4444; }
+.jadwal-status-dot.st-tertunda      { background: #a855f7; }
+
+.jadwal-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 0;
+    color: #a3bfb0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SECTION 3 — Right Column: Calendar + Date Detail
+   ========================================================= */
+.jadwal-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Calendar ── */
+.jadwal-calendar-container {
+    background: #013236;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(1, 50, 54, 0.2);
+}
+
+.jadwal-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.jadwal-calendar-header h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.jadwal-calendar-header button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #94DF0C;
+    padding: 5px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+    font-size: 12px;
+}
+
+.jadwal-calendar-header button:hover {
+    background: rgba(148, 223, 12, 0.15);
+}
+
+.jadwal-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.jadwal-calendar-day-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #4EA771;
+    margin-bottom: 6px;
+}
+
+.jadwal-calendar-day {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    padding: 7px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.jadwal-calendar-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #94DF0C;
+    position: absolute;
+    bottom: 5px;
+}
+
+.jadwal-calendar-day.selected .jadwal-calendar-dot {
+    background: #013236;
+}
+
+.jadwal-calendar-day:hover:not(.empty) {
+    background: rgba(148, 223, 12, 0.18);
+    color: #94DF0C;
+}
+
+.jadwal-calendar-day.empty {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.jadwal-calendar-day.today {
+    font-weight: 700;
+    color: #94DF0C;
+    border: 1px dashed rgba(148, 223, 12, 0.5);
+}
+
+.jadwal-calendar-day.selected {
+    background: #94DF0C;
+    color: #013236;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(148, 223, 12, 0.35);
+}
+
+/* ── Date Detail ── */
+.jadwal-date-detail {
+    background: #4EA771;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 16px rgba(78, 167, 113, 0.25);
+}
+
+.jadwal-date-detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.jadwal-date-icon {
+    color: #ffffff;
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.jadwal-date-detail-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.jadwal-date-detail-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    margin: 2px 0 0;
+}
+
+.jadwal-date-empty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    text-align: center;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.jadwal-date-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.jadwal-date-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.jadwal-date-item-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #013236;
+    background: rgba(255,255,255,0.85);
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.jadwal-date-item-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   SECTION 2 — Weekly Grid
+   ========================================================= */
+.jadwal-weekly-section {
+    position: relative;
+}
+
+.jadwal-legend {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+}
+
+.jadwal-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5a7a68;
+}
+
+.jadwal-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.jadwal-legend-dot.bt-bsi { background: #013236; }
+.jadwal-legend-dot.bt-bsm { background: #0284c7; }
+.jadwal-legend-dot.bt-bsu { background: #ea580c; }
+
+.jadwal-weekly-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.jadwal-day-row {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+    min-height: 52px;
+}
+
+.jadwal-day-row:last-child { border-bottom: none; }
+
+.jadwal-day-row.today {
+    background: rgba(148, 223, 12, 0.04);
+    border-radius: 10px;
+}
+
+.jadwal-day-label {
+    width: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 0 14px 4px;
+}
+
+.jadwal-day-label-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #013236;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jadwal-day-row.today .jadwal-day-label-text { color: #4EA771; font-weight: 700; }
+
+.jadwal-day-today-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #94DF0C;
+    box-shadow: 0 0 0 3px rgba(148,223,12,0.2);
+    flex-shrink: 0;
+}
+
+.jadwal-day-items {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 0;
+    align-items: center;
+    align-content: center;
+}
+
+.jadwal-day-empty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 400;
+    color: #a3bfb0;
+    font-style: italic;
+}
+
+/* Weekly chips — colored by bank type */
+.jadwal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    border: 1.5px solid transparent;
+    transition: all 0.15s ease;
+    cursor: default;
+}
+
+.jadwal-chip.bt-bsi {
+    background: rgba(1,50,54,0.07);
+    border-color: rgba(1,50,54,0.2);
+}
+.jadwal-chip.bt-bsm {
+    background: rgba(2,132,199,0.07);
+    border-color: rgba(2,132,199,0.2);
+}
+.jadwal-chip.bt-bsu {
+    background: rgba(234,88,12,0.07);
+    border-color: rgba(234,88,12,0.2);
+}
+
+.jadwal-chip:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+.jadwal-chip-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.jadwal-chip.bt-bsi .jadwal-chip-name { color: #013236; }
+.jadwal-chip.bt-bsm .jadwal-chip-name { color: #0369a1; }
+.jadwal-chip.bt-bsu .jadwal-chip-name { color: #c2410c; }
+
+.jadwal-chip-divider {
+    width: 1px;
+    height: 12px;
+    background: currentColor;
+    opacity: 0.15;
+    flex-shrink: 0;
+}
+
+.jadwal-chip-time {
+    font-size: 11px;
+    font-weight: 500;
+    color: #7a9e8a;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .jadwal-page {
+        padding: 0 16px 24px;
+    }
+
+    .jadwal-card {
+        padding: 16px;
+    }
+
+    .jadwal-day-row {
+        flex-direction: column;
+    }
+
+    .jadwal-day-label {
+        width: auto;
+        padding: 10px 0 4px;
+    }
+
+    .jadwal-day-items {
+        padding: 4px 0 12px;
+    }
+
+    .jadwal-legend {
+        display: none;
+    }
+
+    .jadwal-tabs {
+        align-self: stretch;
+    }
+
+    .jadwal-tab {
+        flex: 1;
+        justify-content: center;
+    }
+}
+/* =========================================================
+   JADWAL MODAL & ACTIONS
+   ========================================================= */
+
+.jadwal-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(1, 50, 54, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: jadwalModalFadeIn 0.3s ease both;
+}
+
+@keyframes jadwalModalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.jadwal-modal {
+    background: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(1, 50, 54, 0.15);
+    overflow: hidden;
+    animation: jadwalModalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes jadwalModalScale {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.jadwal-modal-header {
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+.jadwal-modal-title-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.jadwal-modal-icon-bg {
+    width: 42px;
+    height: 42px;
+    background: #94DF0C;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #013236;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(148, 223, 12, 0.3);
+}
+
+.jadwal-modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.jadwal-modal-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #7a9e8a;
+    margin: 4px 0 0;
+}
+
+.jadwal-modal-body {
+    padding: 24px 28px;
+}
+
+.jadwal-mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: rgba(1, 50, 54, 0.04);
+    padding: 6px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+}
+
+.jadwal-mode-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #5a7a68;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.jadwal-mode-btn.active {
+    background: #ffffff;
+    color: #4EA771;
+    box-shadow: 0 2px 8px rgba(1, 50, 54, 0.06);
+}
+
+.jadwal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.jadwal-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.jadwal-label {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+    margin-bottom: 8px;
+}
+
+.jadwal-textarea {
+    width: 100%;
+    border: 1.5px solid rgba(1, 50, 54, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    resize: none;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.jadwal-textarea:focus {
+    border-color: #4EA771;
+    box-shadow: 0 0 0 4px rgba(78, 167, 113, 0.1);
+}
+
+.jadwal-modal-footer {
+    padding: 20px 28px 28px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Actions in schedule rows */
+.jadwal-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+}
+
+.jadwal-btn-action {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.jadwal-btn-edit {
+    background: rgba(78, 167, 113, 0.1);
+    color: #4EA771;
+}
+.jadwal-btn-edit:hover {
+    background: #4EA771;
+    color: #ffffff;
+}
+
+.jadwal-btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+.jadwal-btn-delete:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.jadwal-btn-tambah {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #94DF0C;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(148, 223, 12, 0.4);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.jadwal-btn-tambah:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(148, 223, 12, 0.5);
+}
+
+@media (max-width: 500px) {
+    .jadwal-modal {
+        border-radius: 24px 24px 0 0;
+        position: absolute;
+        bottom: 0;
+    }
+}

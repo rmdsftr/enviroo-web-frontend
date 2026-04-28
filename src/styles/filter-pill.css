@@ -1,0 +1,46 @@
+/* =========================================================
+   Filter Pill — Segmented Control
+   ========================================================= */
+.n-filter-pills {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.n-filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-pill);
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    cursor: pointer;
+    transition: background-color var(--t-base), color var(--t-base),
+        border-color var(--t-base), box-shadow var(--t-base),
+        transform var(--t-base);
+    user-select: none;
+}
+
+.n-filter-pill:hover {
+    border-color: var(--c-border-strong);
+    color: var(--c-text);
+    background: var(--c-surface-soft);
+}
+
+.n-filter-pill.active {
+    background: var(--c-primary-100);
+    border-color: var(--c-primary);
+    color: var(--c-primary-700);
+    box-shadow: 0 2px 8px rgba(78, 167, 113, 0.12);
+}
+
+.n-filter-pill-check {
+    font-size: 10px;
+    color: var(--c-primary);
+}

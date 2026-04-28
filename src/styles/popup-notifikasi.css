@@ -1,0 +1,104 @@
+/* =========================================================
+   Popup Notifikasi — Toast
+   ========================================================= */
+.popup-notifikasi-overlay {
+    position: fixed;
+    top: 1.5rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 9999;
+    padding: 0 16px;
+}
+
+.popup-notifikasi-container {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-left: 4px solid var(--c-primary);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    padding: 12px 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 480px;
+    pointer-events: auto;
+    animation: notifSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.popup-notifikasi-container.closing {
+    animation: notifSlideOut 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+@keyframes notifSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes notifSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.96);
+    }
+}
+
+.notif-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.notif-message {
+    font-family: var(--ff-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* ── Variants ── */
+.popup-notifikasi-container.notif-success {
+    border-left-color: var(--c-primary);
+    background: linear-gradient(90deg, var(--c-primary-50), var(--c-surface) 60%);
+}
+.notif-success .notif-icon {
+    color: var(--c-primary);
+}
+
+.popup-notifikasi-container.notif-error {
+    border-left-color: var(--c-danger);
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), var(--c-surface) 60%);
+}
+.notif-error .notif-icon {
+    color: var(--c-danger);
+}
+
+.popup-notifikasi-container.notif-warning {
+    border-left-color: var(--c-warning);
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.10), var(--c-surface) 60%);
+}
+.notif-warning .notif-icon {
+    color: var(--c-warning-600);
+}
+
+.popup-notifikasi-container.notif-info {
+    border-left-color: var(--c-info);
+    background: linear-gradient(90deg, rgba(14, 165, 233, 0.10), var(--c-surface) 60%);
+}
+.notif-info .notif-icon {
+    color: var(--c-info);
+}

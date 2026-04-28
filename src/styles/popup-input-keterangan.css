@@ -1,0 +1,67 @@
+/* =========================================================
+   Popup Input Keterangan
+   ========================================================= */
+.popup-container--keterangan {
+    text-align: left;
+    align-items: stretch;
+    max-width: 460px;
+    padding: 28px;
+}
+
+.popup-container--keterangan .popup-title {
+    text-align: left;
+    margin-bottom: 6px;
+}
+
+.popup-message--tight {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.popup-keterangan-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.popup-keterangan-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: var(--r-lg);
+    border: 1.5px solid var(--c-border);
+    outline: none;
+    font-family: var(--ff-sans);
+    font-size: 13px;
+    color: var(--c-text);
+    background: var(--c-surface-soft);
+    resize: none;
+    transition: border-color var(--t-base), box-shadow var(--t-base),
+        background-color var(--t-base);
+    line-height: 1.5;
+}
+
+.popup-keterangan-textarea::placeholder {
+    color: var(--c-text-subtle);
+}
+
+.popup-keterangan-textarea:hover {
+    border-color: var(--c-border-strong);
+}
+
+.popup-keterangan-textarea:focus {
+    border-color: var(--c-primary);
+    box-shadow: var(--sh-focus);
+    background: var(--c-surface);
+}
+
+.popup-overlay--top {
+    z-index: 10000;
+}
+
+.popup-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
+}

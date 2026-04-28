@@ -1,0 +1,84 @@
+/* =========================================================
+   Enviroo Design Tokens
+   Single source of truth for colors, radii, shadows, spacing
+   ========================================================= */
+
+:root {
+    /* ── Brand Palette ── */
+    --c-primary: #4EA771;          /* Green */
+    --c-primary-600: #3d8a5c;
+    --c-primary-700: #2e7d50;
+    --c-primary-800: #1a5c35;
+    --c-primary-50: #f0faf4;
+    --c-primary-100: #eaf8e7;
+    --c-primary-200: #d6f0d3;
+
+    --c-secondary: #013236;        /* Dark Teal */
+    --c-secondary-700: #014d45;
+    --c-secondary-900: #011618;
+
+    --c-accent: #94DF0C;           /* Neon Lime */
+    --c-accent-600: #7bc40a;
+    --c-accent-700: #6aab08;
+
+    /* ── Neutrals (on light bg) ── */
+    --c-surface: #ffffff;
+    --c-surface-soft: #f8fbf9;
+    --c-surface-muted: #f4faf6;
+    --c-bg: #f5f8f6;
+
+    --c-border: #e2eeea;
+    --c-border-soft: #eef4f1;
+    --c-border-strong: #c9dcd1;
+
+    --c-text: #013236;             /* Primary text */
+    --c-text-soft: #3d5a48;        /* Secondary text */
+    --c-text-muted: #6b9080;       /* Muted / caption */
+    --c-text-subtle: #8aab97;      /* Placeholder / label */
+    --c-text-faint: #b0c9bc;       /* Very muted */
+
+    /* ── Feedback Colors ── */
+    --c-success: #4EA771;
+    --c-success-bg: rgba(78, 167, 113, 0.12);
+
+    --c-danger: #ef4444;
+    --c-danger-600: #dc2626;
+    --c-danger-700: #b91c1c;
+    --c-danger-bg: rgba(239, 68, 68, 0.10);
+
+    --c-warning: #f59e0b;
+    --c-warning-600: #d97706;
+    --c-warning-700: #92400e;
+    --c-warning-bg: rgba(245, 158, 11, 0.12);
+
+    --c-info: #0ea5e9;
+    --c-info-bg: rgba(14, 165, 233, 0.10);
+
+    /* ── Radii ── */
+    --r-xs: 6px;
+    --r-sm: 8px;
+    --r-md: 10px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-2xl: 20px;
+    --r-3xl: 24px;
+    --r-pill: 999px;
+
+    /* ── Elevation (shadows) ── */
+    --sh-xs: 0 1px 2px rgba(1, 50, 54, 0.04);
+    --sh-sm: 0 2px 8px rgba(1, 50, 54, 0.05);
+    --sh-md: 0 4px 14px rgba(1, 50, 54, 0.07);
+    --sh-lg: 0 10px 28px rgba(1, 50, 54, 0.10);
+    --sh-xl: 0 20px 48px rgba(1, 50, 54, 0.14);
+    --sh-focus: 0 0 0 3px rgba(78, 167, 113, 0.18);
+    --sh-focus-accent: 0 0 0 3px rgba(148, 223, 12, 0.25);
+
+    /* ── Transitions ── */
+    --t-fast: 0.15s ease;
+    --t-base: 0.2s ease;
+    --t-slow: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ── Typography ── */
+    --ff-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --ff-mono: 'Google Sans Code', ui-monospace, SFMono-Regular, Menlo, monospace;
+}

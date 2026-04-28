@@ -1,0 +1,249 @@
+/* =========================================================
+   Sidebar
+   ========================================================= */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 220px;
+    background: linear-gradient(165deg, #012b2f 0%, #011618 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0 24px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.18);
+}
+
+/* Subtle brand accent glow */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(148, 223, 12, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(78, 167, 113, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ── Profile ── */
+.profil {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px 28px;
+    text-align: center;
+    position: relative;
+}
+
+.foto-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.foto {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--c-accent), var(--c-primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 3px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35),
+        0 0 0 3px rgba(148, 223, 12, 0.15);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.foto:hover {
+    transform: scale(1.06) rotate(-3deg);
+}
+
+.foto img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #ffffff;
+}
+
+.bank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bank-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+    line-height: 1.25;
+}
+
+.bank-type {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--c-accent);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    opacity: 0.9;
+}
+
+/* ── Divider ── */
+.line {
+    width: 80%;
+    margin: 0 auto 22px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    flex-shrink: 0;
+}
+
+/* ── Menu ── */
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    padding: 0 12px;
+    position: relative;
+}
+
+.menu::-webkit-scrollbar {
+    display: none;
+}
+
+/* ── Menu Item ── */
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background-color var(--t-base), color var(--t-base),
+        transform var(--t-base), box-shadow var(--t-base);
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    outline: none;
+}
+
+.item:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+}
+
+.item:focus-visible {
+    box-shadow: 0 0 0 2px rgba(148, 223, 12, 0.5);
+}
+
+.item.active {
+    background: var(--c-accent);
+    color: var(--c-secondary-900);
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(148, 223, 12, 0.25);
+}
+
+.item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--c-secondary-900);
+    border-radius: 0 3px 3px 0;
+    opacity: 0.5;
+}
+
+.item-icon {
+    font-size: 15px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    transition: transform var(--t-base);
+}
+
+.item:hover .item-icon {
+    transform: scale(1.1);
+}
+
+.item-label {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ── Mobile Hamburger ── */
+.mobile-toggle {
+    display: inline-flex;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 42px;
+    height: 42px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-primary);
+    font-size: 18px;
+    z-index: 1002;
+    box-shadow: var(--sh-sm);
+    transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+.mobile-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: var(--sh-md);
+}
+
+/* ── Overlay (mobile) ── */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 22, 24, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 999;
+}
+
+.sidebar.hidden {
+    display: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .sidebar {
+        z-index: 1001;
+    }
+}

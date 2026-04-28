@@ -1,0 +1,226 @@
+/* =========================================================
+   Stats Card Grid
+   ========================================================= */
+.statistik {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    padding: 0 24px 20px 24px;
+}
+
+/* ── Stat Card Base ── */
+.stat-card {
+    background: var(--c-surface);
+    border-radius: var(--r-xl);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--c-border);
+    box-shadow: var(--sh-xs);
+    transition: transform var(--t-base), box-shadow var(--t-base),
+        border-color var(--t-base);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, currentColor 0%, transparent 60%);
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sh-md);
+}
+
+.stat-card--clickable {
+    cursor: pointer;
+}
+
+.stat-card--clickable:active {
+    transform: translateY(-1px) scale(0.99);
+}
+
+/* ── Top row: icon + badge ── */
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ── Icon badge ── */
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-lg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: transform var(--t-base);
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.08) rotate(-4deg);
+}
+
+/* ── Badge ── */
+.stat-badge {
+    font-family: var(--ff-sans);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--r-pill);
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+}
+
+/* ── Body ── */
+.stat-number-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.stat-number {
+    font-family: var(--ff-sans);
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: var(--c-text);
+}
+
+.stat-satuan {
+    font-family: var(--ff-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--c-text-subtle);
+}
+
+.stat-status {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 4px;
+}
+
+.stat-desc {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--c-text-subtle);
+    line-height: 1.5;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Variant: default (Total) ── */
+.stat-card--default {
+    color: var(--c-primary);
+}
+.stat-card--default .stat-icon {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+.stat-card--default .stat-badge {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+.stat-card--default .stat-status {
+    color: var(--c-text-muted);
+}
+
+/* ── Variant: success (Aktif) ── */
+.stat-card--success {
+    color: var(--c-primary);
+}
+.stat-card--success .stat-icon {
+    background: linear-gradient(135deg, var(--c-primary-100), var(--c-primary-50));
+    color: var(--c-primary);
+}
+.stat-card--success .stat-badge {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+.stat-card--success .stat-status {
+    color: var(--c-primary);
+}
+
+/* ── Variant: danger (Nonaktif) ── */
+.stat-card--danger {
+    color: var(--c-danger);
+}
+.stat-card--danger .stat-icon {
+    background: var(--c-danger-bg);
+    color: var(--c-danger-600);
+}
+.stat-card--danger .stat-badge {
+    background: var(--c-danger-bg);
+    color: var(--c-danger-600);
+}
+.stat-card--danger .stat-status {
+    color: var(--c-danger-600);
+}
+
+/* ── Variant: warning (Pending) ── */
+.stat-card--warning {
+    color: var(--c-warning);
+}
+.stat-card--warning .stat-icon {
+    background: var(--c-warning-bg);
+    color: var(--c-warning-600);
+}
+.stat-card--warning .stat-badge {
+    background: var(--c-warning-bg);
+    color: var(--c-warning-700);
+}
+.stat-card--warning .stat-status {
+    color: var(--c-warning-600);
+}
+
+/* ── Variant: teal (alternate brand) ── */
+.stat-card--teal {
+    color: var(--c-secondary);
+}
+.stat-card--teal .stat-icon {
+    background: rgba(1, 50, 54, 0.08);
+    color: var(--c-secondary);
+}
+.stat-card--teal .stat-badge {
+    background: rgba(1, 50, 54, 0.08);
+    color: var(--c-secondary);
+}
+.stat-card--teal .stat-status {
+    color: var(--c-secondary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .statistik {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .statistik {
+        padding: 0 16px 16px 16px;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 560px) {
+    .statistik {
+        grid-template-columns: 1fr;
+    }
+}

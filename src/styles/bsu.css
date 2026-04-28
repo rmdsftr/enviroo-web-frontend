@@ -1,0 +1,59 @@
+/* =====================
+   BSU Table Section
+   ===================== */
+.bsu-table-section {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Toolbar */
+.bsu-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.bsu-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bsu-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+}
+
+/* Register button */
+.btn-register {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: linear-gradient(135deg, #4EA771, #2e8a57);
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(78, 167, 113, 0.3);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    white-space: nowrap;
+}
+
+.btn-register:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(78, 167, 113, 0.4);
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}

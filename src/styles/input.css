@@ -1,0 +1,164 @@
+/* =========================================================
+   Input Field
+   ========================================================= */
+.input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--ff-sans);
+    color: var(--c-text);
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    transition: border-color var(--t-base), box-shadow var(--t-base),
+        background-color var(--t-base);
+    cursor: text;
+}
+
+.input-wrapper:hover {
+    border-color: var(--c-border-strong);
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--c-primary);
+    box-shadow: var(--sh-focus);
+}
+
+.input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    width: 100%;
+    min-width: 0;
+}
+
+.input-field::placeholder {
+    color: var(--c-text-subtle);
+    font-weight: 400;
+}
+
+/* ── Icon slots ── */
+.input-icon-left,
+.input-icon-right {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text-muted);
+    font-size: 1em;
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+.input-icon-right.input-icon-btn {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: var(--c-text-muted);
+    transition: color var(--t-fast);
+}
+
+.input-icon-right.input-icon-btn:hover {
+    color: var(--c-primary);
+}
+
+.input-wrapper:focus-within .input-icon-left,
+.input-wrapper:focus-within .input-icon-right {
+    color: var(--c-primary);
+}
+
+/* ── Sizes ── */
+.input--small {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: var(--r-sm);
+}
+
+.input--default {
+    padding: 10px 16px;
+    font-size: 12.5px;
+    border-radius: var(--r-md);
+}
+
+.input--large {
+    padding: 14px 20px;
+    font-size: 14px;
+    border-radius: var(--r-lg);
+}
+
+/* ── Solid Variants ── */
+.input--primary.input--solid {
+    background-color: var(--c-primary-50);
+    border-color: transparent;
+    color: var(--c-text);
+}
+.input--primary.input--solid:hover {
+    background-color: var(--c-primary-100);
+}
+.input--primary.input--solid:focus-within {
+    background-color: var(--c-surface);
+    border-color: var(--c-primary);
+}
+
+.input--secondary.input--solid {
+    background-color: var(--c-secondary);
+    border-color: transparent;
+    color: #EAF8E7;
+}
+.input--secondary.input--solid .input-field::placeholder {
+    color: rgba(234, 248, 231, 0.55);
+}
+.input--secondary.input--solid .input-icon-left,
+.input--secondary.input--solid .input-icon-right {
+    color: rgba(234, 248, 231, 0.65);
+}
+.input--secondary.input--solid:focus-within {
+    border-color: var(--c-accent);
+    box-shadow: var(--sh-focus-accent);
+}
+
+.input--tertiary.input--solid {
+    background-color: var(--c-primary-100);
+    border-color: transparent;
+    color: var(--c-primary-800);
+}
+.input--tertiary.input--solid:focus-within {
+    background-color: var(--c-surface);
+    border-color: var(--c-primary);
+}
+
+/* ── Outline Variants ── */
+.input--outline {
+    background: transparent;
+}
+
+.input--primary.input--outline {
+    border-color: var(--c-primary);
+    color: var(--c-text);
+}
+
+.input--secondary.input--outline {
+    border-color: var(--c-secondary);
+    color: var(--c-text);
+}
+
+.input--tertiary.input--outline {
+    border-color: var(--c-primary-200);
+    color: var(--c-text);
+}
+.input--tertiary.input--outline:focus-within {
+    border-color: var(--c-primary);
+}
+
+/* ── Modifiers ── */
+.input--rounded {
+    border-radius: var(--r-pill) !important;
+}
+
+.input--full {
+    width: 100%;
+    display: flex;
+}

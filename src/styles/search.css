@@ -1,0 +1,83 @@
+/* =========================================================
+   Search Bar
+   ========================================================= */
+.searchbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    border-radius: var(--r-pill);
+    padding: 9px 16px;
+    width: 280px;
+    transition: border-color var(--t-base), box-shadow var(--t-base),
+        background-color var(--t-base);
+}
+
+.searchbar:hover {
+    border-color: var(--c-border-strong);
+}
+
+.searchbar:focus-within {
+    border-color: var(--c-primary);
+    box-shadow: var(--sh-focus);
+}
+
+.searchbar-icon {
+    color: var(--c-text-muted);
+    font-size: 13px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    transition: color var(--t-base);
+}
+
+.searchbar:focus-within .searchbar-icon {
+    color: var(--c-primary);
+}
+
+.searchbar-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--ff-sans);
+    font-size: 12.5px;
+    font-weight: 400;
+    color: var(--c-text);
+    min-width: 0;
+}
+
+.searchbar-input::placeholder {
+    color: var(--c-text-subtle);
+}
+
+.searchbar-clear {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--c-text-faint);
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    flex-shrink: 0;
+    transition: color var(--t-base);
+}
+
+.searchbar-clear:hover {
+    color: var(--c-primary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .searchbar {
+        width: 200px;
+    }
+}
+
+@media (max-width: 640px) {
+    .searchbar {
+        width: 100%;
+    }
+}

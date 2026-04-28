@@ -1,0 +1,25 @@
+/* =========================================================
+   Close Button — circular icon button
+   ========================================================= */
+.popup-close-btn {
+    background: var(--c-surface-muted);
+    border: 1px solid var(--c-border);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-text-soft);
+    cursor: pointer;
+    transition: background-color var(--t-base), color var(--t-base),
+        border-color var(--t-base), transform var(--t-base);
+    flex-shrink: 0;
+}
+
+.popup-close-btn:hover {
+    background: var(--c-primary-100);
+    border-color: var(--c-primary);
+    color: var(--c-primary-700);
+    transform: rotate(90deg);
+}

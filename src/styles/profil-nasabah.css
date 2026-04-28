@@ -1,0 +1,466 @@
+/* =========================================================
+   Profil Nasabah — Detail Page
+   ========================================================= */
+
+@keyframes pnFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Outer Card ── */
+.pn-card {
+    margin: 0 24px 24px;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 16px rgba(1, 50, 54, 0.06);
+    overflow: hidden;
+    position: relative;
+    animation: pnFadeIn 0.4s ease both;
+}
+
+/* ── Settings Button ── */
+.pn-settings-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(78, 167, 113, 0.2);
+    background: rgba(78, 167, 113, 0.06);
+    color: #4EA771;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.pn-settings-btn:hover {
+    background: rgba(78, 167, 113, 0.14);
+    border-color: rgba(78, 167, 113, 0.35);
+}
+
+/* =========================================================
+   Section 1 & 2 — Top Grid
+   ========================================================= */
+.pn-top-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+/* =========================================================
+   Section 1 — Identity
+   ========================================================= */
+.pn-identity {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px 28px;
+    border-right: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+/* ── Avatar ── */
+.pn-avatar {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(78, 167, 113, 0.18);
+    box-shadow: 0 4px 16px rgba(1, 50, 54, 0.1);
+}
+.pn-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.pn-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #013236, #06767d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+/* ── Identity Info ── */
+.pn-identity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding-right: 12px;
+}
+
+.pn-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pn-identity-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pn-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.pn-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pn-meta-sep {
+    color: #c5d8cc;
+    font-size: 14px;
+}
+
+.pn-bank-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #06767d;
+}
+.pn-bank-tag svg {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.pn-rekening-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #7a9e8a;
+    background: rgba(1, 50, 54, 0.04);
+    border-radius: 8px;
+    padding: 4px 10px;
+    width: fit-content;
+}
+.pn-rekening-chip svg {
+    font-size: 11px;
+}
+
+/* =========================================================
+   Section 2 — Saldo
+   ========================================================= */
+.pn-saldo-section {
+    padding: 28px 80px 28px 32px; /* space for settings btn on the right side */
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pn-saldo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.pn-saldo-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+.pn-saldo-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #4EA771;
+    background: transparent;
+    border: 1px solid rgba(78, 167, 113, 0.25);
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pn-saldo-toggle:hover {
+    background: rgba(78, 167, 113, 0.08);
+    border-color: rgba(78, 167, 113, 0.4);
+}
+
+/* ── Saldo Cards — identical to stat-card ── */
+.pn-saldo-cards {
+    display: flex;
+    gap: 16px;
+}
+
+.pn-saldo-card {
+    flex: 1;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 4px 0 #01323604, 0 6px 10px 0 #01323609;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.pn-saldo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(1, 50, 54, 0.12);
+}
+
+/* Decorative blob — top right */
+.pn-saldo-card::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Teal variant (Saldo Poin) */
+.pn-saldo-card--teal {
+    background: #ffffff;
+    border-color: rgba(6, 192, 201, 0.15);
+}
+.pn-saldo-card--teal::after {
+    background: #06C0C9;
+    opacity: 0.06;
+}
+.pn-saldo-card--teal .pn-saldo-icon {
+    background: rgba(6, 192, 201, 0.1);
+    color: #047d84;
+}
+.pn-saldo-card--teal .pn-saldo-number { color: #035b60; }
+.pn-saldo-card--teal .pn-saldo-status { color: #06A0A8; }
+
+/* Green variant (Saldo Uang) */
+.pn-saldo-card--green {
+    background: #ffffff;
+    border-color: rgba(78, 167, 113, 0.15);
+}
+.pn-saldo-card--green::after {
+    background: #4EA771;
+    opacity: 0.06;
+}
+.pn-saldo-card--green .pn-saldo-icon {
+    background: rgba(78, 167, 113, 0.1);
+    color: #4EA771;
+}
+.pn-saldo-card--green .pn-saldo-number { color: #2e7d50; }
+.pn-saldo-card--green .pn-saldo-status { color: #4EA771; }
+
+.pn-saldo-card--single {
+    padding: 24px 28px;
+    background: linear-gradient(135deg, #ffffff 40%, rgba(78, 167, 113, 0.05));
+}
+.pn-saldo-card--single .pn-saldo-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+    border-radius: 18px;
+}
+.pn-saldo-card--single .pn-saldo-number {
+    font-size: 28px;
+    margin-bottom: 2px;
+}
+.pn-saldo-card--single .pn-saldo-status {
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+/* Icon */
+.pn-saldo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+.pn-saldo-card:hover .pn-saldo-icon {
+    transform: scale(1.08);
+}
+
+/* Body */
+.pn-saldo-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pn-saldo-number {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.pn-saldo-status {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-top: 3px;
+}
+
+/* =========================================================
+   Section 3 — Detail Info
+   ========================================================= */
+.pn-detail-section {
+    padding: 24px 32px 28px;
+}
+
+.pn-detail-title {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 16px;
+}
+
+.pn-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
+}
+
+.pn-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+.pn-info-row:hover {
+    background: rgba(78, 167, 113, 0.05);
+}
+
+.pn-info-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #EAF8E7, #C8ECC0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #2e7d52;
+    flex-shrink: 0;
+}
+
+.pn-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pn-info-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pn-info-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .pn-card {
+        margin: 0 16px 20px;
+    }
+    .pn-top-grid {
+        grid-template-columns: 1fr;
+    }
+    .pn-identity {
+        padding: 24px 20px 20px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        border-right: none;
+        border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+    }
+    .pn-identity-info {
+        align-items: center;
+        padding-right: 0;
+    }
+    .pn-identity-meta {
+        justify-content: center;
+    }
+    .pn-saldo-section {
+        padding: 20px 20px;
+    }
+    .pn-saldo-cards {
+        flex-direction: column;
+    }
+    .pn-detail-section {
+        padding: 20px 20px 24px;
+    }
+    .pn-info-grid {
+        grid-template-columns: 1fr;
+    }
+}

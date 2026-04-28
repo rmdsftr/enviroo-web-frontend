@@ -1,0 +1,265 @@
+/* =========================================================
+   Info Card
+   ========================================================= */
+.info-card {
+    background: var(--c-surface);
+    border-radius: var(--r-2xl);
+    border: 1px solid var(--c-border);
+    box-shadow: var(--sh-xs);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform var(--t-base), box-shadow var(--t-base),
+        border-color var(--t-base);
+    position: relative;
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sh-md);
+    border-color: rgba(78, 167, 113, 0.35);
+}
+
+/* ── Thumbnail ── */
+.info-card__thumb {
+    position: relative;
+    height: 140px;
+    background: linear-gradient(135deg, var(--c-primary-100), var(--c-primary-50));
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.info-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.info-card:hover .info-card__thumb img {
+    transform: scale(1.04);
+}
+
+.info-card__thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--c-primary-50), var(--c-primary-100));
+}
+
+.info-card__thumb-placeholder span {
+    font-family: var(--ff-sans);
+    font-size: 56px;
+    font-weight: 800;
+    color: rgba(78, 167, 113, 0.25);
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* Timestamp badge */
+.info-card__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 6px 12px;
+    border-radius: var(--r-md);
+    font-family: var(--ff-sans);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--c-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 10px rgba(1, 50, 54, 0.08);
+}
+
+.info-card__badge svg {
+    color: var(--c-primary);
+}
+
+/* ── Body ── */
+.info-card__body {
+    padding: 16px 18px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-card__judul {
+    font-family: var(--ff-sans);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--c-text);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color var(--t-base);
+}
+
+.info-card:hover .info-card__judul {
+    color: var(--c-primary-700);
+}
+
+.info-card__desc {
+    font-family: var(--ff-sans);
+    font-size: 12px;
+    color: var(--c-text-muted);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Meta row */
+.info-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 12px;
+    flex-wrap: wrap;
+}
+
+.info-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--c-text-subtle);
+}
+
+.info-card__meta-item svg {
+    font-size: 13px;
+    color: var(--c-primary);
+    opacity: 0.7;
+}
+
+/* ── Footer ── */
+.info-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--c-surface-soft);
+    border-top: 1px solid var(--c-border-soft);
+}
+
+.info-card__penulis {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ff-sans);
+    font-size: 11.5px;
+    color: var(--c-text-muted);
+    min-width: 0;
+}
+
+.info-card__penulis-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--c-primary), var(--c-primary-600));
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.info-card__penulis strong {
+    color: var(--c-text);
+    font-weight: 600;
+}
+
+.info-card__actions {
+    display: flex;
+    gap: 4px;
+}
+
+.info-card__action-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--r-sm);
+    border: none;
+    background: transparent;
+    color: var(--c-text-subtle);
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--t-base), color var(--t-base);
+}
+
+.info-card__action-btn:hover {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+
+/* ── Status Pill ── */
+.info-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: var(--r-pill);
+    font-family: var(--ff-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.info-card__status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.info-card__status.published {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+
+.info-card__status.published::before {
+    background: var(--c-primary);
+    box-shadow: 0 0 0 2px rgba(78, 167, 113, 0.2);
+}
+
+.info-card__status.draft {
+    background: rgba(1, 50, 54, 0.06);
+    color: var(--c-text-muted);
+}
+
+.info-card__status.draft::before {
+    background: var(--c-text-subtle);
+}
+
+.info-card__admin-id {
+    font-size: 11px;
+    color: var(--c-text-muted);
+    font-family: var(--ff-sans);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
