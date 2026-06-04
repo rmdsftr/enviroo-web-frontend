@@ -453,8 +453,6 @@ export default function ProfilBankPage() {
     const isBsu = location.pathname.includes("/bsu/");
     const isBsm = location.pathname.includes("/bsm/");
     const bankTypeLabel = isBsu ? "Bank Sampah Unit" : isBsm ? "Bank Sampah Mandiri" : "Bank Sampah Induk";
-    const bankTypeShort = isBsu ? "BSU" : isBsm ? "BSM" : "BSI";
-    
     const backPath = isSuperadmin
         ? (isBsu ? "/superadmin/bank-sampah/bsu" : isBsm ? "/superadmin/bank-sampah/bsm" : "/superadmin/bank-sampah/bsi")
         : (isBsu ? "/bsi/bsu" : "/bsi");

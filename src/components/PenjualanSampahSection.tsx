@@ -67,7 +67,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
 
     const totalRp   = items.filter(i => i.satuan_nilai === "Rp").reduce((s, i) => s + (i.total_nilai ?? 0), 0);
     const totalPoin = items.filter(i => i.satuan_nilai !== "Rp").reduce((s, i) => s + (i.total_nilai ?? 0), 0);
-    const totalQty  = items.reduce((s, i) => s + (i.total_qty ?? 0), 0);
 
     return (
         <div className="ssd-section">

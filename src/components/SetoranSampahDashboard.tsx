@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { FaChartBar, FaRecycle } from "react-icons/fa6";
+import { FaRecycle } from "react-icons/fa6";
 import FilterPill, { type FilterOption } from "./filter-pill";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import { StatistikService, type StatistikSetoranItem } from "../services/statistik.service";

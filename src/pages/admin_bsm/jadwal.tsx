@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
-    FaPlus, FaScaleBalanced, FaClockRotateLeft,
+    FaPlus, FaClockRotateLeft,
     FaCalendarCheck, FaCalendarPlus, FaEye,
 } from "react-icons/fa6";
 import { useAuth } from "../../contexts/AuthContext";

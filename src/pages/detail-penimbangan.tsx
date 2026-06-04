@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    FaScaleBalanced,
-    FaListCheck,
     FaCalendarDays,
     FaClock,
     FaCircleCheck,
     FaUser,
-    FaChevronRight,
     FaBoxOpen,
     FaFileExport,
 } from "react-icons/fa6";

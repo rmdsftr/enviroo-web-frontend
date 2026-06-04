@@ -41,12 +41,11 @@ export default function ManajemenRewardSection() {
     const [nilaiRewards, setNilaiRewards] = useState<NilaiRewardBank[]>([]);
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingMaster, setIsLoadingMaster] = useState(false);
+    const [, setIsLoadingMaster] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [masterError, setMasterError] = useState<string | null>(null);
+    const [, setMasterError] = useState<string | null>(null);
 
     // Flow state
-    const [pickerOpen, setPickerOpen] = useState(false);
     const [pickedReward, setPickedReward] = useState<Reward | null>(null);
     const [formOpen, setFormOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);

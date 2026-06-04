@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import {
     FaGift,
     FaMoneyBillWave,
-    FaCoins,
     FaMagnifyingGlass,
     FaCheck,
 } from "react-icons/fa6";

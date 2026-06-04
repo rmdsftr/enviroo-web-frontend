@@ -11,7 +11,6 @@ import {
     FaPen,
     FaFingerprint,
     FaChevronDown,
-    FaGear,
     FaBuilding,
     FaCalendarDays,
     FaCircleInfo,

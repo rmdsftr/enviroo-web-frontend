@@ -57,11 +57,6 @@ const getLocalISODate = (d: Date) => {
     return `${y}-${mo}-${dy}`;
 };
 
-const getWeekOfMonth = (date: Date) => {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    return Math.ceil((date.getDate() + firstDay) / 7);
-};
-
 /* ── Dummy riwayat ── */
 const STATUS_PENIMBANGAN: Record<string, { label: string; cls: string }> = {
     aktif: { label: "Berlangsung", cls: "berlangsung" },
