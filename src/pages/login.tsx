@@ -136,7 +136,7 @@ export default function LoginPage() {
                 errorMessage = errResponse ?? "Gagal mereset password.";
             } else {
                 errorMessage = "Gagal login, periksa kembali data Anda.";
-                if (errResponse) {
+                if (typeof errResponse === "string") {
                     if (errResponse.includes("'min' tag") && errResponse.includes("Password")) {
                         errorMessage = "Password terlalu pendek, minimal 8 karakter.";
                     } else if (errResponse.includes("'email' tag") && errResponse.includes("Email")) {

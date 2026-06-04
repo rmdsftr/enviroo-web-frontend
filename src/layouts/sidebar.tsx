@@ -19,14 +19,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
 
-type MenuItemData = {
+export type MenuItemData = {
     icon: ElementType;
     menu: string;
     id: string;
 };
 
 /* ── Menu Definitions ── */
-const SUPERADMIN_MENU: MenuItemData[] = [
+export const SUPERADMIN_MENU: MenuItemData[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "superadmin" },
     { icon: FaRecycle, menu: "Bank Sampah", id: "superadmin/bank-sampah" },
     { icon: FaUsers, menu: "Pengguna", id: "superadmin/nasabah" },
@@ -36,7 +36,7 @@ const SUPERADMIN_MENU: MenuItemData[] = [
     { icon: FaCircleInfo, menu: "Informasi", id: "superadmin/informasi" },
 ];
 
-const ADMIN_BSI_MENU: MenuItemData[] = [
+export const ADMIN_BSI_MENU: MenuItemData[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "bsi" },
     { icon: FaRecycle, menu: "BSU", id: "bsi/bsu" },
     { icon: FaUsers, menu: "Nasabah", id: "bsi/nasabah" },
@@ -47,7 +47,7 @@ const ADMIN_BSI_MENU: MenuItemData[] = [
     { icon: FaCircleInfo, menu: "Konten", id: "bsi/konten" },
 ];
 
-const ADMIN_BSU_MENU: MenuItemData[] = [
+export const ADMIN_BSU_MENU: MenuItemData[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "bsu" },
     { icon: FaUsers, menu: "Nasabah", id: "bsu/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "bsu/katalog" },
@@ -57,7 +57,7 @@ const ADMIN_BSU_MENU: MenuItemData[] = [
     { icon: FaCircleInfo, menu: "Konten", id: "bsu/konten" },
 ];
 
-const ADMIN_BSM_MENU: MenuItemData[] = [
+export const ADMIN_BSM_MENU: MenuItemData[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "bsm" },
     { icon: FaUsers, menu: "Nasabah", id: "bsm/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "bsm/katalog" },

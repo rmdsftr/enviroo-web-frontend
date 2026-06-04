@@ -7,6 +7,9 @@ type SearchBarProps = {
     value?: string;
     onChange?: (value: string) => void;
     onSearch?: (value: string) => void;
+    onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
+    onFocus?: () => void;
+    onBlur?: () => void;
     width?: string;
 };
 
@@ -15,6 +18,9 @@ export default function SearchBar({
     value,
     onChange,
     onSearch,
+    onKeyDown,
+    onFocus,
+    onBlur,
     width,
 }: SearchBarProps) {
     const [internal, setInternal] = useState("");
@@ -34,6 +40,7 @@ export default function SearchBar({
 
     const handleKey = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") onSearch?.(current);
+        onKeyDown?.(e);
     };
 
     return (
@@ -48,6 +55,8 @@ export default function SearchBar({
                 value={current}
                 onChange={handleChange}
                 onKeyDown={handleKey}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 aria-label={placeholder}
             />
             {current && (
