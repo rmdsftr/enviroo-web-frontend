@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import '../styles/popup-notifikasi.css';
 
 interface PopupNotifikasiProps {
@@ -65,13 +66,14 @@ export const PopupNotifikasi: React.FC<PopupNotifikasiProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div className="popup-notifikasi-overlay">
       <div className={`popup-notifikasi-container notif-${type} ${isClosing ? 'closing' : ''}`}>
         {getIcon()}
         <p className="notif-message">{message}</p>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -23,7 +23,6 @@ import {
     FaCircleCheck,
     FaCircleXmark,
     FaPlus,
-    FaFileExport,
 } from "react-icons/fa6";
 
 // ── Unified row type ──────────────────────────────────────
@@ -35,6 +34,7 @@ type BankRow = {
     jumlah_nasabah?: number;
     jumlah_bsu?: number;    // BSI only
     nama_bsi?: string;      // BSU (superadmin) only
+    jumlah_staff?: number;  // BSM only
 };
 
 // ── Page type ─────────────────────────────────────────────
@@ -168,6 +168,17 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         render: (row) => <span style={{ fontWeight: 600 }}>{row.jumlah_nasabah ?? 0}</span>,
     });
 
+    // BSU & BSM: jumlah staff
+    if (type === "bsu" || type === "bsm") {
+        cols.push({
+            key: "jumlah_staff",
+            header: "Jumlah Staff",
+            align: "center",
+            width: "120px",
+            render: (row) => <span style={{ fontWeight: 600 }}>{row.jumlah_staff ?? 0}</span>,
+        });
+    }
+
     // All: status
     cols.push({
         key: "status",
@@ -232,22 +243,24 @@ export default function BankListPage({ type }: BankListPageProps) {
                 } else if (type === "bsu") {
                     const res = await BsuService.getBsu();
                     const mapped: BankRow[] = (res.data || []).map((b) => ({
-                        BankID: b.BankID,
-                        NamaBank: b.NamaBank,
-                        PhotoURL: b.PhotoURL,
-                        IsActive: b.IsActive,
+                        BankID: b.bank_id,
+                        NamaBank: b.nama_bsu,
+                        PhotoURL: b.photo_url,
+                        IsActive: b.is_active,
                         jumlah_nasabah: b.jumlah_nasabah,
-                        nama_bsi: b.nama_bsi,
+                        jumlah_staff: b.jumlah_staff,
+                        nama_bsi: b.nama_bank_induk,
                     }));
                     setBankList(mapped);
                 } else if (type === "bsm") {
                     const res = await BsmService.getBsm();
                     const mapped: BankRow[] = (res.data || []).map((b) => ({
-                        BankID: b.BankID,
-                        NamaBank: b.NamaBank,
-                        PhotoURL: b.PhotoURL,
-                        IsActive: b.IsActive,
+                        BankID: b.bank_id,
+                        NamaBank: b.nama_bsm,
+                        PhotoURL: b.photo_url,
+                        IsActive: b.is_active,
                         jumlah_nasabah: b.jumlah_nasabah,
+                        jumlah_staff: b.jumlah_staff,
                     }));
                     setBankList(mapped);
                 }
@@ -310,18 +323,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                     <p className="nasabah-hero-desc">{config.heroDesc}</p>
                 </div>
                 <div className="nasabah-hero-right">
-                    <Button
-                        icon={<FaFileExport />}
-                        color="neon"
-                        variant="solid"
-                        size="default"
-                        isRounded
-                        onClick={() => {
-                            setPopupNotif({ message: "Fitur export CSV akan segera tersedia.", type: "success" });
-                        }}
-                    >
-                        Ekspor Laporan
-                    </Button>
                     <Button
                         icon={<FaPlus />}
                         color="secondary"

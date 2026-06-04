@@ -16,6 +16,7 @@ import DashboardBsuPage from './pages/admin_bsu/dashboard';
 import JadwalBsuPage from './pages/admin_bsu/jadwal';
 import JadwalBsiPage from './pages/admin_bsi/jadwal';
 import DashboardBsmPage from './pages/admin_bsm/dashboard';
+import JadwalBsmPage from './pages/admin_bsm/jadwal';
 import ProfilPage from './pages/profil';
 import ErrorPage from './pages/error';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -24,7 +25,24 @@ import NotifikasiPage from './pages/notifikasi';
 import UnggahKontenPage from './pages/unggah_konten';
 import OpenKontenPage from './pages/open_konten';
 import RewardPage from './pages/superadmin/reward';
+import SuperadminPenggunaPage from './pages/superadmin/pengguna';
+import ProfilDlhPage from './pages/superadmin/profil-dlh';
+import ProfilUserPage from './pages/profil-user';
 import PenjualanPage from './pages/penjualan';
+import RiwayatPage from './pages/riwayat';
+import DetailPenimbanganPage from './pages/detail-penimbangan';
+import DetailPenyetoranPage from './pages/detail-penyetoran';
+import DetailPengangkutanPage from './pages/detail-pengangkutan';
+import DetailPenjualanPage from './pages/detail-penjualan';
+import BagiHasilPenjualanPage from './pages/bagi-hasil-penjualan';
+import DistribusiSisaBagiHasilPage from './pages/distribusi-sisa-bagi-hasil';
+import DistribusiSisaBsuPage from './pages/distribusi-sisa-bsu';
+import DetailBagiHasilPage from './pages/detail-bagi-hasil';
+import DetailPenarikanPage from './pages/detail-penarikan';
+import PenerimaBagiHasilPage from './pages/penerima-bagi-hasil';
+import ProfilMyBankPage from './pages/profil-my-bank';
+import MutasiSaldoPage from './pages/mutasi-saldo';
+import ProfilPetugasPage from './pages/profil-petugas';
 
 function App() {
   return(
@@ -45,7 +63,8 @@ function App() {
           <Route path='bank-sampah/bsi' element={<BankListPage type="bsi" />} />
           <Route path='bank-sampah/bsu' element={<BankListPage type="bsu" />} />
           <Route path='bank-sampah/bsm' element={<BankListPage type="bsm" />} />
-          <Route path='nasabah' element={<NasabahPage />} />
+          <Route path='nasabah' element={<SuperadminPenggunaPage />} />
+          <Route path='nasabah/:user_id' element={<ProfilUserPage />} />
           <Route path='bank-sampah/bsi/new' element={<RegistrasiBSIPage />} />
           <Route path='bank-sampah/bsm/new' element={<RegistrasiBSIPage />} />
           <Route path='bank-sampah/bsu/new' element={<RegistrasiBSIPage />} />
@@ -56,6 +75,7 @@ function App() {
           <Route path='jadwal' element={<JadwalPage />} />
           <Route path='katalog' element={<KatalogPage />} />
           <Route path='reward' element={<RewardPage />} />
+          <Route path='profil-dlh' element={<ProfilDlhPage />} />
           <Route path='informasi' element={<InformasiPage />} />
           <Route path='informasi/new' element={<UnggahKontenPage />} />
           <Route path='informasi/edit/:id' element={<UnggahKontenPage />} />
@@ -75,6 +95,17 @@ function App() {
           <Route path='bsu/:id' element={<ProfilBankPage />} />
           <Route path='konten' element={<InformasiPage />} />
           <Route path='jadwal' element={<JadwalBsiPage />} />
+          <Route path='riwayat' element={<RiwayatPage />} />
+          <Route path='riwayat/penimbangan/:id' element={<DetailPenimbanganPage />} />
+          <Route path='riwayat/setoran/:id' element={<DetailPenyetoranPage />} />
+          <Route path='riwayat/pengangkutan/:id' element={<DetailPengangkutanPage />} />
+          <Route path='riwayat/penjualan/:id' element={<DetailPenjualanPage />} />
+          <Route path='riwayat/penarikan/:id' element={<DetailPenarikanPage />} />
+          <Route path='bagi-hasil/:id' element={<BagiHasilPenjualanPage />} />
+          <Route path='bagi-hasil/penerima/:id' element={<PenerimaBagiHasilPage />} />
+          <Route path='distribusi-sisa/:id' element={<DistribusiSisaBagiHasilPage />} />
+          <Route path='distribusi-sisa-bsu/:id' element={<DistribusiSisaBsuPage />} />
+          <Route path='riwayat/bagi-hasil/:id' element={<DetailBagiHasilPage />} />
           <Route path='konten/new' element={<UnggahKontenPage />} />
           <Route path='konten/edit/:id' element={<UnggahKontenPage />} />
           <Route path='konten/:id' element={<OpenKontenPage />} />
@@ -89,8 +120,19 @@ function App() {
           <Route path='nasabah' element={<NasabahPage />} />
           <Route path='katalog' element={<KatalogPage />} />
           <Route path='jadwal' element={<JadwalBsuPage />} />
+          <Route path='riwayat' element={<RiwayatPage />} />
+          <Route path='riwayat/penimbangan/:id' element={<DetailPenimbanganPage />} />
+          <Route path='riwayat/setoran/:id' element={<DetailPenyetoranPage />} />
+          <Route path='riwayat/pengangkutan/:id' element={<DetailPengangkutanPage />} />
+          <Route path='riwayat/penarikan/:id' element={<DetailPenarikanPage />} />
+          <Route path='riwayat/bagi-hasil/:id' element={<DetailBagiHasilPage />} />
           <Route path='nasabah/:id' element={<ProfilNasabahPage />} />
+          <Route path='distribusi-sisa/:id' element={<DistribusiSisaBsuPage />} />
           <Route path='penjualan' element={<PenjualanPage />} />
+          <Route path='konten' element={<InformasiPage />} />
+          <Route path='konten/new' element={<UnggahKontenPage />} />
+          <Route path='konten/edit/:id' element={<UnggahKontenPage />} />
+          <Route path='konten/:id' element={<OpenKontenPage />} />
         </Route>
       </Route>
 
@@ -98,8 +140,25 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['admin_bsm']} />}>
         <Route path='/bsm' element={<RootLayout />}>
           <Route index element={<DashboardBsmPage />} />
+          <Route path='nasabah' element={<NasabahPage />} />
+          <Route path='nasabah/:id' element={<ProfilNasabahPage />} />
+          <Route path='jadwal' element={<JadwalBsmPage />} />
+          <Route path='riwayat' element={<RiwayatPage />} />
+          <Route path='riwayat/penimbangan/:id' element={<DetailPenimbanganPage />} />
+          <Route path='riwayat/setoran/:id' element={<DetailPenyetoranPage />} />
+          <Route path='riwayat/pengangkutan/:id' element={<DetailPengangkutanPage />} />
+          <Route path='riwayat/penjualan/:id' element={<DetailPenjualanPage />} />
+          <Route path='riwayat/penarikan/:id' element={<DetailPenarikanPage />} />
+          <Route path='bagi-hasil/:id' element={<BagiHasilPenjualanPage />} />
+          <Route path='bagi-hasil/penerima/:id' element={<PenerimaBagiHasilPage />} />
+          <Route path='distribusi-sisa/:id' element={<DistribusiSisaBagiHasilPage />} />
+          <Route path='riwayat/bagi-hasil/:id' element={<DetailBagiHasilPage />} />
           <Route path='katalog' element={<KatalogPage />} />
           <Route path='penjualan' element={<PenjualanPage />} />
+          <Route path='konten' element={<InformasiPage />} />
+          <Route path='konten/new' element={<UnggahKontenPage />} />
+          <Route path='konten/edit/:id' element={<UnggahKontenPage />} />
+          <Route path='konten/:id' element={<OpenKontenPage />} />
         </Route>
       </Route>
 
@@ -107,6 +166,13 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path='/profil' element={<RootLayout />}>
           <Route index element={<ProfilPage />} />
+        </Route>
+      </Route>
+      <Route element={<ProtectedRoute allowedRoles={['admin_bsi', 'admin_bsu', 'admin_bsm']} />}>
+        <Route path='/profil-bank' element={<RootLayout />}>
+          <Route index element={<ProfilMyBankPage />} />
+          <Route path='mutasi-saldo' element={<MutasiSaldoPage />} />
+          <Route path='detail-petugas/:admin_id' element={<ProfilPetugasPage />} />
         </Route>
       </Route>
       <Route path='/unauthorized' element={

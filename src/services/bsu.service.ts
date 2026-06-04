@@ -13,7 +13,8 @@ export const BsuService = {
         }
         formData.append("provinsi", data.provinsi);
         formData.append("kabupaten_kota", data.kabupaten_kota);
-        formData.append("kecamatan", data.kecamatan);
+        formData.append("id_kecamatan", data.id_kecamatan);
+        formData.append("id_kelurahan", data.id_kelurahan);
         formData.append("alamat_lengkap", data.alamat_lengkap);
         formData.append("latitude", data.latitude.toString());
         formData.append("longitude", data.longitude.toString());
@@ -21,6 +22,8 @@ export const BsuService = {
         data.user_id.forEach((id) => {
             formData.append("user_id[]", id);
         });
+
+        formData.append("admin_id", data.admin_id);
 
         const response = await api.post("/bsu/add-bsu", formData, {
             headers: {

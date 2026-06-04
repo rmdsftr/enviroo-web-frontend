@@ -15,12 +15,18 @@ export interface NewNasabah {
     no_whatsapp: string;
     bank_id: string;
     admin_id: string;
+    no_rekening?: string;
+    saldo_rupiah?: number;
+    saldo_poin?: number;
 }
 
 export interface AddNasabahOldUserPayload {
     user_id: string;
     bank_id: string;
     admin_id: string;
+    no_rekening?: string;
+    saldo_rupiah?: number;
+    saldo_poin?: number;
 }
 
 export interface NasabahListData {
@@ -41,6 +47,8 @@ export interface NasabahBankSampah {
     nasabah_id: string;
     nama_nasabah: string;
     foto: string;
+    nik: string;
+    email: string;
     bank_sampah_pusat: string;
     bank_sampah_unit: string;
     status_nasabah: string;

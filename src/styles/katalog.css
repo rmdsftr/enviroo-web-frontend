@@ -2,7 +2,7 @@
    Katalog Page — Sampah & Sembako Catalog
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;700&display=swap');
 
 /* ── CSS Variables ── */
 :root {
@@ -431,6 +431,33 @@ input[type=number] {
     box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15) !important;
 }
 
+/* Textarea — visually matches Input component */
+.km-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border: 1.5px solid #d1d9d4;
+    border-radius: var(--r-md, 12px);
+    padding: 10px 16px;
+    font-size: 12.5px;
+    font-family: 'Poppins', sans-serif;
+    color: #013236;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.km-textarea::placeholder {
+    color: #6b9080;
+    font-weight: 400;
+}
+
+.km-textarea:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15);
+}
+
 /* Hide spin buttons for number inputs */
 .km-body input[type="number"]::-webkit-outer-spin-button,
 .km-body input[type="number"]::-webkit-inner-spin-button {
@@ -595,7 +622,7 @@ input[type=number] {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    padding: 16px 28px 24px;
+    padding: 14px 28px;
     border-top: 1px solid var(--k-border);
 }
 

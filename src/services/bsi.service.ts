@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { NewBSI, GetBSIResponse, GetUnitBSIResponse, AddUnitRequest, GetNasabahBSIResponse } from "../types/bsi.type";
+import type { NewBSI, GetBSIResponse, GetUnitBSIResponse, AddUnitRequest } from "../types/bsi.type";
 
 export const BsiService = {
     // ... existing methods ...
@@ -13,7 +13,8 @@ export const BsiService = {
         }
         formData.append("provinsi", data.provinsi);
         formData.append("kabupaten_kota", data.kabupaten_kota);
-        formData.append("kecamatan", data.kecamatan);
+        formData.append("id_kecamatan", data.id_kecamatan);
+        formData.append("id_kelurahan", data.id_kelurahan);
         formData.append("alamat_lengkap", data.alamat_lengkap);
         formData.append("latitude", data.latitude.toString());
         formData.append("longitude", data.longitude.toString());
@@ -51,7 +52,8 @@ export const BsiService = {
         }
         formData.append("provinsi", data.provinsi);
         formData.append("kabupaten_kota", data.kabupaten_kota);
-        formData.append("kecamatan", data.kecamatan);
+        formData.append("id_kecamatan", data.id_kecamatan);
+        formData.append("id_kelurahan", data.id_kelurahan);
         formData.append("alamat_lengkap", data.alamat_lengkap);
         formData.append("latitude", data.latitude.toString());
         formData.append("longitude", data.longitude.toString());
@@ -60,6 +62,8 @@ export const BsiService = {
             formData.append("user_id[]", id);
         });
 
+        formData.append("admin_id", data.admin_id);
+
         const response = await api.post(`/bsi/add-unit/${bankId}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
@@ -67,8 +71,4 @@ export const BsiService = {
         return response.data;
     },
 
-    async getNasabahBSI(bankId: string): Promise<GetNasabahBSIResponse> {
-        const response = await api.get<GetNasabahBSIResponse>(`/bsi/get-nasabah/${bankId}`);
-        return response.data;
-    }
 };

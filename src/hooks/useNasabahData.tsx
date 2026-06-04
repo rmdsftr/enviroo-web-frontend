@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { NasabahService } from "../services/nasabah.service";
+import { BankService } from "../services/bank.service";
 import { BsiService } from "../services/bsi.service";
 import type { NasabahRow } from "../constants/nasabah.constants";
 import { mapBsiNasabah, mapSuperadminNasabah, computeNasabahStats } from "../utils/nasabah.utils";
@@ -39,8 +40,8 @@ export function useNasabahData() {
     const fetchNasabahs = async () => {
         setLoading(true);
         try {
-            if ((isAdminBsi || isAdminBsu) && user?.bank_id) {
-                const res = await BsiService.getNasabahBSI(user.bank_id);
+            if ((isAdminBsi || isAdminBsu || isAdminBsm) && user?.bank_id) {
+                const res = await BankService.getNasabah(user.bank_id);
                 setNasabahList(mapBsiNasabah(res.data));
             } else {
                 const res = await NasabahService.getNasabahs();
@@ -57,11 +58,11 @@ export function useNasabahData() {
     useEffect(() => {
         fetchNasabahs();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.bank_id, isAdminBsi, isAdminBsu]);
+    }, [user?.bank_id, isAdminBsi, isAdminBsu, isAdminBsm]);
 
     useEffect(() => {
-        // BSU: bank_id sudah fixed dari sesi, tidak perlu fetch afiliasi options
-        if (isAdminBsu) return;
+        // BSU dan BSM: bank_id sudah fixed dari sesi, tidak perlu fetch afiliasi options
+        if (isAdminBsu || isAdminBsm) return;
 
         if (isAdminBsi && user?.bank_id) {
             BsiService.getUnit(user.bank_id)
@@ -85,7 +86,7 @@ export function useNasabahData() {
                 .catch((err) => console.error("Gagal mendapatkan opsi afiliasi nasabah", err));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAdminBsi, isAdminBsu, user?.bank_id]);
+    }, [isAdminBsi, isAdminBsu, isAdminBsm, user?.bank_id]);
 
     // ── Reset page when filters change ───────────────────
     const handleStatusFilter = (val: string) => {

@@ -33,25 +33,18 @@ export default function StatistikLayout({
             tabIndex={onClick ? 0 : undefined}
             onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
         >
-            {/* Top row: icon + badge */}
-            <div className="stat-top">
-                <div className="stat-icon">
-                    <Icon />
+            <div className="stat-icon">
+                <Icon />
+            </div>
+
+            <div className="stat-body">
+                <div className="stat-number-row">
+                    <span className="stat-number">{formattedAngka}</span>
+                    {satuan && <span className="stat-satuan">{satuan}</span>}
                 </div>
-                <span className="stat-badge">{angka}</span>
+                <span className="stat-status">{status}</span>
+                {deskripsi && <p className="stat-desc">{deskripsi}</p>}
             </div>
-
-            {/* Label */}
-            <span className="stat-status">{status}</span>
-
-            {/* Big number */}
-            <div className="stat-number-row">
-                <span className="stat-number">{formattedAngka}</span>
-                {satuan && <span className="stat-satuan">{satuan}</span>}
-            </div>
-
-            {/* Optional description */}
-            {deskripsi && <p className="stat-desc">{deskripsi}</p>}
         </div>
     );
 }

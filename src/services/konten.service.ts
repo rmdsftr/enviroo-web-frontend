@@ -15,6 +15,7 @@ export interface UploadKontenPayload {
 export const KontenService = {
     addKonten: async (payload: UploadKontenPayload): Promise<AddKontenResponse> => {
         const formData = new FormData();
+        formData.append("bank_id", payload.bankId);
         formData.append("judul", payload.judul);
         formData.append("deskripsi", payload.deskripsi);
         formData.append("body_json", payload.bodyJson);
@@ -29,7 +30,7 @@ export const KontenService = {
         }
 
         const response = await api.post<AddKontenResponse>(
-            `/konten/add-konten/${payload.bankId}/${payload.adminId}`,
+            `/konten/add-konten/${payload.adminId}`,
             formData,
             { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -37,10 +38,23 @@ export const KontenService = {
         return response.data;
     },
 
-    getAllKonten: async (bankId: string, published?: boolean): Promise<GetAllKontenResponse> => {
-        const params = published !== undefined ? { published: published.toString() } : {};
+    getAllKonten: async (bankId: string, published?: boolean, page?: number): Promise<GetAllKontenResponse> => {
+        const params: Record<string, string> = {};
+        if (published !== undefined) params.published = published.toString();
+        if (page !== undefined) params.page = page.toString();
         const response = await api.get<GetAllKontenResponse>(
             `/konten/all-konten/${bankId}`,
+            { params }
+        );
+        return response.data;
+    },
+
+    getAllKontenSuperadmin: async (published?: boolean, page?: number): Promise<GetAllKontenResponse> => {
+        const params: Record<string, string> = {};
+        if (published !== undefined) params.published = published.toString();
+        if (page !== undefined) params.page = page.toString();
+        const response = await api.get<GetAllKontenResponse>(
+            "/konten/all-konten",
             { params }
         );
         return response.data;

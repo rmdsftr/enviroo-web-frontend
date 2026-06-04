@@ -1,20 +1,22 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
+import SetoranSampahDashboard from "../components/SetoranSampahDashboard";
+import PenjualanSampahSection from "../components/PenjualanSampahSection";
+import MasukSampahSection from "../components/MasukSampahSection";
+import KontribusiNasabahSection from "../components/KontribusiNasabahSection";
+import "../styles/setoran-dashboard.css";
 import { ProfilService } from "../services/profil.service";
 import { NasabahService } from "../services/nasabah.service";
 import { AdminService } from "../services/admin.service";
-import { UsersService } from "../services/users.service";
 import { BsuService } from "../services/bsu.service";
-import type { NonAdminUser } from "../types/users.type";
-import type { BankSampahProfile, HistoryAkunBank } from "../types/profil.type";
+import { PengangkutanService, type PengangkutanItem } from "../services/pengangkutan.service";
+import { DistribusiSisaService } from "../services/distribusi_sisa.service";
+import type { BankSampahProfile } from "../types/profil.type";
 import type { NasabahBankSampah } from "../types/nasabah.type";
 import type { AdminBankSampah } from "../types/admin.type";
 import type { BSUByBankId } from "../types/bsu.type";
-import type { ReactivateNasabahResponse } from "../types/auth.type";
-import { AuthService } from "../services/auth.service";
-import { JadwalService, type JadwalItem } from "../services/jadwal.service";
+import type { BagiHasilBsuItem } from "../types/distribusi_sisa.type";
 import BreadcrumbLayout from "../layouts/breadcrumb";
-import PopupAktivasiResult from "../layouts/popup-aktivasi-result";
 import {
     FaGear,
     FaLocationDot,
@@ -23,71 +25,39 @@ import {
     FaCircleCheck,
     FaCircleXmark,
     FaClock,
-    FaUserPlus,
     FaLayerGroup,
-    FaScaleBalanced,
-    FaTruck,
-    FaPenToSquare,
     FaToggleOff,
     FaTrashCan,
-    FaUserShield,
+    FaEye,
 } from "react-icons/fa6";
 import "../styles/layout.css";
 import "../styles/profil-bank.css";
 import "../styles/nasabah.css";
 import "../styles/regis-bsi.css";
+import "../styles/riwayat.css";
+import "../styles/jadwal-bsu.css";
 
 import StatistikLayout from "../layouts/statistik";
 import Table, {
     TableAvatar,
     TableBadge,
+    TableActionBtn,
     type ColumnDef,
 } from "../components/table";
 import PopupMenu from "../components/popup-menu";
-import Button from "../components/button";
-import CloseButton from "../components/close-button";
-import Dropdown from "../components/dropdown";
-import Input from "../components/input";
+import ViewPhoto from "../components/view-photo";
 import Tabs from "../components/tabs";
 import FilterPill from "../components/filter-pill";
+import FilterRange, { defaultMonthRange } from "../components/filter-range";
+import SearchBar from "../components/search";
 import { useAuth } from "../contexts/AuthContext";
 import PopupConfirmation from "../layouts/popup-confirmation";
 import PopupInputKeterangan from "../layouts/popup-input-keterangan";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
 import { BankService } from "../services/bank.service";
+import { formatTanggal } from "../utils/date.utils";
+import { getApiError } from "../utils/error.utils";
 
-// ── Helper: label & badge color ──
-const JENIS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-    BSI: { label: "Bank Sampah Induk", color: "#013236", bg: "rgba(1, 50, 54, 0.08)" },
-    BSU: { label: "Bank Sampah Unit", color: "#06767d", bg: "rgba(6, 192, 201, 0.10)" },
-    BSM: { label: "Bank Sampah Mandiri", color: "#9a6b0b", bg: "rgba(245, 166, 35, 0.10)" },
-};
-
-const HARI_DISPLAY: Record<string, string> = {
-    senin: "Senin", selasa: "Selasa", rabu: "Rabu",
-    kamis: "Kamis", jumat: "Jumat", sabtu: "Sabtu", minggu: "Minggu",
-};
-const MINGGU_LABEL = (n: number) => n === 0 ? "Setiap minggu" : `Minggu ke-${n}`;
-
-const formatTime = (timeStr: string) => {
-    if (!timeStr) return "";
-    const m = timeStr.match(/^(\d{2}:\d{2})(:\d{2})?(?:[+-]\d{2}:\d{2}|Z)?$/);
-    if (m) return m[1];
-    try {
-        const d = new Date(timeStr);
-        if (isNaN(d.getTime())) return timeStr;
-        return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false });
-    } catch { return timeStr; }
-};
-
-const formatDayOfMonth = (dateStr: string) => {
-    if (!dateStr) return { day: "", month: "" };
-    const date = new Date(dateStr);
-    return {
-        day: String(date.getDate()).padStart(2, "0"),
-        month: date.toLocaleDateString("id-ID", { month: "short" })
-    };
-};
 
 // ─────────────────────────────────────────────────────────
 // ── Tipe & Mock Data BSU
@@ -103,6 +73,12 @@ const getBsuColumns = (): ColumnDef<BSUByBankId>[] => [
         ),
     },
     {
+        key: "bank_id",
+        header: "Bank ID",
+        width: "160px",
+        render: (row) => <span className="table-name">{row.bank_id}</span>,
+    },
+    {
         key: "nama",
         header: "Nama BSU",
         render: (row) => (
@@ -116,6 +92,15 @@ const getBsuColumns = (): ColumnDef<BSUByBankId>[] => [
         width: "140px",
         render: (row) => (
             <span style={{ fontWeight: 600 }}>{row.jumlah_nasabah}</span>
+        ),
+    },
+    {
+        key: "staff",
+        header: "Jumlah Staff",
+        align: "center",
+        width: "120px",
+        render: (row) => (
+            <span style={{ fontWeight: 600 }}>{row.jumlah_staff}</span>
         ),
     },
     {
@@ -140,10 +125,7 @@ const getRoleLabel = (role: string) => {
     return role;
 }
 
-const getAdminColumns = (
-    onDeleteAdmin: (adminId: string) => void,
-    onToggleAktivasiAdmin: (userId: string, currentStatus: string) => void
-): ColumnDef<AdminBankSampah>[] => [
+const getAdminColumns = (): ColumnDef<AdminBankSampah>[] => [
     {
         key: "foto",
         header: "Foto",
@@ -155,7 +137,7 @@ const getAdminColumns = (
         key: "userId",
         header: "Admin ID",
         width: "160px",
-        render: (row) => <span className="table-name">{row.user_id}</span>,
+        render: (row) => <span className="table-name">{row.admin_id}</span>,
     },
     {
         key: "nama",
@@ -188,30 +170,6 @@ const getAdminColumns = (
             }
             return <TableBadge label={row.status_admin === "aktif" ? "Aktif" : "Nonaktif"} active={row.status_admin === "aktif"} />;
         },
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "64px",
-        align: "center",
-        render: (row) => (
-            <PopupMenu
-                trigger={<button className="table-action-btn" type="button" title="Pengaturan"><FaGear /></button>}
-                items={[
-                    {
-                        label: row.status_admin === "aktif" ? "Nonaktifkan Akun Staff" : "Generate Aktivasi Akun Staff",
-                        icon: <FaToggleOff />,
-                        onClick: () => onToggleAktivasiAdmin(row.user_id, row.status_admin),
-                    },
-                    {
-                        label: "Hapus Staff",
-                        icon: <FaTrashCan />,
-                        variant: "danger",
-                        onClick: () => onDeleteAdmin(row.admin_id),
-                    },
-                ]}
-            />
-        ),
     },
 ];
 
@@ -264,6 +222,17 @@ const getNasabahColumns = (): ColumnDef<NasabahBankSampah>[] => {
             render: (row) => <span className="table-name">{row.nama_nasabah}</span>,
         },
         {
+            key: "nik",
+            header: "NIK",
+            width: "150px",
+            render: (row) => <span>{row.nik || "-"}</span>,
+        },
+        {
+            key: "email",
+            header: "Email",
+            render: (row) => <span>{row.email || "-"}</span>,
+        },
+        {
             key: "status",
             header: "Status",
             width: "120px",
@@ -273,6 +242,86 @@ const getNasabahColumns = (): ColumnDef<NasabahBankSampah>[] => {
 
     return cols;
 };
+
+// ─────────────────────────────────────────────────────────
+// ── Riwayat Pengangkutan & Bagi Hasil BSU (for admin_bsi)
+// ─────────────────────────────────────────────────────────
+const STATUS_PENGANGKUTAN: Record<string, { label: string; cls: string }> = {
+    completed: { label: "Selesai",            cls: "selesai"     },
+    otw:       { label: "Dalam Perjalanan",   cls: "berlangsung" },
+    requested: { label: "Diminta",            cls: "mendatang"   },
+};
+
+const ANGKUT_COLS: ColumnDef<PengangkutanItem>[] = [
+    {
+        key: "pengangkutan_id",
+        header: "ID Pengangkutan",
+        render: (row) => <span className="table-id">{row.pengangkutan_id}</span>,
+    },
+    {
+        key: "tanggal",
+        header: "Tanggal Pengangkutan",
+        width: "180px",
+        render: (row) => row.changed_at ? formatTanggal(row.changed_at) : "—",
+    },
+    {
+        key: "pihak",
+        header: "Diangkut Oleh",
+        render: (row) => row.nama_bsi,
+    },
+    {
+        key: "status",
+        header: "Status Pengangkutan",
+        width: "180px",
+        render: (row) => {
+            const s = STATUS_PENGANGKUTAN[row.status_pengangkutan];
+            return (
+                <span className={`jbsu-status-pill ${s?.cls ?? row.status_pengangkutan}`}>
+                    {s?.label ?? row.status_pengangkutan}
+                </span>
+            );
+        },
+    },
+    {
+        key: "aksi",
+        header: "Aksi",
+        width: "70px",
+        align: "center" as const,
+        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
+    },
+];
+
+const BAGI_HASIL_BSU_COLS: ColumnDef<BagiHasilBsuItem>[] = [
+    {
+        key: "penerima_sisa_id",
+        header: "ID Bagi Hasil",
+        render: (row) => <span className="table-id">{row.penerima_sisa_id}</span>,
+    },
+    {
+        key: "tanggal",
+        header: "Tanggal Distribusi",
+        width: "160px",
+        render: (row) => row.tanggal_distribusi ? formatTanggal(row.tanggal_distribusi) : "—",
+    },
+    {
+        key: "total_diterima",
+        header: "Total Diterima",
+        width: "160px",
+        render: (row) => {
+            const num = row.nominal_diterima.toLocaleString("id-ID");
+            return row.satuan_nominal === "Rp" ? `Rp ${num}` : `${num} poin`;
+        },
+    },
+    {
+        key: "aksi",
+        header: "Aksi",
+        width: "70px",
+        align: "center" as const,
+        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
+    },
+];
+
+// ─────────────────────────────────────────────────────────
 
 export default function ProfilBankPage() {
     const { id } = useParams<{ id: string }>();
@@ -285,35 +334,28 @@ export default function ProfilBankPage() {
     const [adminList, setAdminList] = useState<AdminBankSampah[]>([]);
     const [staffFilter, setStaffFilter] = useState<string>("all");
     const [bsuList, setBsuList] = useState<BSUByBankId[]>([]);
-    const [penimbanganJadwal, setPenimbanganJadwal] = useState<JadwalItem[]>([]);
-    const [pengangkutanJadwal, setPengangkutanJadwal] = useState<JadwalItem[]>([]);
-
-    // ── Tambah Admin Modal State ──
-    const [showTambahAdminModal, setShowTambahAdminModal] = useState(false);
-    const [nonAdminUsers, setNonAdminUsers] = useState<NonAdminUser[]>([]);
-    const [selectedUserId, setSelectedUserId] = useState<string>("");
-    const [selectedRole, setSelectedRole] = useState<string>("");
-    const [isSubmittingAdmin, setIsSubmittingAdmin] = useState(false);
-
-    // ── Tambah Akun Baru (di dalam Modal Tambah Admin) ──
-    const [isAddingNewUser, setIsAddingNewUser] = useState(false);
-    const [newUserForm, setNewUserForm] = useState({ nik: "", nama: "", email: "", noWa: "" });
-
-    const [isReactivateModalOpen, setIsReactivateModalOpen] = useState(false);
-    const [reactivateData, setReactivateData] = useState<ReactivateNasabahResponse["data"] | null>(null);
     const [isActivationConfirmOpen, setIsActivationConfirmOpen] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [isInputKeteranganOpen, setIsInputKeteranganOpen] = useState(false);
+    const [isPhotoOpen, setIsPhotoOpen] = useState(false);
 
     const [showNotifPopup, setShowNotifPopup] = useState(false);
     const [notifMessage, setNotifMessage] = useState("");
     const [notifType, setNotifType] = useState<"success" | "error" | "warning" | "info">("success");
+    const [notifShouldNavigate, setNotifShouldNavigate] = useState(false);
 
-    // ── Hapus Staff Confirmation ──
-    const [isDeleteAdminOpen, setIsDeleteAdminOpen] = useState(false);
-    const [pendingDeleteAdminId, setPendingDeleteAdminId] = useState<string | null>(null);
+    // State untuk tab Pengangkutan & Bagi Hasil BSU (admin_bsi viewing BSU)
+    const [angkutList, setAngkutList] = useState<PengangkutanItem[]>([]);
+    const [angkutLoading, setAngkutLoading] = useState(false);
+    const [angkutFrom, setAngkutFrom] = useState(() => defaultMonthRange().from);
+    const [angkutTo, setAngkutTo] = useState(() => defaultMonthRange().to);
+    const [angkutSearch, setAngkutSearch] = useState("");
 
-    // ── Riwayat Akun Bank ──
-    const [historyList, setHistoryList] = useState<HistoryAkunBank[]>([]);
+    const [bagiHasilBsuList, setBagiHasilBsuList] = useState<BagiHasilBsuItem[]>([]);
+    const [bagiHasilBsuLoading, setBagiHasilBsuLoading] = useState(false);
+    const [bagiHasilBsuFrom, setBagiHasilBsuFrom] = useState(() => defaultMonthRange().from);
+    const [bagiHasilBsuTo, setBagiHasilBsuTo] = useState(() => defaultMonthRange().to);
+    const [bagiHasilBsuSearch, setBagiHasilBsuSearch] = useState("");
 
     const isBsuUrl = location.pathname.includes("/bsu/");
     const isBsmUrl = location.pathname.includes("/bsm/");
@@ -324,7 +366,7 @@ export default function ProfilBankPage() {
             ProfilService.getBankSampahProfile(id)
                 .then(res => setBankProfile(res.data))
                 .catch(err => console.error("Gagal menarik profil bank:", err));
-                
+
             NasabahService.getNasabahByBankId(id)
                 .then(res => setNasabahList(res.data))
                 .catch(err => console.error("Gagal menarik daftar nasabah profil:", err));
@@ -339,30 +381,24 @@ export default function ProfilBankPage() {
                     .catch(err => console.error("Gagal menarik daftar bsu:", err));
             }
 
-            ProfilService.getHistoryAkunBank(id)
-                .then(res => setHistoryList(res.data || []))
-                .catch(err => console.error("Gagal menarik riwayat akun bank:", err));
+            if (isBsuUrl && user?.role === "admin_bsi") {
+                setAngkutLoading(true);
+                PengangkutanService.getPengangkutanByBank(id)
+                    .then(data => setAngkutList(data))
+                    .catch(err => console.error("Gagal menarik data pengangkutan BSU:", err))
+                    .finally(() => setAngkutLoading(false));
 
-            JadwalService.getJadwalBank(id)
-                .then(res => {
-                    setPenimbanganJadwal(res.data.penimbangan || []);
-                    setPengangkutanJadwal(res.data.pengangkutan || []);
-                })
-                .catch(err => console.error("Gagal menarik jadwal bank:", err));
+                setBagiHasilBsuLoading(true);
+                DistribusiSisaService.getRiwayatBagiHasilBsu(id)
+                    .then(data => setBagiHasilBsuList(data))
+                    .catch(err => console.error("Gagal menarik data bagi hasil BSU:", err))
+                    .finally(() => setBagiHasilBsuLoading(false));
+            }
         }
-    }, [id, isBsiUrl]);
+    }, [id, isBsiUrl, isBsuUrl, user?.role]);
 
     // State for Tabs
     const [activeTab, setActiveTab] = useState(isBsiUrl ? "Bank Sampah Unit" : "Nasabah");
-
-    // Fetch non-admin users when modal opens
-    useEffect(() => {
-        if (showTambahAdminModal && id) {
-            UsersService.getNonAdminNonNasabahUsers(id)
-                .then(res => setNonAdminUsers(res.data || []))
-                .catch(err => console.error("Gagal memuat daftar user:", err));
-        }
-    }, [showTambahAdminModal, id]);
 
     // State for BSU
     const totalBsu = bsuList.length;
@@ -381,6 +417,33 @@ export default function ProfilBankPage() {
         return adminList.filter(admin => admin.role.startsWith(staffFilter));
     }, [adminList, staffFilter]);
 
+    // Filter Pengangkutan BSU
+    const filteredAngkut = useMemo(() => {
+        const q = angkutSearch.toLowerCase();
+        return angkutList.filter(item => {
+            if (!item.changed_at) return false;
+            const month = item.changed_at.substring(0, 7);
+            if (month < angkutFrom || month > angkutTo) return false;
+            if (q) return item.pengangkutan_id.toLowerCase().includes(q);
+            return true;
+        });
+    }, [angkutList, angkutFrom, angkutTo, angkutSearch]);
+
+    // Filter Bagi Hasil BSU
+    const filteredBagiHasilBsu = useMemo(() => {
+        const q = bagiHasilBsuSearch.toLowerCase();
+        return bagiHasilBsuList.filter(item => {
+            const month = item.tanggal_distribusi.substring(0, 7);
+            if (month < bagiHasilBsuFrom || month > bagiHasilBsuTo) return false;
+            if (q) {
+                return item.penerima_sisa_id.toLowerCase().includes(q) ||
+                       item.distribusi_id.toLowerCase().includes(q) ||
+                       item.bagi_hasil_id.toLowerCase().includes(q);
+            }
+            return true;
+        });
+    }, [bagiHasilBsuList, bagiHasilBsuFrom, bagiHasilBsuTo, bagiHasilBsuSearch]);
+
     const isSuperadmin = user?.role === "superadmin";
     const isAdminBsi = user?.role === "admin_bsi";
     // const isAdminBsm = user?.role === "admin_bsm";
@@ -396,183 +459,14 @@ export default function ProfilBankPage() {
         ? (isBsu ? "/superadmin/bank-sampah/bsu" : isBsm ? "/superadmin/bank-sampah/bsm" : "/superadmin/bank-sampah/bsi")
         : (isBsu ? "/bsi/bsu" : "/bsi");
 
-    // Determine available roles based on bank type
-    const getRoleOptions = () => {
-        const isBsuUrl2 = location.pathname.includes("/bsu/");
-        const isBsmUrl2 = location.pathname.includes("/bsm/");
-        if (isBsuUrl2) return [
-            { label: "Admin BSU", value: "admin_bsu" },
-            { label: "Petugas BSU", value: "petugas_bsu" },
-        ];
-        if (isBsmUrl2) return [
-            { label: "Admin BSM", value: "admin_bsm" },
-            { label: "Petugas BSM", value: "petugas_bsm" },
-        ];
-        return [
-            { label: "Admin BSI", value: "admin_bsi" },
-            { label: "Petugas BSI", value: "petugas_bsi" },
-        ];
-    };
-
-    const handleTambahAdmin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedUserId) {
-            setNotifMessage("Pilih satu akun terlebih dahulu.");
-            setNotifType("warning");
-            setShowNotifPopup(true);
-            return;
-        }
-        if (!selectedRole) {
-            setNotifMessage("Pilih role terlebih dahulu.");
-            setNotifType("warning");
-            setShowNotifPopup(true);
-            return;
-        }
-        if (!id) return;
-        setIsSubmittingAdmin(true);
-        try {
-            await AdminService.addAdmin(id, selectedUserId, selectedRole, user?.identity_id || "");
-            // Refresh admin list
-            const res = await AdminService.getAdminByBankId(id);
-            setAdminList(res.data);
-            setShowTambahAdminModal(false);
-            setSelectedUserId("");
-            setSelectedRole("");
-            setNotifMessage("Admin berhasil ditambahkan!");
-            setNotifType("success");
-            setShowNotifPopup(true);
-        } catch (err) {
-            console.error("Gagal menambahkan admin:", err);
-            setNotifMessage("Gagal menambahkan admin. Silakan coba lagi.");
-            setNotifType("error");
-            setShowNotifPopup(true);
-        } finally {
-            setIsSubmittingAdmin(false);
-        }
-    };
-
-    const handleSaveNewUser = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            const payload = {
-                user_id: newUserForm.nik,
-                nama: newUserForm.nama,
-                email: newUserForm.email,
-                no_whatsapp: newUserForm.noWa,
-            };
-            
-            await UsersService.createUsers(payload);
-            console.log("Successfully saved new user:", payload);
-            
-            // Refresh table list
-            if (id) {
-                const res = await UsersService.getNonAdminNonNasabahUsers(id);
-                setNonAdminUsers(res.data || []);
-            }
-            
-            setIsAddingNewUser(false);
-            setNewUserForm({ nik: "", nama: "", email: "", noWa: "" });
-            setNotifMessage("Berhasil menambahkan akun baru!");
-            setNotifType("success");
-            setShowNotifPopup(true);
-        } catch (error) {
-            console.error("Gagal menambahkan akun:", error);
-            setNotifMessage("Gagal menambahkan akun baru. Silakan coba lagi.");
-            setNotifType("error");
-            setShowNotifPopup(true);
-        }
-    };
-
-    const handleDeleteAdmin = (adminId: string) => {
-        setPendingDeleteAdminId(adminId);
-        setIsDeleteAdminOpen(true);
-    };
-
-    const executeDeleteAdmin = async () => {
-        if (!pendingDeleteAdminId) return;
-        setIsDeleteAdminOpen(false);
-        try {
-            await AdminService.deleteAdmin(pendingDeleteAdminId, user?.identity_id || "");
-            if (id) {
-                const res = await AdminService.getAdminByBankId(id);
-                setAdminList(res.data);
-            }
-            setNotifMessage("Staff berhasil dihapus.");
-            setNotifType("success");
-            setShowNotifPopup(true);
-        } catch (error) {
-            console.error("Gagal menghapus staff:", error);
-            setNotifMessage("Terjadi kesalahan saat menghapus staff.");
-            setNotifType("error");
-            setShowNotifPopup(true);
-        } finally {
-            setPendingDeleteAdminId(null);
-        }
-    };
-
-    const handleToggleAktivasiStaff = async (userId: string, currentStatus: string) => {
-        if (!id) return;
-        
-        const isCurrentlyActive = currentStatus === "aktif";
-
-        try {
-            if (isCurrentlyActive) {
-                // Logic: Nonaktifkan (Deactivate)
-                await AuthService.deactivateAkun(userId, "admin");
-                setAdminList(prev => prev.map(a => a.user_id === userId ? { ...a, status_admin: "nonaktif" as any } : a));
-                window.alert("Akun staff berhasil dinonaktifkan");
-            } else {
-                // Logic: Generate Aktivasi (Reactivate)
-                if (!user?.identity_id) {
-                    window.alert("Data admin pengautentikasi tidak ditemukan. Silakan login kembali.");
-                    return;
-                }
-                
-                const res = await AuthService.generateReactivateAkun(userId, user.identity_id, "admin");
-                setReactivateData(res.data);
-                setIsReactivateModalOpen(true);
-                
-                // Update status locally to pending since a new token was generated
-                setAdminList(prev => prev.map(a => a.user_id === userId ? { ...a, status_admin: "pending" as any } : a));
-            }
-        } catch (error) {
-            console.error("Gagal memproses status staff:", error);
-            window.alert("Terjadi kesalahan saat memproses status staff");
-        }
-    };
-
-    // Get data 
+    // Get data
     if (!bankProfile) {
         return <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>Memuat profil...</div>;
     }
 
-    const executeToggleAktivasi = async () => {
+    const handleToggleAktivasiBank = () => {
         if (!bankProfile || !id) return;
-        try {
-            await ProfilService.toggleAktivasiBank(id);
-            const isNowActive = !bankProfile.is_active;
-            setBankProfile(prev => prev ? { ...prev, is_active: isNowActive } : null);
-            setNotifMessage(isNowActive ? "Bank sampah berhasil diaktifkan" : "Bank sampah berhasil dinonaktifkan");
-            setNotifType("success");
-            setShowNotifPopup(true);
-        } catch (error) {
-            console.error("Gagal mengubah status aktivasi bank:", error);
-            setNotifMessage("Terjadi kesalahan saat mengubah status bank sampah");
-            setNotifType("error");
-            setShowNotifPopup(true);
-        }
-    };
-
-    const handleToggleAktivasiBank = async () => {
-        if (!bankProfile || !id) return;
-        
-        if (isSuperadmin) {
-            // Superadmin bisa langsung eksekusi atau via popup (di sini kita langsungkan sesuai kode awal)
-            executeToggleAktivasi();
-        } else if (isAdminBsi) {
-            // Admin BSI harus lewat konfirmasi popup
-            setIsActivationConfirmOpen(true);
-        }
+        setIsActivationConfirmOpen(true);
     };
 
     const handleAktivasiBank = async (keterangan: string) => {
@@ -597,19 +491,25 @@ export default function ProfilBankPage() {
         }
     };
 
-    const handleHapusBankSampah = async () => {
+    const handleHapusBankSampah = () => {
         if (!id) return;
-        
-        const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus bank sampah ini? Tindakan ini tidak dapat dibatalkan.");
-        if (!confirmDelete) return;
+        setIsDeleteConfirmOpen(true);
+    };
 
+    const doHapusBankSampah = async () => {
+        if (!id) return;
+        setIsDeleteConfirmOpen(false);
         try {
             await ProfilService.hapusBankSampah(id);
-            window.alert("Bank sampah berhasil dihapus.");
-            navigate(backPath); // Kembali ke list sebelumnya (BSI/BSM/BSU)
+            setNotifMessage("Bank sampah berhasil dihapus.");
+            setNotifType("success");
+            setNotifShouldNavigate(true);
+            setShowNotifPopup(true);
         } catch (error) {
             console.error("Gagal menghapus bank sampah:", error);
-            window.alert("Terjadi kesalahan saat menghapus bank sampah.");
+            setNotifMessage(getApiError(error, "Terjadi kesalahan saat menghapus bank sampah."));
+            setNotifType("error");
+            setShowNotifPopup(true);
         }
     };
 
@@ -622,11 +522,12 @@ export default function ProfilBankPage() {
         provinsi: bankProfile.provinsi || "-",
         kota: bankProfile.kabupaten_kota || "-",
         kecamatan: bankProfile.kecamatan || "-",
+        kelurahan: bankProfile.kelurahan || "-",
         alamatLengkap: bankProfile.alamat_lengkap || "-",
         afiliasiBsi: bankProfile.bank_induk,
         is_active: bankProfile.is_active
     };
-    const jenisConf = JENIS_CONFIG[bank.jenis] || JENIS_CONFIG.BSI;
+
 
     const breadcrumbItems = isSuperadmin 
         ? [
@@ -644,83 +545,36 @@ export default function ProfilBankPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
             <br />
 
-            {/* ── Hapus Staff Confirmation Popup ── */}
-            <PopupConfirmation
-                isOpen={isDeleteAdminOpen}
-                type="danger"
-                title="Hapus Staff"
-                message="Apakah Anda yakin ingin menghapus staff ini? Tindakan ini tidak dapat dibatalkan."
-                confirmText="Ya, Hapus"
-                cancelText="Batal"
-                onConfirm={executeDeleteAdmin}
-                onCancel={() => { setIsDeleteAdminOpen(false); setPendingDeleteAdminId(null); }}
-            />
+            {/* ── View Photo ── */}
+            {isPhotoOpen && bank.foto && (
+                <ViewPhoto src={bank.foto} alt={bank.nama} onClose={() => setIsPhotoOpen(false)} />
+            )}
 
             {/* ── Popup Notifikasi ── */}
             {showNotifPopup && (
                 <PopupNotifikasi
                     message={notifMessage}
                     type={notifType}
-                    onClose={() => setShowNotifPopup(false)}
+                    onClose={() => {
+                        setShowNotifPopup(false);
+                        if (notifShouldNavigate) {
+                            setNotifShouldNavigate(false);
+                            navigate(backPath);
+                        }
+                    }}
                 />
             )}
 
             {/* ── Profile Card ── */}
             <div className="profil-bank-card">
-                {/* Settings popup */}
-                {isSuperadmin && (
-                <div style={{ position: "absolute", top: "24px", right: "28px", zIndex: 10 }}>
-                    <PopupMenu
-                        trigger={
-                            <button className="profil-bank-settings-btn" title="Pengaturan" style={{ position: "static" }}>
-                                <FaGear />
-                            </button>
-                        }
-                        items={[
-                        {
-                            label: "Edit Informasi",
-                            icon: <FaPenToSquare />,
-                            onClick: () => navigate(`/superadmin/bank-sampah/${bankTypeShort.toLowerCase()}/${bank.id}/edit`),
-                        },
-                        {
-                            label: bankProfile.is_active ? "Nonaktifkan Bank Sampah" : "Aktifkan Bank Sampah",
-                            icon: <FaToggleOff />,
-                            onClick: handleToggleAktivasiBank,
-                        },
-                        {
-                            label: "Hapus Bank Sampah",
-                            icon: <FaTrashCan />,
-                            variant: "danger",
-                            onClick: handleHapusBankSampah,
-                        },
-                    ]}
-                />
-                </div>
-                )}
-
-                {isAdminBsi && (
-                <div style={{ position: "absolute", top: "24px", right: "28px", zIndex: 10 }}>
-                    <PopupMenu
-                        trigger={
-                            <button className="profil-bank-settings-btn" title="Pengaturan" style={{ position: "static" }}>
-                                <FaGear />
-                            </button>
-                        }
-                        items={[
-                        {
-                            label: bankProfile.is_active ? "Nonaktifkan Bank Sampah" : "Aktifkan Bank Sampah",
-                            icon: <FaToggleOff />,
-                            onClick: handleToggleAktivasiBank,
-                        }
-                    ]}
-                />
-                </div>
-                )}
-
-                <div className="profil-bank-content">
-                    {/* Photo */}
+                {/* Left: foto + nama + ID */}
+                <div className="profil-bank-left">
                     <div className="profil-bank-photo-wrapper">
-                        <div className="profil-bank-photo">
+                        <div
+                            className="profil-bank-photo"
+                            style={bank.foto ? { cursor: "pointer" } : undefined}
+                            onClick={() => bank.foto && setIsPhotoOpen(true)}
+                        >
                             {bank.foto ? (
                                 <img src={bank.foto} alt={bank.nama} />
                             ) : (
@@ -729,26 +583,62 @@ export default function ProfilBankPage() {
                                 </div>
                             )}
                         </div>
-                        <div 
-                            className={`profil-bank-status-dot ${bank.is_active ? 'active' : 'inactive'}`} 
+                        <div
+                            className={`profil-bank-status-dot ${bank.is_active ? 'active' : 'inactive'}`}
                             title={bank.is_active ? "Aktif" : "Nonaktif"}
                         />
                     </div>
+                    <span className="profil-bank-left-name">{bank.nama}</span>
+                    <span className="profil-bank-id-label">{bank.id}</span>
+                </div>
 
-                    {/* Info */}
+                {/* Right: afiliasi + deskripsi + alamat */}
+                <div className="profil-bank-right">
+                    {isSuperadmin && (
+                    <div style={{ position: "absolute", top: "20px", right: "24px", zIndex: 10 }}>
+                        <PopupMenu
+                            trigger={
+                                <button className="profil-bank-settings-btn" title="Pengaturan" style={{ position: "static" }}>
+                                    <FaGear />
+                                </button>
+                            }
+                            items={[
+                            {
+                                label: bankProfile.is_active ? "Nonaktifkan Bank Sampah" : "Aktifkan Bank Sampah",
+                                icon: <FaToggleOff />,
+                                onClick: handleToggleAktivasiBank,
+                            },
+                            {
+                                label: "Hapus Bank Sampah",
+                                icon: <FaTrashCan />,
+                                variant: "danger",
+                                onClick: handleHapusBankSampah,
+                            },
+                        ]}
+                        />
+                    </div>
+                    )}
+
+                    {isAdminBsi && (
+                    <div style={{ position: "absolute", top: "20px", right: "24px", zIndex: 10 }}>
+                        <PopupMenu
+                            trigger={
+                                <button className="profil-bank-settings-btn" title="Pengaturan" style={{ position: "static" }}>
+                                    <FaGear />
+                                </button>
+                            }
+                            items={[
+                            {
+                                label: bankProfile.is_active ? "Nonaktifkan Bank Sampah" : "Aktifkan Bank Sampah",
+                                icon: <FaToggleOff />,
+                                onClick: handleToggleAktivasiBank,
+                            }
+                        ]}
+                        />
+                    </div>
+                    )}
+
                     <div className="profil-bank-info">
-                        {/* Name + badge */}
-                        <div className="profil-bank-name-row">
-                            <h1 className="profil-bank-name">{bank.nama}</h1>
-                            <span
-                                className="profil-bank-jenis-badge"
-                                style={{ color: jenisConf.color, background: jenisConf.bg }}
-                            >
-                                {bankTypeShort}
-                            </span>
-                        </div>
-
-                        {/* Afiliasi badge (BSU only) */}
                         {bank.afiliasiBsi && (
                             <div className="profil-bank-afiliasi">
                                 <FaBuilding />
@@ -756,10 +646,8 @@ export default function ProfilBankPage() {
                             </div>
                         )}
 
-                        {/* Deskripsi */}
                         <p className="profil-bank-desc">{bank.deskripsi}</p>
 
-                        {/* Alamat */}
                         <div className="profil-bank-alamat">
                             <div className="profil-bank-alamat-icon">
                                 <FaLocationDot />
@@ -769,6 +657,7 @@ export default function ProfilBankPage() {
                                     <span className="profil-bank-alamat-tag">{bank.provinsi}</span>
                                     <span className="profil-bank-alamat-tag">{bank.kota}</span>
                                     <span className="profil-bank-alamat-tag">{bank.kecamatan}</span>
+                                    <span className="profil-bank-alamat-tag">{bank.kelurahan}</span>
                                 </div>
                                 <p className="profil-bank-alamat-text">{bank.alamatLengkap}</p>
                             </div>
@@ -778,10 +667,12 @@ export default function ProfilBankPage() {
             </div>
 
             {/* ── Sub Navbar ── */}
-            <Tabs 
-                tabs={(bank.jenis === "BSI" 
-                    ? ["Bank Sampah Unit", "Nasabah", "Staff", "Jadwal"] 
-                    : ["Nasabah", "Staff", "Jadwal", "Log Akun Bank"]
+            <Tabs
+                tabs={(bank.jenis === "BSI"
+                    ? ["Bank Sampah Unit", "Nasabah", "Staff", ...(isSuperadmin ? ["Statistik"] : [])]
+                    : isBsuUrl && isAdminBsi
+                        ? ["Nasabah", "Staff", "Pengangkutan", "Bagi Hasil"]
+                        : ["Nasabah", "Staff", ...(isSuperadmin ? ["Statistik"] : [])]
                 ).map(t => ({ id: t, label: t }))}
                 activeTab={activeTab}
                 onChange={(id) => setActiveTab(id)}
@@ -875,8 +766,8 @@ export default function ProfilBankPage() {
                     <div className="nasabah-tab-content">
                         {/* Toolbar + tabel untuk Admin */}
                         <div className="bsu-table-section">
-                            <div className="nasabah-toolbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "16px" }}>
-                                <FilterPill 
+                            <div className="nasabah-toolbar" style={{ display: "flex", marginBottom: "16px" }}>
+                                <FilterPill
                                     options={[
                                         { label: "Semua", value: "all" },
                                         { label: "Admin", value: "admin" },
@@ -885,456 +776,85 @@ export default function ProfilBankPage() {
                                     activeValue={staffFilter}
                                     onChange={(val) => setStaffFilter(val)}
                                 />
-                                <Button
-                                    variant="solid"
-                                    color="neon"
-                                    isRounded
-                                    icon={<FaUserPlus />}
-                                    onClick={() => {
-                                        setSelectedUserId("");
-                                        setSelectedRole("");
-                                        setIsAddingNewUser(false);
-                                        setShowTambahAdminModal(true);
-                                    }}
-                                >
-                                    Tambah Admin
-                                </Button>
                             </div>
 
                             <Table
-                                columns={getAdminColumns(handleDeleteAdmin, handleToggleAktivasiStaff)}
+                                columns={getAdminColumns()}
                                 data={filteredAdminList}
                                 rowKey={(row) => row.user_id}
                             />
                         </div>
                     </div>
                 )}
-                {activeTab === "Jadwal" && (
-                    <div className="jadwal-tab-content">
-                        {/* Jadwal Penimbangan */}
-                        <div className="jadwal-card">
-                            <div className="jadwal-card-header">
-                                <div className="jadwal-card-icon jadwal-icon--timbang">
-                                    <FaScaleBalanced />
-                                </div>
-                                <div className="jadwal-card-header-text">
-                                    <h3 className="jadwal-card-title">Jadwal Penimbangan</h3>
-                                    <p className="jadwal-card-subtitle">Jadwal rutin penimbangan sampah nasabah</p>
-                                </div>
-                                <span className="jadwal-card-count jadwal-count--timbang">{penimbanganJadwal.length} jadwal</span>
+                {activeTab === "Pengangkutan" && (
+                    <div className="nasabah-tab-content">
+                        <div className="bsu-table-section">
+                            <div className="riwayat-filter-row">
+                                <SearchBar
+                                    placeholder="Cari ID Pengangkutan..."
+                                    value={angkutSearch}
+                                    onChange={setAngkutSearch}
+                                    width="300px"
+                                />
+                                <FilterRange
+                                    from={angkutFrom}
+                                    to={angkutTo}
+                                    onChange={(f, t) => { setAngkutFrom(f); setAngkutTo(t); }}
+                                />
                             </div>
-                            <div className="jadwal-timeline">
-                                {penimbanganJadwal.length === 0 ? (
-                                    <div className="jadwal-empty-state">Belum ada jadwal penimbangan.</div>
-                                ) : (
-                                    penimbanganJadwal.map((item) => {
-                                        const { day, month } = formatDayOfMonth(item.tanggal);
-                                        return (
-                                            <div key={item.jadwal_id} className="jadwal-timeline-item">
-                                                <div className="jadwal-date-badge jadwal-date--timbang">
-                                                    <span className="jadwal-date-day">{item.is_rutin ? "-" : day}</span>
-                                                    <span className="jadwal-date-month">{item.is_rutin ? "Rutin" : month}</span>
-                                                </div>
-                                                <div className="jadwal-timeline-connector">
-                                                    <div className="jadwal-timeline-dot jadwal-dot--timbang" />
-                                                    <div className="jadwal-timeline-line jadwal-line--timbang" />
-                                                </div>
-                                                <div className="jadwal-timeline-content">
-                                                    <span className="jadwal-timeline-hari">
-                                                        {item.is_rutin ? `${HARI_DISPLAY[item.hari]} (${MINGGU_LABEL(item.minggu_ke)})` : (item.nama_jadwal_spesial || "Spesial")}
-                                                    </span>
-                                                    <span className="jadwal-timeline-waktu">
-                                                        <FaClock /> {formatTime(item.jam_mulai)} – {formatTime(item.jam_selesai)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Jadwal Pengangkutan */}
-                        <div className="jadwal-card">
-                            <div className="jadwal-card-header">
-                                <div className="jadwal-card-icon jadwal-icon--angkut">
-                                    <FaTruck />
-                                </div>
-                                <div className="jadwal-card-header-text">
-                                    <h3 className="jadwal-card-title">Jadwal Pengangkutan</h3>
-                                    <p className="jadwal-card-subtitle">Jadwal pengangkutan sampah ke pusat daur ulang</p>
-                                </div>
-                                <span className="jadwal-card-count jadwal-count--angkut">{pengangkutanJadwal.length} jadwal</span>
-                            </div>
-                            <div className="jadwal-timeline">
-                                {pengangkutanJadwal.length === 0 ? (
-                                    <div className="jadwal-empty-state">Belum ada jadwal pengangkutan.</div>
-                                ) : (
-                                    pengangkutanJadwal.map((item) => {
-                                        const { day, month } = formatDayOfMonth(item.tanggal);
-                                        return (
-                                            <div key={item.jadwal_id} className="jadwal-timeline-item">
-                                                <div className="jadwal-date-badge jadwal-date--angkut">
-                                                    <span className="jadwal-date-day">{item.is_rutin ? "-" : day}</span>
-                                                    <span className="jadwal-date-month">{item.is_rutin ? "Rutin" : month}</span>
-                                                </div>
-                                                <div className="jadwal-timeline-connector">
-                                                    <div className="jadwal-timeline-dot jadwal-dot--angkut" />
-                                                    <div className="jadwal-timeline-line jadwal-line--angkut" />
-                                                </div>
-                                                <div className="jadwal-timeline-content">
-                                                    <span className="jadwal-timeline-hari">
-                                                        {item.target_bank_name || "BS Induk"} 
-                                                        {item.is_rutin ? ` • ${HARI_DISPLAY[item.hari]}` : ` • ${item.nama_jadwal_spesial || "Spesial"}`}
-                                                    </span>
-                                                    <span className="jadwal-timeline-waktu">
-                                                        <FaClock /> {formatTime(item.jam_mulai)} – {formatTime(item.jam_selesai)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
+                            {angkutLoading
+                                ? <div className="riwayat-loading">Memuat data...</div>
+                                : <Table<PengangkutanItem>
+                                    columns={ANGKUT_COLS}
+                                    data={filteredAngkut}
+                                    rowKey={(row) => row.pengangkutan_id}
+                                    emptyMessage="Belum ada riwayat pengangkutan."
+                                    onRowClick={(row) => navigate(`/bsi/riwayat/pengangkutan/${row.pengangkutan_id}`)}
+                                  />
+                            }
                         </div>
                     </div>
                 )}
-                {activeTab === "Log Akun Bank" && (
+                {activeTab === "Statistik" && id && (
+                    <div className="nasabah-tab-content" style={{ display: "flex", flexDirection: "column", gap: "24px", padding: "0 24px 48px" }}>
+                        <SetoranSampahDashboard bankId={id} />
+                        {bank.jenis === "BSU"
+                            ? <MasukSampahSection bankId={id} />
+                            : <PenjualanSampahSection bankId={id} />
+                        }
+                        <KontribusiNasabahSection bankId={id} />
+                    </div>
+                )}
+                {activeTab === "Bagi Hasil" && (
                     <div className="nasabah-tab-content">
                         <div className="bsu-table-section">
-                            <Table
-                                columns={[
-                                    {
-                                        key: "action",
-                                        header: "Action",
-                                        width: "110px",
-                                        align: "center",
-                                        render: (row: HistoryAkunBank) => {
-                                            const colorMap: Record<string, { color: string; bg: string }> = {
-                                                'CREATE': { color: '#4EA771', bg: 'rgba(78,167,113,0.12)' },
-                                                'UPDATE': { color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' },
-                                                'DELETE': { color: '#EF4444', bg: 'rgba(239,68,68,0.12)' },
-                                            };
-                                            const c = colorMap[row.action] || colorMap['UPDATE'];
-                                            return (
-                                                <span style={{
-                                                    display: 'inline-block',
-                                                    padding: '4px 10px',
-                                                    borderRadius: '6px',
-                                                    fontSize: '12px',
-                                                    fontWeight: 600,
-                                                    color: c.color,
-                                                    backgroundColor: c.bg,
-                                                }}>
-                                                    {row.action}
-                                                </span>
-                                            );
-                                        },
-                                    },
-                                    {
-                                        key: "timestamp",
-                                        header: "Timestamp",
-                                        width: "180px",
-                                        render: (row: HistoryAkunBank) => {
-                                            const date = new Date(row.created_at);
-                                            const tanggal = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-                                            const jam = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                                            return <span style={{ fontSize: '13px', color: '#555' }}>{tanggal} • {jam}</span>;
-                                        },
-                                    },
-                                    {
-                                        key: "informasi",
-                                        header: "Informasi",
-                                        render: (row: HistoryAkunBank) => (
-                                            <span style={{ fontSize: '13px' }}>{row.informasi}</span>
-                                        ),
-                                    },
-                                    {
-                                        key: "keterangan",
-                                        header: "Keterangan",
-                                        render: (row: HistoryAkunBank) => (
-                                            <span style={{ fontSize: '13px', color: '#666' }}>{row.keterangan || '-'}</span>
-                                        ),
-                                    },
-                                    {
-                                        key: "created_by",
-                                        header: "By Admin",
-                                        width: "150px",
-                                        render: (row: HistoryAkunBank) => (
-                                            <span style={{ fontSize: '13px', fontWeight: 500 }}>{row.created_by_name || '-'}</span>
-                                        ),
-                                    },
-                                ]}
-                                data={historyList}
-                                rowKey={(row) => row.history_bank_id}
-                                emptyMessage="Belum ada riwayat perubahan akun bank."
-                            />
+                            <div className="riwayat-filter-row">
+                                <SearchBar
+                                    placeholder="Cari ID bagi hasil atau distribusi..."
+                                    value={bagiHasilBsuSearch}
+                                    onChange={setBagiHasilBsuSearch}
+                                    width="300px"
+                                />
+                                <FilterRange
+                                    from={bagiHasilBsuFrom}
+                                    to={bagiHasilBsuTo}
+                                    onChange={(f, t) => { setBagiHasilBsuFrom(f); setBagiHasilBsuTo(t); }}
+                                />
+                            </div>
+                            {bagiHasilBsuLoading
+                                ? <div className="riwayat-loading">Memuat data...</div>
+                                : <Table<BagiHasilBsuItem>
+                                    columns={BAGI_HASIL_BSU_COLS}
+                                    data={filteredBagiHasilBsu}
+                                    rowKey={(row) => row.penerima_sisa_id}
+                                    emptyMessage="Belum ada riwayat bagi hasil."
+                                    onRowClick={(row) => navigate(`/bsi/distribusi-sisa-bsu/${row.penerima_sisa_id}`)}
+                                  />
+                            }
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* ══════════════ MODAL: Tambah Admin / Akun ══════════════ */}
-            {showTambahAdminModal && (
-                <div className="regis-modal-overlay" onClick={() => setShowTambahAdminModal(false)}>
-                    <div className="regis-modal" style={{ maxWidth: isAddingNewUser ? 540 : 860, maxHeight: "90vh", display: "flex", flexDirection: "column" }} onClick={e => e.stopPropagation()}>
-                        <div className="regis-modal-header" style={{ flexShrink: 0 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                <div className="regis-section-icon icon-admin" style={{ width: 36, height: 36, fontSize: 16 }}>
-                                    <FaUserShield />
-                                </div>
-                                <div>
-                                    <h3 className="regis-modal-title">
-                                        {isAddingNewUser ? "Tambahkan Akun Baru" : "Tambah Admin / Petugas"}
-                                    </h3>
-                                    <p className="regis-modal-subtitle">
-                                        {isAddingNewUser 
-                                            ? "Tambahkan akun pengguna baru ke sistem" 
-                                            : "Pilih akun dan tentukan role untuk bank sampah ini"}
-                                    </p>
-                                </div>
-                            </div>
-                            <CloseButton onClick={() => {
-                                if (isAddingNewUser) {
-                                    setIsAddingNewUser(false);
-                                } else {
-                                    setShowTambahAdminModal(false);
-                                }
-                            }} />
-                        </div>
-
-                        {!isAddingNewUser ? (
-                            // Tampilan Pilih Role & Akun
-                            <form onSubmit={handleTambahAdmin} style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                                <div className="regis-modal-body" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, padding: "24px", overflowY: "auto", flex: 1 }}>
-                                    
-                                    {/* Kiri: Daftar Akun Non-Admin */}
-                                    <div className="regis-form-group" style={{ marginBottom: 0 }}>
-                                        <label className="regis-label">
-                                            Pilih Akun <span className="required">*</span>
-                                        </label>
-                                        <p style={{ fontSize: 12, color: "#888", marginBottom: 12, marginTop: 0 }}>Pilih satu akun untuk dijadikan admin atau petugas</p>
-                                        <div className="regis-admin-table-wrapper" style={{ maxHeight: 380, overflowY: "auto" }}>
-                                            <table className="regis-admin-table">
-                                                <thead style={{ position: "sticky", top: 0, zIndex: 10 }}>
-                                                    <tr>
-                                                        <th style={{ width: 44, textAlign: "center" }}></th>
-                                                        <th style={{ width: 48, textAlign: "center" }}>Foto</th>
-                                                        <th>Nama & Email</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {nonAdminUsers.length === 0 ? (
-                                                        <tr>
-                                                            <td colSpan={3} style={{ textAlign: "center", padding: "24px", color: "#aaa", fontSize: 13 }}>
-                                                                Tidak ada akun yang tersedia
-                                                            </td>
-                                                        </tr>
-                                                    ) : nonAdminUsers.map(user => {
-                                                        const isSelected = selectedUserId === user.UserID;
-                                                        return (
-                                                            <tr
-                                                                key={user.UserID}
-                                                                className={isSelected ? "selected" : ""}
-                                                                onClick={() => setSelectedUserId(user.UserID)}
-                                                                style={{ cursor: "pointer" }}
-                                                            >
-                                                                <td style={{ textAlign: "center" }}>
-                                                                    <label className="regis-checkbox-wrapper" onClick={e => e.stopPropagation()}>
-                                                                        <input
-                                                                            type="radio"
-                                                                            name="tambah-admin-user"
-                                                                            checked={isSelected}
-                                                                            onChange={() => setSelectedUserId(user.UserID)}
-                                                                            style={{ accentColor: "#013236" }}
-                                                                        />
-                                                                    </label>
-                                                                </td>
-                                                                <td style={{ textAlign: "center" }}>
-                                                                    <div className="regis-admin-avatar">
-                                                                        {user.PhotoURL ? (
-                                                                            <img src={user.PhotoURL} alt={user.Nama} />
-                                                                        ) : (
-                                                                            <span>{user.Nama.charAt(0).toUpperCase()}</span>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <div style={{ display: "flex", flexDirection: "column" }}>
-                                                                        <span className="regis-admin-name">{user.Nama}</span>
-                                                                        <span className="regis-admin-email" style={{ fontSize: 11, color: "#888" }}>{user.Email}</span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    {/* Kanan: Role Dropdown */}
-                                    <div className="regis-form-group" style={{ marginBottom: 0 }}>
-                                        <label className="regis-label" htmlFor="tambah-admin-role">
-                                            Role <span className="required">*</span>
-                                        </label>
-                                        <p style={{ fontSize: 12, color: "#888", marginBottom: 12, marginTop: 0 }}>Tentukan posisi jabatan untuk pengguna terpilih</p>
-                                        <Dropdown
-                                            options={getRoleOptions()}
-                                            value={selectedRole}
-                                            onChange={(e) => setSelectedRole(e.target.value)}
-                                            placeholder="Pilih Role Jabatan"
-                                            dropdownSize="large"
-                                            fullWidth
-                                        />
-                                        {selectedUserId && selectedRole && (
-                                            <div style={{ marginTop: 24, padding: "16px", background: "#f0f5f2", borderRadius: "12px", border: "1px solid #c1d9c9" }}>
-                                                <div style={{ fontSize: 12, color: "#5a7a68", marginBottom: 4 }}>Ringkasan Pilihan:</div>
-                                                <div style={{ fontSize: 14, color: "#013236", fontWeight: 600 }}>{nonAdminUsers.find(u => u.UserID === selectedUserId)?.Nama || "Seseorang"}</div>
-                                                <div style={{ fontSize: 13, color: "#3d5a48" }}>akan ditunjuk sebagai <strong>{getRoleOptions().find(r => r.value === selectedRole)?.label || "Role"}</strong></div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="regis-modal-footer" style={{ flexShrink: 0, justifyContent: "space-between" }}>
-                                    <Button
-                                        type="button"
-                                        color="primary"
-                                        variant="ghost"
-                                        size="default"
-                                        isRounded
-                                        icon={<FaUserPlus />}
-                                        onClick={() => setIsAddingNewUser(true)}
-                                    >
-                                        Tambahkan Akun Baru
-                                    </Button>
-                                    <div style={{ display: "flex", gap: "12px" }}>
-                                        <Button
-                                            type="button"
-                                            color="primary"
-                                            variant="outline"
-                                            size="default"
-                                            onClick={() => setShowTambahAdminModal(false)}
-                                            disabled={isSubmittingAdmin}
-                                        >
-                                            Batal
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            color="primary"
-                                            variant="solid"
-                                            size="default"
-                                            disabled={isSubmittingAdmin}
-                                        >
-                                            {isSubmittingAdmin ? "Menyimpan..." : "Simpan Admin"}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </form>
-                        ) : (
-                            // Tampilan Form Tambah Akun Baru
-                            <form onSubmit={handleSaveNewUser} style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                                <div className="regis-modal-body" style={{ overflowY: "auto", flex: 1 }}>
-                                    <div className="regis-form-group">
-                                        <label className="regis-label" htmlFor="new-admin-nik">
-                                            NIK <span className="required">*</span>
-                                        </label>
-                                        <Input
-                                            id="new-admin-nik"
-                                            className="regis-input-neutral"
-                                            variant="solid"
-                                            inputSize="large"
-                                            fullWidth
-                                            placeholder="Masukkan 16 digit NIK"
-                                            value={newUserForm.nik}
-                                            onChange={(e) => setNewUserForm({ ...newUserForm, nik: e.target.value })}
-                                            required
-                                            maxLength={16}
-                                        />
-                                    </div>
-                                    <div className="regis-form-group">
-                                        <label className="regis-label" htmlFor="new-admin-nama">
-                                            Nama Lengkap <span className="required">*</span>
-                                        </label>
-                                        <Input
-                                            id="new-admin-nama"
-                                            className="regis-input-neutral"
-                                            variant="solid"
-                                            inputSize="large"
-                                            fullWidth
-                                            placeholder="Masukkan nama lengkap"
-                                            value={newUserForm.nama}
-                                            onChange={(e) => setNewUserForm({ ...newUserForm, nama: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="regis-form-group">
-                                        <label className="regis-label" htmlFor="new-admin-email">
-                                            Email <span className="required">*</span>
-                                        </label>
-                                        <Input
-                                            id="new-admin-email"
-                                            type="email"
-                                            className="regis-input-neutral"
-                                            variant="solid"
-                                            inputSize="large"
-                                            fullWidth
-                                            placeholder="contoh@email.com"
-                                            value={newUserForm.email}
-                                            onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="regis-form-group">
-                                        <label className="regis-label" htmlFor="new-admin-nowa">
-                                            No. WhatsApp <span className="required">*</span>
-                                        </label>
-                                        <Input
-                                            id="new-admin-nowa"
-                                            type="tel"
-                                            className="regis-input-neutral"
-                                            variant="solid"
-                                            inputSize="large"
-                                            fullWidth
-                                            placeholder="081234567890"
-                                            value={newUserForm.noWa}
-                                            onChange={(e) => setNewUserForm({ ...newUserForm, noWa: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div className="regis-modal-footer" style={{ flexShrink: 0 }}>
-                                    <Button
-                                        type="button"
-                                        color="primary"
-                                        variant="outline"
-                                        size="default"
-                                        onClick={() => setIsAddingNewUser(false)}
-                                    >
-                                        Kembali
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        color="primary"
-                                        variant="solid"
-                                        size="default"
-                                    >
-                                        Simpan Akun
-                                    </Button>
-                                </div>
-                            </form>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            <PopupAktivasiResult
-                isOpen={isReactivateModalOpen}
-                onClose={() => setIsReactivateModalOpen(false)}
-                data={reactivateData}
-                description="Berikan informasi berikut kepada staff untuk proses aktivasi akun mereka."
-            />
 
             <PopupConfirmation
                 isOpen={isActivationConfirmOpen}
@@ -1354,6 +874,17 @@ export default function ProfilBankPage() {
                 cancelText="Batal"
             />
 
+            <PopupConfirmation
+                isOpen={isDeleteConfirmOpen}
+                type="danger"
+                title="Hapus Bank Sampah?"
+                message="Apakah Anda yakin ingin menghapus bank sampah ini? Tindakan ini tidak dapat dibatalkan."
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                onConfirm={doHapusBankSampah}
+                onCancel={() => setIsDeleteConfirmOpen(false)}
+            />
+
             <PopupInputKeterangan
                 isOpen={isInputKeteranganOpen}
                 title={bankProfile?.is_active ? "Kenapa bank sampah ini perlu dinonaktifkan?" : "Kenapa bank sampah ini diaktifkan kembali?"}
@@ -1361,13 +892,6 @@ export default function ProfilBankPage() {
                 onCancel={() => setIsInputKeteranganOpen(false)}
             />
 
-            {showNotifPopup && (
-                <PopupNotifikasi
-                    message={notifMessage}
-                    type={notifType}
-                    onClose={() => setShowNotifPopup(false)}
-                />
-            )}
         </>
     );
 }

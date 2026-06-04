@@ -12,6 +12,7 @@ import SearchBar from "../components/search";
 import Pagination from "../components/pagination";
 import SkeletonTable from "../components/skeleton-table";
 import EmptyState from "../components/empty-state";
+import { api } from "../services/api";
 import {
     FaUsers,
     FaCircleCheck,
@@ -30,6 +31,7 @@ export default function NasabahPage() {
         user,
         isAdminBsi,
         isAdminBsu,
+        isAdminBsm,
         paginatedNasabah,
         filteredNasabah,
         loading,
@@ -46,8 +48,9 @@ export default function NasabahPage() {
         fetchNasabahs,
     } = useNasabahData();
 
-    const columns = buildColumns(isAdminBsi, isAdminBsu, navigate);
+    const columns = buildColumns(isAdminBsi, isAdminBsu, navigate, isAdminBsm);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     // ── Popup notifikasi state ────────────────────────────
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -56,6 +59,29 @@ export default function NasabahPage() {
     const handleModalSuccess = () => {
         fetchNasabahs();
         setPopupNotif({ message: "Berhasil mendaftarkan nasabah baru!", type: "success" });
+    };
+
+    // ── Export laporan nasabah ────────────────────────────
+    const handleExportLaporan = async () => {
+        if (!user?.bank_id) return;
+        setIsExporting(true);
+        try {
+            const response = await api.get(`/laporan/nasabah/${user.bank_id}`, {
+                responseType: "blob",
+            });
+            const url = URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `laporan-nasabah-${user.bank_id}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch {
+            setPopupNotif({ message: "Gagal mengekspor laporan. Silakan coba lagi.", type: "error" });
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     return (
@@ -70,18 +96,19 @@ export default function NasabahPage() {
                     </p>
                 </div>
                 <div className="nasabah-hero-right">
-                    <Button
-                        icon={<FaFileExport />}
-                        color="neon"
-                        variant="solid"
-                        size="default"
-                        isRounded
-                        onClick={() => {
-                            setPopupNotif({ message: "Fitur export CSV akan segera tersedia.", type: "success" });
-                        }}
-                    >
-                        Ekspor Laporan
-                    </Button>
+                    {user?.bank_id && (
+                        <Button
+                            icon={<FaFileExport />}
+                            color="neon"
+                            variant="solid"
+                            size="default"
+                            isRounded
+                            onClick={handleExportLaporan}
+                            disabled={isExporting}
+                        >
+                            {isExporting ? "Mengekspor..." : "Ekspor Laporan"}
+                        </Button>
+                    )}
                     <Button
                         icon={<FaUserPlus />}
                         color="secondary"
@@ -172,6 +199,7 @@ export default function NasabahPage() {
                 onSuccess={handleModalSuccess}
                 isAdminBsi={isAdminBsi}
                 isAdminBsu={isAdminBsu}
+                isAdminBsm={isAdminBsm}
                 bankId={user?.bank_id || ""}
                 identityId={user?.identity_id || ""}
                 afiliasiOptions={afiliasiOptions}

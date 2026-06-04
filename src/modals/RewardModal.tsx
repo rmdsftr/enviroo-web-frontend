@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import Input from "../components/input";
+import Dropdown from "../components/dropdown";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import "../styles/reward.css";
+
+const NAMA_REWARD_OPTIONS = [
+    { label: "Uang", value: "Uang" },
+    { label: "Sembako", value: "Sembako" },
+];
+
+const SATUAN_OPTIONS = [
+    { label: "Rp", value: "Rp" },
+    { label: "poin", value: "poin" },
+];
 
 export interface RewardFormData {
     reward_id?: number;
@@ -17,9 +27,11 @@ interface RewardModalProps {
     onClose: () => void;
     onSubmit: (data: RewardFormData) => Promise<void>;
     initialData?: RewardFormData | null;
+    existingNames?: string[];
+    existingSatuans?: string[];
 }
 
-export default function RewardModal({ isOpen, onClose, onSubmit, initialData }: RewardModalProps) {
+export default function RewardModal({ isOpen, onClose, onSubmit, initialData, existingNames = [], existingSatuans = [] }: RewardModalProps) {
     const isEdit = !!initialData?.reward_id;
 
     const [form, setForm] = useState<RewardFormData>({
@@ -98,38 +110,41 @@ export default function RewardModal({ isOpen, onClose, onSubmit, initialData }: 
 
                     <div className="rw-modal-field">
                         <label className="rw-modal-label">Nama Reward</label>
-                        <Input
-                            className="rw-input-override"
-                            type="text"
-                            placeholder="Contoh: Uang Tunai, Emas, Sembako"
+                        <Dropdown
+                            options={isEdit ? NAMA_REWARD_OPTIONS : NAMA_REWARD_OPTIONS.filter(o => !existingNames.map(n => n.toLowerCase()).includes(o.value.toLowerCase()))}
                             value={form.nama_reward}
                             onChange={e => setForm(prev => ({ ...prev, nama_reward: e.target.value }))}
+                            placeholder="Pilih jenis reward..."
+                            fullWidth
                             required
+                            disabled={isEdit}
                         />
                     </div>
 
                     <div className="rw-modal-field">
                         <label className="rw-modal-label">Satuan</label>
-                        <Input
-                            className="rw-input-override"
-                            type="text"
-                            placeholder="Contoh: Rp, gram, kg"
+                        <Dropdown
+                            options={isEdit ? SATUAN_OPTIONS : SATUAN_OPTIONS.filter(o => !existingSatuans.map(s => s.toLowerCase()).includes(o.value.toLowerCase()))}
                             value={form.satuan}
                             onChange={e => setForm(prev => ({ ...prev, satuan: e.target.value }))}
+                            placeholder="Pilih satuan..."
+                            fullWidth
                             required
+                            disabled={isEdit}
                         />
                     </div>
 
                     <div className="rw-modal-field">
                         <label className="rw-modal-label">
-                            Deskripsi <span style={{ color: "var(--c-text-faint)" }}>(opsional)</span>
+                            Deskripsi 
                         </label>
                         <textarea
                             className="rw-modal-textarea"
-                            placeholder="Jelaskan detail konversi reward ini..."
+                            placeholder="Jelaskan detail reward ini..."
                             value={form.deskripsi}
                             onChange={e => setForm(prev => ({ ...prev, deskripsi: e.target.value }))}
                             rows={3}
+                            required
                         />
                     </div>
 

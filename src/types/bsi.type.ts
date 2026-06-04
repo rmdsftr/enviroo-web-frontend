@@ -4,7 +4,8 @@ export interface NewBSI {
     foto: File;
     provinsi: string;
     kabupaten_kota: string;
-    kecamatan: string;
+    id_kecamatan: string;
+    id_kelurahan: string;
     alamat_lengkap: string;
     latitude: number;
     longitude: number;
@@ -45,11 +46,13 @@ export interface AddUnitRequest {
     foto: File;
     provinsi: string;
     kabupaten_kota: string;
-    kecamatan: string;
+    id_kecamatan: string;
+    id_kelurahan: string;
     alamat_lengkap: string;
     latitude: number;
     longitude: number;
     user_id: string[];
+    admin_id: string;
 }
 
 export interface BsiNasabahUser {
@@ -61,12 +64,11 @@ export interface BsiNasabahUser {
 }
 
 export interface BsiNasabahItem {
-    NasabahID: string;
-    BankID: string;
-    UserID: string;
-    JoinedAt: string;
-    StatusNasabah: string;
-    User: BsiNasabahUser;
+    nasabah_id: string;
+    nama: string;
+    email: string;
+    foto: string;
+    status: string;
 }
 
 export interface GetNasabahBSIResponse {

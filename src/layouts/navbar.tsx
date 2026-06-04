@@ -1,37 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaBell, FaChevronDown, FaRightFromBracket, FaUser } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import "../styles/navbar.css";
-import logo from "../assets/logo-enviroo.png";
 import ava from "../assets/profile.png";
 import SearchBar from "../components/search";
 import { useAuth } from "../contexts/AuthContext";
+import { NotifikasiService } from "../services/notifikasi.service";
+
+const ADMIN_ROLES = ["admin_bsi", "admin_bsu", "admin_bsm"];
 
 export default function NavbarLayout() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [notifCount] = useState(3);
+    const [unreadCount, setUnreadCount] = useState(0);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    const isAdmin = ADMIN_ROLES.includes(user?.role?.toLowerCase() ?? "");
+
+    useEffect(() => {
+        if (!isAdmin || !user?.user_id) return;
+        NotifikasiService.getUnreadCount(user.user_id)
+            .then(setUnreadCount)
+            .catch(() => {});
+    }, [isAdmin, user?.user_id]);
 
     return (
         <header className="nav">
             {/* Left: logo + search */}
             <div className="nav-left">
-                <div className="nav-logo">
-                    <img src={logo} alt="Enviroo logo" />
-                </div>
                 <SearchBar placeholder="Cari data..." />
             </div>
 
             {/* Right: notif + profile */}
             <div className="nav-right">
-                {/* Notification bell */}
-                <button className="nav-icon-btn" aria-label="Notifikasi">
-                    <FaBell />
-                    {notifCount > 0 && (
-                        <span className="nav-badge">{notifCount}</span>
-                    )}
-                </button>
+                {/* Notification bell — only for admin roles */}
+                {isAdmin && (
+                    <button
+                        className="nav-icon-btn"
+                        aria-label="Notifikasi"
+                        onClick={() => navigate("/notifikasi")}
+                    >
+                        <FaBell />
+                        {unreadCount > 0 && (
+                            <span className="nav-badge">{unreadCount}</span>
+                        )}
+                    </button>
+                )}
 
                 {/* Profile dropdown */}
                 <div

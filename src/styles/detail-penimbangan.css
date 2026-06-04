@@ -1,0 +1,523 @@
+/* =========================================================
+   Detail Penimbangan — Page Styles
+   ========================================================= */
+
+@keyframes dpFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page Wrapper ── */
+.dp-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px 32px;
+    animation: dpFadeIn 0.4s ease both;
+}
+
+/* ── Hero ── */
+.dp-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 28px 0 20px;
+}
+
+.dp-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.dp-hero-left h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0 0 4px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+}
+
+.dp-hero-left p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+.dp-hero-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── Loading / Error states ── */
+.dp-loading,
+.dp-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.dp-error {
+    color: #ef4444;
+}
+
+/* =========================================================
+   Main 2-Column Grid Card
+   ========================================================= */
+.dp-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 16px rgba(1, 50, 54, 0.06);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .dp-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Left Column: Overview ── */
+.dp-overview {
+    padding: 28px 28px 32px;
+    border-right: 1px solid rgba(1, 50, 54, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (max-width: 960px) {
+    .dp-overview {
+        border-right: none;
+        border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+    }
+}
+
+/* ── Overview header ── */
+.dp-overview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dp-overview-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #eaf6ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #4EA771;
+    flex-shrink: 0;
+}
+
+.dp-overview-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.dp-overview-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+}
+
+/* ── Info rows ── */
+.dp-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dp-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.dp-info-row:hover {
+    background: rgba(78, 167, 113, 0.05);
+}
+
+.dp-info-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: #f1f8f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #6b9080;
+    flex-shrink: 0;
+}
+
+.dp-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.dp-info-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dp-info-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Status Pill (reuse jbsu pattern) ── */
+.dp-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.dp-status-pill.selesai {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dp-status-pill.aktif {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.dp-status-pill.dibatalkan {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dp-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+/* ── Divider ── */
+.dp-divider {
+    height: 1px;
+    background: rgba(1, 50, 54, 0.06);
+    margin: 4px 0;
+}
+
+/* ── Stats row (total setoran / items) ── */
+.dp-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.dp-stat-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    background: rgba(1, 50, 54, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+}
+
+.dp-stat-chip-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #013236;
+    line-height: 1;
+}
+
+.dp-stat-chip-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   Right Column: List Setoran
+   ========================================================= */
+.dp-setoran-col {
+    padding: 28px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dp-setoran-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dp-setoran-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #eaf6ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #4EA771;
+    flex-shrink: 0;
+}
+
+.dp-setoran-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.dp-setoran-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+}
+
+.dp-setoran-count-badge {
+    margin-left: auto;
+    background: rgba(1, 50, 54, 0.06);
+    color: #013236;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* ── List ── */
+.dp-setoran-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ── Setoran Row (clickable card) ── */
+.dp-setoran-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(1, 50, 54, 0.07);
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    text-decoration: none;
+}
+
+.dp-setoran-row:hover {
+    border-color: rgba(78, 167, 113, 0.35);
+    box-shadow: 0 4px 14px rgba(78, 167, 113, 0.10);
+    background: rgba(78, 167, 113, 0.02);
+}
+
+.dp-setoran-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ddf0e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3d8a5c;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.dp-setoran-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+}
+
+.dp-setoran-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dp-setoran-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dp-setoran-id {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #7a9e8a;
+    font-weight: 500;
+}
+
+.dp-setoran-sep {
+    color: #c5d8cc;
+    font-size: 12px;
+}
+
+.dp-setoran-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #7a9e8a;
+}
+
+.dp-setoran-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.dp-setoran-items {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #013236;
+}
+
+/* dp-setoran-poin removed */
+
+.dp-setoran-status-pill {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.dp-setoran-status-pill.berhasil {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dp-setoran-status-pill.gagal {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dp-setoran-status-pill.pending {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.dp-setoran-arrow {
+    color: #b0c9bc;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.dp-setoran-row:hover .dp-setoran-arrow {
+    color: #4EA771;
+    transform: translateX(2px);
+}
+
+/* ── Empty setoran ── */
+.dp-setoran-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 0;
+    color: #b0c9bc;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+}
+
+.dp-setoran-empty svg {
+    font-size: 28px;
+    opacity: 0.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .dp-page {
+        padding: 0 16px 24px;
+    }
+
+    .dp-hero h1 {
+        font-size: 20px;
+    }
+
+    .dp-hero-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .dp-overview,
+    .dp-setoran-col {
+        padding: 20px 20px 24px;
+    }
+
+    .dp-stats-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dp-setoran-row {
+        gap: 10px;
+        padding: 11px 12px;
+    }
+}

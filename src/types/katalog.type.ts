@@ -1,3 +1,7 @@
+import type { Reward } from "./reward.type";
+
+export type { Reward };
+
 export interface KategoriSampah {
     KategoriID: number;
     Kategori: string;
@@ -9,12 +13,25 @@ export interface GetKategoriResponse {
 }
 
 export type SatuanEnum = "kg" | "pcs" | "liter";
+export type LevelUser = "nasabah" | "eksternal";
+export type SatuanReward = "Rp" | "poin";
 
-export type LevelUser = "nasabah" | "bsu" | "eksternal";
-
-export interface SchemaHarga {
+export interface HargaPerLevel {
+    schema_id: number;
     level_user: LevelUser;
-    poin_harga: number;
+    harga: number;
+    satuan_reward: SatuanReward;
+}
+
+export interface KatalogHistoryItem {
+    history_id: number;
+    schema_id: number;
+    level_user: LevelUser;
+    harga_lama: number;
+    harga_baru: number;
+    changed_at: string;
+    changed_by_id: string;
+    changed_by_nama: string;
 }
 
 export interface KatalogSampah {
@@ -24,9 +41,25 @@ export interface KatalogSampah {
     satuan: SatuanEnum;
     bank_id: string;
     kategori_id: number;
+    reward_id: number;
+    syarat_pemilahan: string;
     stok: number;
     kategori: KategoriSampah;
-    harga: SchemaHarga[];
+    reward: Reward;
+}
+
+export interface KatalogDetail {
+    sampah_id: string;
+    nama_sampah: string;
+    photo_url: string;
+    satuan: SatuanEnum;
+    bank_id: string;
+    syarat_pemilahan: string;
+    kategori: KategoriSampah;
+    reward: Reward;
+    stok: number;
+    harga_per_level: HargaPerLevel[];
+    history_harga: KatalogHistoryItem[];
 }
 
 export interface GetKatalogResponse {
@@ -34,57 +67,27 @@ export interface GetKatalogResponse {
     message: string;
 }
 
-// History response item — PascalCase because backend model lacks JSON tags
-export interface KatalogHistoryResponseItem {
-    HistorySampahID: number;
-    SampahID: string;
-    LevelUser: LevelUser;
-    OldPoin: number;
-    NewPoin: number;
-    ChangedAt: string;
-    ChangedBy: string;
-    admin_nama: string; // explicitly tagged in DTO
-}
-
-export interface GetKatalogHistoryResponse {
-    data: KatalogHistoryResponseItem[];
+export interface GetKatalogDetailResponse {
+    data: KatalogDetail;
     message: string;
 }
 
 // ── Request payloads ──────────────────────────────────────────
 
-/** BSI add: 3 price levels (nasabah, bsu, eksternal) */
-export interface AddKatalogBSIRequest {
+export interface AddKatalogRequest {
     nama_sampah: string;
     satuan: SatuanEnum;
     kategori_id: number;
-    harga_nasabah: number;
-    harga_bsu: number;
-    harga_eksternal: number;
+    reward_id: number;
+    syarat_pemilahan?: string;
     foto?: File;
 }
 
-/** BSM add: 2 price levels (nasabah, eksternal) — no BSU */
-export interface AddKatalogBSMRequest {
-    nama_sampah: string;
-    satuan: SatuanEnum;
-    kategori_id: number;
-    harga_nasabah: number;
-    harga_eksternal: number;
-    foto?: File;
-}
-
-/** Edit item (non-harga fields) — same for BSI and BSM */
 export interface EditKatalogRequest {
     nama_sampah: string;
     satuan: SatuanEnum;
     kategori_id: number;
+    reward_id: number;
+    syarat_pemilahan?: string;
     foto?: File;
-}
-
-/** Update one schema harga */
-export interface UpdateHargaSchemaRequest {
-    level_user: LevelUser;
-    poin_harga_baru: number;
-    changed_by: string; // admin_id
 }

@@ -52,7 +52,7 @@
 .info-card__thumb-placeholder span {
     font-family: var(--ff-sans);
     font-size: 56px;
-    font-weight: 800;
+    font-weight: 700;
     color: rgba(78, 167, 113, 0.25);
     text-transform: uppercase;
     line-height: 1;

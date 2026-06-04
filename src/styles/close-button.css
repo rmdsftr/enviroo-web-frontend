@@ -21,5 +21,4 @@
     background: var(--c-primary-100);
     border-color: var(--c-primary);
     color: var(--c-primary-700);
-    transform: rotate(90deg);
 }

@@ -21,7 +21,7 @@ api.interceptors.response.use(
       
       // Jika error berasal dari endpoint login atau refresh itu sendiri,
       // jangan coba refresh lagi untuk menghindari infinite loop.
-      if (originalRequest.url?.includes("/auth/refresh") || originalRequest.url?.includes("/auth/login/web")) {
+      if (originalRequest.url?.includes("/auth/refresh") || originalRequest.url?.includes("/auth/login")) {
         if (window.location.pathname !== "/") {
           localStorage.removeItem("userData");
           window.location.href = "/";

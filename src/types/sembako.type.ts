@@ -1,16 +1,14 @@
-import type { LevelUser } from "./katalog.type";
-
-export interface SembakoHargaSchema {
-    level_user: LevelUser;
-    poin_harga: number;
-}
-
 export interface KatalogSembakoItem {
     sembako_id: string;
+    bank_id: string | null;
     nama_sembako: string;
-    photo_url: string;
+    photo_url: string | null;
+    nilai_poin: number;
     stok: number;
-    schema_harga: SembakoHargaSchema[];
+    created_at: string;
+    created_by: string | null;
+    updated_at: string;
+    updated_by: string | null;
 }
 
 export interface GetSembakoResponse {
@@ -18,18 +16,18 @@ export interface GetSembakoResponse {
     message: string;
 }
 
-// History response — PascalCase because backend model lacks JSON tags
-export interface SembakoHistoryItem {
-    HistorySembakoID: number;
-    SembakoID: string;
-    LevelUser: LevelUser;
-    PoinLama: number;
-    PoinBaru: number;
-    ChangedBy: string;
-    ChangedAt: string;
+export interface RiwayatDistribusi {
+    distribusi_id: string;
+    tanggal_kirim: string;
+    stok_terdistribusi: number;
+    nama_admin_bsi: string;
+    nama_admin_bsu: string;
 }
 
-export interface GetSembakoHistoryResponse {
-    data: SembakoHistoryItem[];
+export interface GetDetailSembakoBSUResponse {
+    data: {
+        sembako: KatalogSembakoItem;
+        riwayat_distribusi: RiwayatDistribusi[];
+    };
     message: string;
 }

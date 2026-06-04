@@ -7,6 +7,7 @@ import type {
     AddNilaiRewardRequest,
     UpdateNilaiRewardRequest,
     HistoryNilaiReward,
+    DetailNilaiRewardBank,
 } from "../types/reward.type";
 
 export const RewardService = {
@@ -37,6 +38,11 @@ export const RewardService = {
         return response.data;
     },
 
+    async getDetailNilaiReward(nilaiRewardId: string): Promise<{ message: string; data: DetailNilaiRewardBank }> {
+        const response = await api.get(`/nilai-reward/detail/${nilaiRewardId}`);
+        return response.data;
+    },
+
     async addNilaiReward(
         bankId: string,
         data: AddNilaiRewardRequest,
@@ -46,10 +52,11 @@ export const RewardService = {
     },
 
     async updateNilaiReward(
-        nilaiRewardId: string,
+        bankId: string,
+        rewardId: number,
         data: UpdateNilaiRewardRequest,
-    ): Promise<{ message: string; data: NilaiRewardBank }> {
-        const response = await api.patch(`/nilai-reward/edit/${nilaiRewardId}`, data);
+    ): Promise<{ message: string; data: NilaiRewardBank[] }> {
+        const response = await api.patch(`/nilai-reward/edit/${bankId}/${rewardId}`, data);
         return response.data;
     },
 

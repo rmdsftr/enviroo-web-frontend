@@ -2,295 +2,660 @@ import { useState, useEffect, useCallback } from "react";
 import {
     FaGift,
     FaPlus,
+    FaGear,
+    FaMoneyBillWave,
+    FaBoxOpen,
     FaPenToSquare,
     FaTrashCan,
-    FaClock,
-    FaMoneyBillWave,
-    FaCoins,
-    FaTableList,
 } from "react-icons/fa6";
 import Button from "../../components/button";
+import Dropdown from "../../components/dropdown";
+import Pagination from "../../components/pagination";
 import RewardModal from "../../modals/RewardModal";
 import type { RewardFormData } from "../../modals/RewardModal";
+import KategoriFormModal from "../../modals/KategoriFormModal";
+import KecamatanFormModal from "../../modals/KecamatanFormModal";
+import KelurahanFormModal from "../../modals/KelurahanFormModal";
+import type { KelurahanFormData } from "../../modals/KelurahanFormModal";
 import PopupConfirmation from "../../layouts/popup-confirmation";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import { RewardService } from "../../services/reward.service";
+import { LokasiService } from "../../services/lokasi.service";
+import { KatalogService } from "../../services/katalog.service";
 import type { Reward } from "../../types/reward.type";
-import "../../styles/layout.css";
-import "../../styles/reward.css";
+import type { Kecamatan, Kelurahan } from "../../types/lokasi.type";
+import type { KategoriSampah } from "../../types/katalog.type";
+import "../../styles/manajemen-reward.css";
+import "../../styles/table.css";
 
-/** Pick card variant class based on reward name */
-function getRewardVariant(nama: string): string {
+function rewardVariant(nama: string): "uang" | "sembako" | "default" {
     const lower = nama.toLowerCase();
     if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah")) return "uang";
-    if (lower.includes("emas") || lower.includes("gold")) return "emas";
+    if (lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return "sembako";
     return "default";
 }
 
-/** Pick icon component based on reward name */
 function RewardIcon({ nama }: { nama: string }) {
     const lower = nama.toLowerCase();
-    if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah"))
-        return <FaMoneyBillWave />;
-    if (lower.includes("emas") || lower.includes("gold"))
-        return <FaCoins />;
+    if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah")) return <FaMoneyBillWave />;
+    if (lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return <FaBoxOpen />;
     return <FaGift />;
 }
 
-/** Format ISO date to Indonesian locale */
-function formatDate(iso: string): string {
-    try {
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return "-";
-        return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
-    } catch {
-        return "-";
-    }
-}
+const DIVIDER = <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />;
 
-export default function RewardPage() {
+export default function KonfigurasiPage() {
+    /* ── Reward ─────────────────────────────────────────────── */
     const [rewards, setRewards] = useState<Reward[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isLoadingReward, setIsLoadingReward] = useState(true);
+    const [rewardError, setRewardError] = useState<string | null>(null);
+    const [rewardModalOpen, setRewardModalOpen] = useState(false);
+    const [editReward, setEditReward] = useState<RewardFormData | null>(null);
 
-    // Modal state
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editData, setEditData] = useState<RewardFormData | null>(null);
+    const hasUang = rewards.some(r => rewardVariant(r.NamaReward) === "uang");
+    const hasSembako = rewards.some(r => rewardVariant(r.NamaReward) === "sembako");
+    const allRewardsPresent = hasUang && hasSembako;
 
-    // Delete confirmation
-    const [deleteTarget, setDeleteTarget] = useState<Reward | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    // Toast notification
-    const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
-
-    /* ── Fetch rewards ── */
     const fetchRewards = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
+        setIsLoadingReward(true);
+        setRewardError(null);
         try {
             const res = await RewardService.getRewards();
             setRewards(Array.isArray(res.data) ? res.data : []);
-        } catch (err: any) {
-            console.error("Gagal mengambil data reward:", err);
-            setError("Gagal mengambil data reward. Pastikan server backend aktif.");
+        } catch {
+            setRewardError("Gagal mengambil data reward. Pastikan server backend aktif.");
         } finally {
-            setIsLoading(false);
+            setIsLoadingReward(false);
         }
     }, []);
 
-    useEffect(() => {
-        fetchRewards();
-    }, [fetchRewards]);
-
-    /* ── Add / Edit submit (called from modal) ── */
-    const handleSubmit = async (data: RewardFormData) => {
+    const handleRewardSubmit = async (data: RewardFormData) => {
         const payload = {
             nama_reward: data.nama_reward.trim(),
             satuan: data.satuan.trim(),
             deskripsi: data.deskripsi.trim() || null,
         };
-
         if (data.reward_id) {
             await RewardService.updateReward(data.reward_id, payload);
-            setPopupNotif({ message: "Reward berhasil diperbarui!", type: "success" });
+            showNotif("Reward berhasil diperbarui!", "success");
         } else {
             await RewardService.addReward(payload);
-            setPopupNotif({ message: "Reward baru berhasil ditambahkan!", type: "success" });
+            showNotif("Reward baru berhasil ditambahkan!", "success");
         }
-
-        setModalOpen(false);
-        setEditData(null);
+        setRewardModalOpen(false);
+        setEditReward(null);
         fetchRewards();
     };
 
-    /* ── Delete ── */
-    const handleDelete = async () => {
-        if (!deleteTarget) return;
-        setIsDeleting(true);
+    /* ── Kategori Sampah ────────────────────────────────────── */
+    const [kategoris, setKategoris] = useState<KategoriSampah[]>([]);
+    const [isLoadingKategori, setIsLoadingKategori] = useState(true);
+    const [kategoriModalOpen, setKategoriModalOpen] = useState(false);
+    const [editKategori, setEditKategori] = useState<KategoriSampah | null>(null);
+    const [deleteKategoriTarget, setDeleteKategoriTarget] = useState<KategoriSampah | null>(null);
+    const [isDeletingKategori, setIsDeletingKategori] = useState(false);
+
+    const fetchKategoris = useCallback(async () => {
+        setIsLoadingKategori(true);
         try {
-            await RewardService.deleteReward(deleteTarget.RewardID);
-            setDeleteTarget(null);
-            setPopupNotif({ message: "Reward berhasil dihapus.", type: "success" });
-            fetchRewards();
-        } catch (err: any) {
-            console.error("Gagal menghapus reward:", err);
-            setPopupNotif({ message: "Gagal menghapus reward.", type: "error" });
+            const res = await KatalogService.getKategori();
+            setKategoris(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            showNotif("Gagal memuat data kategori sampah.", "error");
         } finally {
-            setIsDeleting(false);
+            setIsLoadingKategori(false);
+        }
+    }, []);
+
+    const handleKategoriSubmit = async (nama: string) => {
+        if (editKategori) {
+            await KatalogService.updateKategori(editKategori.KategoriID, nama);
+            showNotif("Kategori berhasil diperbarui.", "success");
+        } else {
+            await KatalogService.addKategori(nama);
+            showNotif("Kategori berhasil ditambahkan.", "success");
+        }
+        setKategoriModalOpen(false);
+        setEditKategori(null);
+        fetchKategoris();
+    };
+
+    const handleKategoriDelete = async () => {
+        if (!deleteKategoriTarget) return;
+        setIsDeletingKategori(true);
+        try {
+            await KatalogService.deleteKategori(deleteKategoriTarget.KategoriID);
+            showNotif("Kategori berhasil dihapus.", "success");
+            setDeleteKategoriTarget(null);
+            fetchKategoris();
+        } catch (err: any) {
+            showNotif(err?.response?.data?.error || "Gagal menghapus kategori.", "error");
+        } finally {
+            setIsDeletingKategori(false);
         }
     };
 
-    /* ── Open edit ── */
-    const openEdit = (reward: Reward) => {
-        setEditData({
-            reward_id: reward.RewardID,
-            nama_reward: reward.NamaReward,
-            satuan: reward.Satuan,
-            deskripsi: reward.Deskripsi || "",
-        });
-        setModalOpen(true);
+    /* ── Kecamatan ──────────────────────────────────────────── */
+    const [kecamatans, setKecamatans] = useState<Kecamatan[]>([]);
+    const [isLoadingKec, setIsLoadingKec] = useState(true);
+    const [kecModalOpen, setKecModalOpen] = useState(false);
+    const [editKec, setEditKec] = useState<Kecamatan | null>(null);
+    const [deleteKecTarget, setDeleteKecTarget] = useState<Kecamatan | null>(null);
+    const [isDeletingKec, setIsDeletingKec] = useState(false);
+
+    const fetchKecamatan = useCallback(async () => {
+        setIsLoadingKec(true);
+        try {
+            const res = await LokasiService.getAllKecamatan();
+            setKecamatans(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            showNotif("Gagal memuat data kecamatan.", "error");
+        } finally {
+            setIsLoadingKec(false);
+        }
+    }, []);
+
+    const handleKecSubmit = async (nama: string) => {
+        if (editKec) {
+            await LokasiService.updateKecamatan(editKec.id_kecamatan, nama);
+            showNotif("Kecamatan berhasil diperbarui.", "success");
+        } else {
+            await LokasiService.createKecamatan(nama);
+            showNotif("Kecamatan berhasil ditambahkan.", "success");
+        }
+        setKecModalOpen(false);
+        setEditKec(null);
+        fetchKecamatan();
     };
 
-    /* ── Open add ── */
-    const openAdd = () => {
-        setEditData(null);
-        setModalOpen(true);
+    const handleKecDelete = async () => {
+        if (!deleteKecTarget) return;
+        setIsDeletingKec(true);
+        try {
+            await LokasiService.deleteKecamatan(deleteKecTarget.id_kecamatan);
+            showNotif("Kecamatan berhasil dihapus.", "success");
+            setDeleteKecTarget(null);
+            fetchKecamatan();
+            fetchKelurahan(kelPage, filterKecId);
+        } catch (err: any) {
+            showNotif(err?.response?.data?.error || "Gagal menghapus kecamatan.", "error");
+        } finally {
+            setIsDeletingKec(false);
+        }
     };
 
+    /* ── Kelurahan ──────────────────────────────────────────── */
+    const [kelurahans, setKelurahans] = useState<Kelurahan[]>([]);
+    const [isLoadingKel, setIsLoadingKel] = useState(true);
+    const [kelModalOpen, setKelModalOpen] = useState(false);
+    const [editKel, setEditKel] = useState<Kelurahan | null>(null);
+    const [deleteKelTarget, setDeleteKelTarget] = useState<Kelurahan | null>(null);
+    const [isDeletingKel, setIsDeletingKel] = useState(false);
+    const [filterKecId, setFilterKecId] = useState("");
+    const [kelPage, setKelPage] = useState(1);
+    const [kelTotalPages, setKelTotalPages] = useState(1);
+    const [kelTotalItems, setKelTotalItems] = useState(0);
+    const KEL_LIMIT = 25;
+
+    const fetchKelurahan = useCallback(async (page: number, kecId: string) => {
+        setIsLoadingKel(true);
+        try {
+            if (kecId) {
+                const res = await LokasiService.getKelurahanByKecamatan(Number(kecId));
+                const data = Array.isArray(res.data) ? res.data : [];
+                setKelurahans(data);
+                setKelTotalItems(data.length);
+                setKelTotalPages(1);
+            } else {
+                const res = await LokasiService.getAllKelurahan({ page, limit: KEL_LIMIT });
+                setKelurahans(Array.isArray(res.data) ? res.data : []);
+                setKelTotalPages(res.pagination?.total_pages ?? 1);
+                setKelTotalItems(res.pagination?.total_items ?? 0);
+            }
+        } catch {
+            showNotif("Gagal memuat data kelurahan.", "error");
+        } finally {
+            setIsLoadingKel(false);
+        }
+    }, []);
+
+    const handleKelSubmit = async (data: KelurahanFormData) => {
+        if (editKel) {
+            await LokasiService.updateKelurahan(editKel.id_kelurahan, {
+                id_kecamatan: data.id_kecamatan,
+                kelurahan: data.kelurahan,
+            });
+            showNotif("Kelurahan berhasil diperbarui.", "success");
+        } else {
+            await LokasiService.createKelurahan({
+                id_kecamatan: data.id_kecamatan,
+                kelurahan: data.kelurahan,
+            });
+            showNotif("Kelurahan berhasil ditambahkan.", "success");
+        }
+        setKelModalOpen(false);
+        setEditKel(null);
+        fetchKelurahan(kelPage, filterKecId);
+    };
+
+    const handleKelDelete = async () => {
+        if (!deleteKelTarget) return;
+        setIsDeletingKel(true);
+        try {
+            await LokasiService.deleteKelurahan(deleteKelTarget.id_kelurahan);
+            showNotif("Kelurahan berhasil dihapus.", "success");
+            setDeleteKelTarget(null);
+            fetchKelurahan(kelPage, filterKecId);
+        } catch (err: any) {
+            showNotif(err?.response?.data?.error || "Gagal menghapus kelurahan.", "error");
+        } finally {
+            setIsDeletingKel(false);
+        }
+    };
+
+    /* ── Shared notif ───────────────────────────────────────── */
+    const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
+    const showNotif = (message: string, type: "success" | "error") => setPopupNotif({ message, type });
+
+    /* ── Init ───────────────────────────────────────────────── */
+    useEffect(() => {
+        fetchRewards();
+        fetchKategoris();
+        fetchKecamatan();
+    }, [fetchRewards, fetchKategoris, fetchKecamatan]);
+
+    useEffect(() => {
+        fetchKelurahan(kelPage, filterKecId);
+    }, [kelPage, filterKecId, fetchKelurahan]);
+
+    const kecamatanFilterOptions = [
+        { label: "Semua Kecamatan", value: "" },
+        ...kecamatans.map(k => ({ label: k.kecamatan, value: String(k.id_kecamatan) })),
+    ];
+
+    /* ── Render ─────────────────────────────────────────────── */
     return (
-        <>
-            {/* ── Hero Header (same layout as nasabah-hero) ── */}
-            <div className="reward-hero">
-                <div className="reward-hero-left">
-                    <h1 className="reward-hero-title">Manajemen Reward</h1>
-                    <p className="reward-hero-desc">
-                        Kelola jenis-jenis reward yang tersedia untuk konversi poin nasabah.
-                        Setiap reward memiliki satuan yang menentukan nilai tukar poin.
+        <section className="mr-section">
+
+            {/* ══ REWARD ══════════════════════════════════════════ */}
+            <div className="mr-header">
+                <div className="mr-header-left">
+                    <h2 className="mr-header-title">Konfigurasi</h2>
+                    <p className="mr-header-desc">
+                        Kelola jenis-jenis reward yang tersedia. Sistem reward saat ini mendukung uang tunai dan sembako.
                     </p>
                 </div>
-                <div className="reward-hero-right">
+                {!allRewardsPresent && (
                     <Button
                         color="neon"
                         variant="solid"
                         isRounded
                         icon={<FaPlus />}
-                        onClick={openAdd}
+                        onClick={() => { setEditReward(null); setRewardModalOpen(true); }}
                     >
                         Tambah Reward
                     </Button>
-                </div>
+                )}
             </div>
 
-            {/* ── Error Banner ── */}
-            {error && (
-                <div className="reward-error-banner">{error}</div>
-            )}
+            {rewardError && <div className="mr-error-banner">{rewardError}</div>}
 
-            {/* ── Master Reward Cards Section ── */}
-            <div className="reward-section">
-                <div className="reward-section-header">
-                    <div className="reward-section-icon">
-                        <FaGift />
-                    </div>
-                    <div>
-                        <h2>Data Master Reward</h2>
-                        <p>Jenis reward yang bisa digunakan di semua bank sampah</p>
-                    </div>
-                    {!isLoading && !error && (
-                        <span className="reward-section-count">{rewards.length} reward</span>
-                    )}
-                </div>
-
-                {isLoading ? (
-                    <div className="reward-cards-loading">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="reward-card-skeleton" />
-                        ))}
-                    </div>
-                ) : rewards.length === 0 && !error ? (
-                    <div className="reward-empty">
-                        <div className="reward-empty-icon"><FaGift /></div>
+            <div className="mr-cards-row">
+                {isLoadingReward ? (
+                    <><div className="mr-card-skeleton" /><div className="mr-card-skeleton" /></>
+                ) : rewards.length === 0 && !rewardError ? (
+                    <div className="mr-empty">
+                        <div className="mr-empty-icon"><FaGift /></div>
                         <h3>Belum Ada Reward</h3>
                         <p>Tambahkan jenis reward pertama untuk memulai sistem konversi poin nasabah.</p>
-                        <Button color="primary" isRounded icon={<FaPlus />} onClick={openAdd}>
+                        {/* <Button
+                            color="neon"
+                            isRounded
+                            icon={<FaPlus />}
+                            onClick={() => { setEditReward(null); setRewardModalOpen(true); }}
+                            style={{ marginTop: "8px" }}
+                        >
                             Tambah Reward Pertama
-                        </Button>
+                        </Button> */}
                     </div>
                 ) : (
-                    <div className="reward-cards-grid">
-                        {rewards.map(reward => {
-                            const variant = getRewardVariant(reward.NamaReward);
-                            return (
-                                <div key={reward.RewardID} className={`reward-card reward-card--${variant}`}>
-                                    <div className="reward-card-top">
-                                        <div className={`reward-card-icon reward-card-icon--${variant}`}>
-                                            <RewardIcon nama={reward.NamaReward} />
-                                        </div>
-                                        <div className="reward-card-actions">
+                    rewards.map(reward => {
+                        const variant = rewardVariant(reward.NamaReward);
+                        return (
+                            <div key={reward.RewardID} className={`mr-card mr-card--${variant}`}>
+                                <div className={`mr-card-icon mr-card-icon--${variant}`}>
+                                    <RewardIcon nama={reward.NamaReward} />
+                                </div>
+                                <div className="mr-card-body">
+                                    <div className="mr-card-header">
+                                        <h3 className="mr-card-name">{reward.NamaReward}</h3>
+                                        <button
+                                            type="button"
+                                            className="mr-card-action-btn"
+                                            title="Edit reward"
+                                            onClick={() => {
+                                                setEditReward({
+                                                    reward_id: reward.RewardID,
+                                                    nama_reward: reward.NamaReward,
+                                                    satuan: reward.Satuan,
+                                                    deskripsi: reward.Deskripsi || "",
+                                                });
+                                                setRewardModalOpen(true);
+                                            }}
+                                        >
+                                            <FaGear />
+                                        </button>
+                                    </div>
+                                    <span className="mr-card-satuan">Satuan: {reward.Satuan}</span>
+                                    <p style={{ fontSize: "13px", color: "var(--c-text-muted)", marginTop: "4px", lineHeight: 1.4 }}>
+                                        {reward.Deskripsi || "Tidak ada deskripsi"}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+
+            {DIVIDER}
+
+            {/* ══ KATEGORI SAMPAH ══════════════════════════════════ */}
+            <div className="mr-header" style={{ paddingTop: 0 }}>
+                <div className="mr-header-left">
+                    <h2 className="mr-header-title">Kategori Sampah</h2>
+                    <p className="mr-header-desc">Kelola kategori sampah yang tersedia sebagai referensi pada katalog bank sampah.</p>
+                </div>
+                <Button
+                    color="secondary"
+                    variant="solid"
+                    isRounded
+                    icon={<FaPlus />}
+                    onClick={() => { setEditKategori(null); setKategoriModalOpen(true); }}
+                >
+                    Tambah Kategori
+                </Button>
+            </div>
+
+            <div className="table-wrapper">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: "56px" }}>No</th>
+                            <th style={{ width: "80px" }}>ID</th>
+                            <th>Nama Kategori</th>
+                            <th style={{ width: "100px", textAlign: "center" }}>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoadingKategori ? (
+                            <tr><td colSpan={4} className="table-empty">Memuat data...</td></tr>
+                        ) : kategoris.length === 0 ? (
+                            <tr><td colSpan={4} className="table-empty">Belum ada data kategori sampah.</td></tr>
+                        ) : (
+                            kategoris.map((kat, idx) => (
+                                <tr key={kat.KategoriID}>
+                                    <td style={{ color: "var(--c-text-muted)", fontSize: "12px" }}>{idx + 1}</td>
+                                    <td className="table-id" style={{ fontWeight: 600 }}>{kat.KategoriID}</td>
+                                    <td>{kat.Kategori}</td>
+                                    <td>
+                                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
                                             <button
-                                                className="reward-card-action-btn"
-                                                title="Edit reward"
-                                                onClick={() => openEdit(reward)}
+                                                className="table-action-btn"
+                                                title="Edit kategori"
+                                                onClick={() => { setEditKategori(kat); setKategoriModalOpen(true); }}
                                             >
                                                 <FaPenToSquare />
                                             </button>
                                             <button
-                                                className="reward-card-action-btn reward-card-action-btn--danger"
-                                                title="Hapus reward"
-                                                onClick={() => setDeleteTarget(reward)}
+                                                className="table-action-btn"
+                                                title="Hapus kategori"
+                                                style={{ color: "var(--c-danger, #ef4444)", borderColor: "rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)" }}
+                                                onClick={() => setDeleteKategoriTarget(kat)}
                                             >
                                                 <FaTrashCan />
                                             </button>
                                         </div>
-                                    </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-                                    <div className="reward-card-body">
-                                        <h3>{reward.NamaReward}</h3>
-                                        <div className="reward-card-satuan">
-                                            Satuan: {reward.Satuan}
+            {DIVIDER}
+
+            {/* ══ KECAMATAN ═══════════════════════════════════════ */}
+            <div className="mr-header" style={{ paddingTop: 0 }}>
+                <div className="mr-header-left">
+                    <h2 className="mr-header-title">Manajemen Kecamatan</h2>
+                    <p className="mr-header-desc">Data master kecamatan yang digunakan sebagai referensi alamat bank sampah.</p>
+                </div>
+                <Button
+                    color="secondary"
+                    variant="solid"
+                    isRounded
+                    icon={<FaPlus />}
+                    onClick={() => { setEditKec(null); setKecModalOpen(true); }}
+                >
+                    Tambah Kecamatan
+                </Button>
+            </div>
+
+            <div className="table-wrapper">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: "56px" }}>No</th>
+                            <th style={{ width: "80px" }}>ID</th>
+                            <th>Nama Kecamatan</th>
+                            <th style={{ width: "100px", textAlign: "center" }}>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoadingKec ? (
+                            <tr><td colSpan={4} className="table-empty">Memuat data...</td></tr>
+                        ) : kecamatans.length === 0 ? (
+                            <tr><td colSpan={4} className="table-empty">Belum ada data kecamatan.</td></tr>
+                        ) : (
+                            kecamatans.map((kec, idx) => (
+                                <tr key={kec.id_kecamatan}>
+                                    <td style={{ color: "var(--c-text-muted)", fontSize: "12px" }}>{idx + 1}</td>
+                                    <td className="table-id" style={{ fontWeight: 600 }}>{kec.id_kecamatan}</td>
+                                    <td>{kec.kecamatan}</td>
+                                    <td>
+                                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Edit kecamatan"
+                                                onClick={() => { setEditKec(kec); setKecModalOpen(true); }}
+                                            >
+                                                <FaPenToSquare />
+                                            </button>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Hapus kecamatan"
+                                                style={{ color: "var(--c-danger, #ef4444)", borderColor: "rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)" }}
+                                                onClick={() => setDeleteKecTarget(kec)}
+                                            >
+                                                <FaTrashCan />
+                                            </button>
                                         </div>
-                                        <p className={`reward-card-desc ${!reward.Deskripsi ? "reward-card-desc--empty" : ""}`}>
-                                            {reward.Deskripsi || "Tidak ada deskripsi"}
-                                        </p>
-                                    </div>
-
-                                    <div className="reward-card-footer">
-                                        <FaClock />
-                                        <span>Diperbarui {formatDate(reward.UpdatedAt)}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
 
-            {/* ── Divider ── */}
-            <div className="reward-divider" />
+            {DIVIDER}
 
-            {/* ── Table Placeholder (Nilai Reward per Bank) ── */}
-            <div className="reward-table-section">
-                <div className="reward-table-header">
-                    <div className="reward-table-icon">
-                        <FaTableList />
-                    </div>
-                    <div>
-                        <h2>Nilai Reward per Bank Sampah</h2>
-                        <p>Tabel konversi poin di setiap bank sampah</p>
-                    </div>
+            {/* ══ KELURAHAN ════════════════════════════════════════ */}
+            <div className="mr-header" style={{ paddingTop: 0 }}>
+                <div className="mr-header-left">
+                    <h2 className="mr-header-title">Manajemen Kelurahan</h2>
+                    <p className="mr-header-desc">Data master kelurahan yang terhubung dengan kecamatan.</p>
                 </div>
-                <div className="reward-table-placeholder">
-                    <div className="reward-table-placeholder-icon"><FaTableList /></div>
-                    <h3>Segera Hadir</h3>
-                    <p>
-                        Tabel nilai konversi reward di setiap bank sampah akan ditampilkan di sini.
-                        Data ini menunjukkan berapa poin yang diperlukan untuk menukarkan setiap jenis reward.
-                    </p>
+                <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                    <div style={{ minWidth: "200px" }}>
+                        <Dropdown
+                            options={kecamatanFilterOptions}
+                            value={filterKecId}
+                            onChange={e => { setFilterKecId(e.target.value); setKelPage(1); }}
+                            fullWidth
+                            isRounded
+                        />
+                    </div>
+                    <Button
+                        color="secondary"
+                        variant="solid"
+                        isRounded
+                        icon={<FaPlus />}
+                        onClick={() => { setEditKel(null); setKelModalOpen(true); }}
+                    >
+                        Tambah Kelurahan
+                    </Button>
                 </div>
             </div>
 
-            {/* ── Reward Modal ── */}
+            <div className="table-wrapper">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: "56px" }}>No</th>
+                            <th style={{ width: "80px" }}>ID</th>
+                            <th>Nama Kelurahan</th>
+                            <th>Kecamatan</th>
+                            <th style={{ width: "100px", textAlign: "center" }}>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoadingKel ? (
+                            <tr><td colSpan={5} className="table-empty">Memuat data...</td></tr>
+                        ) : kelurahans.length === 0 ? (
+                            <tr><td colSpan={5} className="table-empty">Belum ada data kelurahan.</td></tr>
+                        ) : (
+                            kelurahans.map((kel, idx) => (
+                                <tr key={kel.id_kelurahan}>
+                                    <td style={{ color: "var(--c-text-muted)", fontSize: "12px" }}>
+                                        {(kelPage - 1) * KEL_LIMIT + idx + 1}
+                                    </td>
+                                    <td className="table-id" style={{ fontWeight: 600 }}>{kel.id_kelurahan}</td>
+                                    <td>{kel.kelurahan}</td>
+                                    <td style={{ color: "var(--c-text-muted)" }}>
+                                        {kel.Kecamatan?.kecamatan
+                                            ?? kecamatans.find(k => k.id_kecamatan === kel.id_kecamatan)?.kecamatan
+                                            ?? "-"}
+                                    </td>
+                                    <td>
+                                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Edit kelurahan"
+                                                onClick={() => { setEditKel(kel); setKelModalOpen(true); }}
+                                            >
+                                                <FaPenToSquare />
+                                            </button>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Hapus kelurahan"
+                                                style={{ color: "var(--c-danger, #ef4444)", borderColor: "rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)" }}
+                                                onClick={() => setDeleteKelTarget(kel)}
+                                            >
+                                                <FaTrashCan />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {kelTotalPages > 1 && (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
+                    <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
+                        {(kelPage - 1) * KEL_LIMIT + 1}–{Math.min(kelPage * KEL_LIMIT, kelTotalItems)} dari {kelTotalItems} kelurahan
+                    </span>
+                    <Pagination
+                        currentPage={kelPage}
+                        totalPages={kelTotalPages}
+                        onPageChange={setKelPage}
+                    />
+                </div>
+            )}
+            <br />
+            <br />
+            <br />
+            <br />
+
+            {/* ══ MODALS ══════════════════════════════════════════ */}
+            <KategoriFormModal
+                isOpen={kategoriModalOpen}
+                onClose={() => { setKategoriModalOpen(false); setEditKategori(null); }}
+                onSubmit={handleKategoriSubmit}
+                initialData={editKategori}
+            />
+
             <RewardModal
-                isOpen={modalOpen}
-                onClose={() => { setModalOpen(false); setEditData(null); }}
-                onSubmit={handleSubmit}
-                initialData={editData}
+                isOpen={rewardModalOpen}
+                onClose={() => { setRewardModalOpen(false); setEditReward(null); }}
+                onSubmit={handleRewardSubmit}
+                initialData={editReward}
+                existingNames={rewards.map(r => r.NamaReward)}
+                existingSatuans={rewards.map(r => r.Satuan)}
             />
 
-            {/* ── Delete Confirmation ── */}
+            <KecamatanFormModal
+                isOpen={kecModalOpen}
+                onClose={() => { setKecModalOpen(false); setEditKec(null); }}
+                onSubmit={handleKecSubmit}
+                initialData={editKec}
+            />
+
+            <KelurahanFormModal
+                isOpen={kelModalOpen}
+                onClose={() => { setKelModalOpen(false); setEditKel(null); }}
+                onSubmit={handleKelSubmit}
+                initialData={editKel}
+                kecamatans={kecamatans}
+            />
+
             <PopupConfirmation
-                isOpen={!!deleteTarget}
+                isOpen={!!deleteKategoriTarget}
                 type="danger"
-                title="Hapus Reward?"
-                message={`Apakah Anda yakin ingin menghapus reward "${deleteTarget?.NamaReward || ""}"? Tindakan ini tidak dapat dibatalkan.`}
-                confirmText={isDeleting ? "Menghapus..." : "Ya, Hapus"}
+                title="Hapus Kategori?"
+                message={`Kategori "${deleteKategoriTarget?.Kategori || ""}" akan dihapus. Kategori yang masih digunakan oleh katalog sampah tidak dapat dihapus.`}
+                confirmText={isDeletingKategori ? "Menghapus..." : "Ya, Hapus"}
                 cancelText="Batal"
-                onConfirm={handleDelete}
-                onCancel={() => setDeleteTarget(null)}
+                onConfirm={handleKategoriDelete}
+                onCancel={() => setDeleteKategoriTarget(null)}
             />
 
-            {/* ── Toast Notification ── */}
+            <PopupConfirmation
+                isOpen={!!deleteKecTarget}
+                type="danger"
+                title="Hapus Kecamatan?"
+                message={`Kecamatan "${deleteKecTarget?.kecamatan || ""}" akan dihapus beserta seluruh kelurahan di dalamnya. Tindakan ini tidak dapat dibatalkan.`}
+                confirmText={isDeletingKec ? "Menghapus..." : "Ya, Hapus"}
+                cancelText="Batal"
+                onConfirm={handleKecDelete}
+                onCancel={() => setDeleteKecTarget(null)}
+            />
+
+            <PopupConfirmation
+                isOpen={!!deleteKelTarget}
+                type="danger"
+                title="Hapus Kelurahan?"
+                message={`Kelurahan "${deleteKelTarget?.kelurahan || ""}" akan dihapus. Tindakan ini tidak dapat dibatalkan.`}
+                confirmText={isDeletingKel ? "Menghapus..." : "Ya, Hapus"}
+                cancelText="Batal"
+                onConfirm={handleKelDelete}
+                onCancel={() => setDeleteKelTarget(null)}
+            />
+
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}
@@ -298,6 +663,6 @@ export default function RewardPage() {
                     onClose={() => setPopupNotif(null)}
                 />
             )}
-        </>
+        </section>
     );
 }

@@ -221,7 +221,7 @@
     border-radius: 12px;
     font-family: 'Poppins', sans-serif;
     font-size: 15px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
     flex-shrink: 0;
 }
@@ -358,6 +358,200 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(1, 50, 54, 0.08), transparent);
     margin: 0 24px;
+}
+
+/* =========================================================
+   Statistik per Kecamatan
+   ========================================================= */
+
+.bs-kec-section {
+    margin: 0 24px 24px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 8px rgba(1, 50, 54, 0.04);
+}
+
+.bs-kec-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.bs-kec-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bs-kec-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+.bs-kec-sort-pills {
+    display: flex;
+    gap: 6px;
+}
+
+.bs-kec-sort-pill {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(1, 50, 54, 0.15);
+    background: transparent;
+    color: #6b9080;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.bs-kec-sort-pill:hover {
+    border-color: #4EA771;
+    color: #4EA771;
+}
+
+.bs-kec-sort-pill--active {
+    background: #013236;
+    border-color: #013236;
+    color: #ffffff;
+}
+
+.bs-kec-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bs-kec-row {
+    border-radius: 12px;
+    border: 1px solid rgba(1, 50, 54, 0.07);
+    overflow: hidden;
+    transition: box-shadow 0.18s ease;
+}
+
+.bs-kec-row:hover {
+    box-shadow: 0 2px 10px rgba(1, 50, 54, 0.08);
+}
+
+.bs-kec-row-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.bs-kec-rank {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #b5cfc0;
+    width: 22px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.bs-kec-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    width: 160px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bs-kec-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #eef5f0;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.bs-kec-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: #94DF0C;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bs-kec-count {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #013236;
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.bs-kec-chevron {
+    font-size: 10px;
+    color: #a0bfaa;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.bs-kec-chevron--open {
+    transform: rotate(180deg);
+}
+
+.bs-kec-banks {
+    border-top: 1px solid rgba(1, 50, 54, 0.06);
+    padding: 10px 16px 12px 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #fafdfb;
+}
+
+.bs-kec-bank-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    color: #4a6e58;
+}
+
+.bs-kec-bank-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.bs-kec-bank-id {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: monospace;
+    color: #8aaa96;
+}
+
+.bs-kec-bank-name {
+    font-weight: 500;
+}
+
+.bs-kec-bank-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 5px;
+    color: #fff;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 /* =========================================================

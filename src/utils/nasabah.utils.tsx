@@ -4,11 +4,11 @@ import type { BsiNasabahItem } from "../types/bsi.type";
 // ── Map BSI nasabah API response → NasabahRow[] ─────────
 export function mapBsiNasabah(data: BsiNasabahItem[]): NasabahRow[] {
     return (data || []).map((item) => ({
-        id: item.NasabahID,
-        foto: item.User?.PhotoURL || undefined,
-        nama: item.User?.Nama || "-",
-        email: item.User?.Email || "-",
-        status: (item.StatusNasabah as StatusNasabah) || "pending",
+        id: item.nasabah_id,
+        foto: item.foto || undefined,
+        nama: item.nama || "-",
+        email: item.email || "-",
+        status: (item.status as StatusNasabah) || "pending",
     }));
 }
 

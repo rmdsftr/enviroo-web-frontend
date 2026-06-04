@@ -12,10 +12,11 @@
 .stat-card {
     background: var(--c-surface);
     border-radius: var(--r-xl);
-    padding: 20px;
+    padding: 20px 20px;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
     position: relative;
     overflow: hidden;
     border: 1px solid var(--c-border);
@@ -34,7 +35,6 @@
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
     box-shadow: var(--sh-md);
 }
 
@@ -46,14 +46,7 @@
     transform: translateY(-1px) scale(0.99);
 }
 
-/* ── Top row: icon + badge ── */
-.stat-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* ── Icon badge ── */
+/* ── Icon ── */
 .stat-icon {
     width: 44px;
     height: 44px;
@@ -66,22 +59,14 @@
     transition: transform var(--t-base);
 }
 
-.stat-card:hover .stat-icon {
-    transform: scale(1.08) rotate(-4deg);
+/* ── Body (number + label column) ── */
+.stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
-/* ── Badge ── */
-.stat-badge {
-    font-family: var(--ff-sans);
-    font-size: 10.5px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: var(--r-pill);
-    line-height: 1.4;
-    letter-spacing: 0.03em;
-}
-
-/* ── Body ── */
 .stat-number-row {
     display: flex;
     align-items: baseline;
@@ -90,10 +75,10 @@
 
 .stat-number {
     font-family: var(--ff-sans);
-    font-size: 32px;
-    font-weight: 800;
+    font-size: 28px;
+    font-weight: 700;
     line-height: 1;
-    letter-spacing: -1px;
+    letter-spacing: -0.5px;
     color: var(--c-text);
 }
 
@@ -110,7 +95,6 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    margin-top: 4px;
 }
 
 .stat-desc {
@@ -126,14 +110,7 @@
 }
 
 /* ── Variant: default (Total) ── */
-.stat-card--default {
-    color: var(--c-primary);
-}
 .stat-card--default .stat-icon {
-    background: var(--c-primary-100);
-    color: var(--c-primary-700);
-}
-.stat-card--default .stat-badge {
     background: var(--c-primary-100);
     color: var(--c-primary-700);
 }
@@ -142,30 +119,16 @@
 }
 
 /* ── Variant: success (Aktif) ── */
-.stat-card--success {
-    color: var(--c-primary);
-}
 .stat-card--success .stat-icon {
     background: linear-gradient(135deg, var(--c-primary-100), var(--c-primary-50));
     color: var(--c-primary);
-}
-.stat-card--success .stat-badge {
-    background: var(--c-primary-100);
-    color: var(--c-primary-700);
 }
 .stat-card--success .stat-status {
     color: var(--c-primary);
 }
 
 /* ── Variant: danger (Nonaktif) ── */
-.stat-card--danger {
-    color: var(--c-danger);
-}
 .stat-card--danger .stat-icon {
-    background: var(--c-danger-bg);
-    color: var(--c-danger-600);
-}
-.stat-card--danger .stat-badge {
     background: var(--c-danger-bg);
     color: var(--c-danger-600);
 }
@@ -174,30 +137,16 @@
 }
 
 /* ── Variant: warning (Pending) ── */
-.stat-card--warning {
-    color: var(--c-warning);
-}
 .stat-card--warning .stat-icon {
     background: var(--c-warning-bg);
     color: var(--c-warning-600);
-}
-.stat-card--warning .stat-badge {
-    background: var(--c-warning-bg);
-    color: var(--c-warning-700);
 }
 .stat-card--warning .stat-status {
     color: var(--c-warning-600);
 }
 
 /* ── Variant: teal (alternate brand) ── */
-.stat-card--teal {
-    color: var(--c-secondary);
-}
 .stat-card--teal .stat-icon {
-    background: rgba(1, 50, 54, 0.08);
-    color: var(--c-secondary);
-}
-.stat-card--teal .stat-badge {
     background: rgba(1, 50, 54, 0.08);
     color: var(--c-secondary);
 }

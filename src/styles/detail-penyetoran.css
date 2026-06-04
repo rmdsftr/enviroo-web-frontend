@@ -1,0 +1,468 @@
+/* =========================================================
+   Detail Penyetoran — Page Styles
+   (Mirrors detail-penimbangan.css with dps- prefix)
+   ========================================================= */
+
+@keyframes dpsFadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page Wrapper ── */
+.dps-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0 24px 32px;
+    animation: dpsFadeIn 0.4s ease both;
+}
+
+/* ── Hero ── */
+.dps-hero {
+    padding: 28px 0 20px;
+}
+
+.dps-hero h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0 0 4px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+}
+
+.dps-hero p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+/* ── Loading / Error ── */
+.dps-loading,
+.dps-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.dps-error { color: #ef4444; }
+
+/* =========================================================
+   2-Column Card
+   ========================================================= */
+.dps-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 16px rgba(1, 50, 54, 0.06);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .dps-card { grid-template-columns: 1fr; }
+}
+
+/* ── Left Column ── */
+.dps-overview {
+    padding: 28px 28px 32px;
+    border-right: 1px solid rgba(1, 50, 54, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+@media (max-width: 960px) {
+    .dps-overview {
+        border-right: none;
+        border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+    }
+}
+
+/* ── Overview header ── */
+.dps-overview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+.dps-overview-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.dps-overview-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+    word-break: break-all;
+}
+
+/* ── Status pill ── */
+.dps-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.dps-status-pill.berhasil {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dps-status-pill.gagal {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dps-status-pill.pending {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.dps-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+/* ── Divider ── */
+.dps-divider {
+    height: 1px;
+    background: rgba(1, 50, 54, 0.06);
+    margin: 4px 0;
+}
+
+/* ── Info list ── */
+.dps-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Nasabah row — avatar + info */
+.dps-nasabah-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.dps-nasabah-row:hover {
+    background: rgba(78, 167, 113, 0.05);
+}
+
+.dps-nasabah-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ddf0e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3d8a5c;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.dps-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.dps-info-row:hover {
+    background: rgba(78, 167, 113, 0.05);
+}
+
+.dps-info-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: #f1f8f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #6b9080;
+    flex-shrink: 0;
+}
+
+.dps-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.dps-info-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dps-info-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Stats chips ── */
+.dps-stats-row {
+    display: flex;
+    gap: 10px;
+}
+
+.dps-stat-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 14px;
+    background: rgba(1, 50, 54, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+}
+
+.dps-stat-chip-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #013236;
+    line-height: 1;
+}
+
+.dps-stat-chip-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   Right Column — Item List
+   ========================================================= */
+.dps-items-col {
+    padding: 28px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Section header ── */
+.dps-items-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dps-items-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.dps-items-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+}
+
+.dps-items-count-badge {
+    margin-left: auto;
+    background: rgba(78, 167, 113, 0.10);
+    color: #3d8a5c;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+/* ── Item list container ── */
+.dps-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: 14px;
+    border: 1px solid rgba(1, 50, 54, 0.07);
+    overflow: hidden;
+}
+
+/* ── Table header row ── */
+.dps-item-thead {
+    display: grid;
+    grid-template-columns: 36px 1fr 60px 80px;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f7fbf8;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.07);
+}
+
+.dps-item-th {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dps-item-col-no   { text-align: center; }
+.dps-item-col-qty  { text-align: right; }
+.dps-item-col-unit { text-align: left; }
+
+/* ── Data rows ── */
+.dps-item-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 60px 80px;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+    transition: background 0.12s ease;
+}
+
+.dps-item-row:last-of-type {
+    border-bottom: none;
+}
+
+.dps-item-row:hover {
+    background: rgba(78, 167, 113, 0.04);
+}
+
+.dps-item-no {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #b0c9bc;
+    text-align: center;
+}
+
+.dps-item-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.dps-item-icon-wrap {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #f1f8f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #6b9080;
+    flex-shrink: 0;
+}
+
+.dps-item-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #013236;
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dps-item-qty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    text-align: right;
+}
+
+.dps-item-unit {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #7a9e8a;
+    text-transform: lowercase;
+}
+
+/* ── Empty state ── */
+.dps-items-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 40px 0;
+    color: #b0c9bc;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+}
+
+.dps-items-empty svg {
+    font-size: 28px;
+    opacity: 0.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .dps-page {
+        padding: 0 16px 24px;
+    }
+
+    .dps-hero h1 {
+        font-size: 20px;
+    }
+
+    .dps-overview,
+    .dps-items-col {
+        padding: 20px 20px 24px;
+    }
+
+    .dps-item-thead,
+    .dps-item-row {
+        grid-template-columns: 28px 1fr 50px 64px;
+        padding: 10px 12px;
+    }
+}

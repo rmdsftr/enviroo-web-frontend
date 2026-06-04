@@ -174,7 +174,7 @@
 .ok-banner-placeholder span {
     font-family: 'Poppins', sans-serif;
     font-size: 64px;
-    font-weight: 800;
+    font-weight: 700;
     color: rgba(148, 223, 12, 0.15);
     text-transform: uppercase;
 }
@@ -343,13 +343,14 @@
 
 .ok-footer-author {
     font-family: 'Poppins', sans-serif;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
     color: #013236;
     display: flex;
     align-items: center;
     gap: 10px;
     line-height: 1.2;
+    margin-bottom: 5px;
 }
 
 .ok-footer-author svg {
@@ -363,7 +364,7 @@
 
 .ok-footer-date {
     font-family: 'Poppins', sans-serif;
-    font-size: 11.5px;
+    font-size: 10px;
     color: #6b9080;
     display: flex;
     align-items: center;
@@ -468,7 +469,7 @@
 .ok-sidebar-item-thumb span {
     font-family: 'Poppins', sans-serif;
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 700;
     color: rgba(148, 223, 12, 0.3);
     text-transform: uppercase;
 }

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-/// <reference types="@types/google.maps" />
 import { useState, useRef, useCallback, useEffect } from "react";
 import BreadcrumbLayout from "../layouts/breadcrumb";
+import { getApiError } from "../utils/error.utils";
 import Input from "../components/input";
 import Dropdown from "../components/dropdown";
 import Button from "../components/button";
@@ -21,7 +21,12 @@ import {
     FaCheck,
     FaArrowRight,
 } from "react-icons/fa6";
-import { Wrapper } from "@googlemaps/react-wrapper";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import "../styles/layout.css";
 import "../styles/regis-bsi.css";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -30,64 +35,62 @@ import { UsersService } from "../services/users.service";
 import { BsiService } from "../services/bsi.service";
 import { BsmService } from "../services/bsm.service";
 import { BsuService } from "../services/bsu.service";
+import { LokasiService } from "../services/lokasi.service";
 import type { NonAdminUser } from "../types/users.type";
+import type { Kecamatan, Kelurahan } from "../types/lokasi.type";
+import PopupNotifikasi from "../layouts/popup-notifikasi";
 
-// ── Google Map Component ──
+// Fix Leaflet default marker icons in Vite
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUrl: markerShadow });
+
+function MapClickHandler({ onLocationSelect }: { onLocationSelect: (lat: number, lng: number) => void }) {
+    useMapEvents({ click(e) { onLocationSelect(e.latlng.lat, e.latlng.lng); } });
+    return null;
+}
+
+function MapFlyTo({ position }: { position: [number, number] | null }) {
+    const map = useMap();
+    useEffect(() => {
+        if (position) map.flyTo(position, 16, { duration: 1.2 });
+    }, [position, map]);
+    return null;
+}
+
+function InvalidateSizeOnMount() {
+    const map = useMap();
+    useEffect(() => {
+        const timer = setTimeout(() => map.invalidateSize(), 500);
+        return () => clearTimeout(timer);
+    }, [map]);
+    return null;
+}
+
 function MapComponent({
-    center,
-    zoom,
     latitude,
     longitude,
-    onLocationSelect
+    onLocationSelect,
+    geocodedPos,
 }: {
-    center: google.maps.LatLngLiteral;
-    zoom: number;
     latitude: number | null;
     longitude: number | null;
     onLocationSelect: (lat: number, lng: number) => void;
+    geocodedPos: [number, number] | null;
 }) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [map, setMap] = useState<google.maps.Map>();
-    const [marker, setMarker] = useState<google.maps.Marker>();
-
-    useEffect(() => {
-        if (ref.current && !map) {
-            setMap(new google.maps.Map(ref.current, {
-                center,
-                zoom,
-                mapTypeControl: false,
-                streetViewControl: false,
-            }));
-        }
-    }, [ref, map, center, zoom]);
-
-    useEffect(() => {
-        if (map) {
-            const listener = map.addListener("click", (e: google.maps.MapMouseEvent) => {
-                if (e.latLng) {
-                    onLocationSelect(e.latLng.lat(), e.latLng.lng());
-                }
-            });
-            return () => {
-                google.maps.event.removeListener(listener);
-            };
-        }
-    }, [map, onLocationSelect]);
-
-    useEffect(() => {
-        if (map && latitude !== null && longitude !== null) {
-            if (!marker) {
-                setMarker(new google.maps.Marker({
-                    position: { lat: latitude, lng: longitude },
-                    map,
-                }));
-            } else {
-                marker.setPosition({ lat: latitude, lng: longitude });
-            }
-        }
-    }, [map, latitude, longitude, marker]);
-
-    return <div ref={ref} style={{ width: "100%", height: "100%" }} />;
+    return (
+        <MapContainer center={[-0.9493, 100.4235]} zoom={12} style={{ width: "100%", height: "100%" }}>
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <MapClickHandler onLocationSelect={onLocationSelect} />
+            <MapFlyTo position={geocodedPos} />
+            <InvalidateSizeOnMount />
+            {latitude !== null && longitude !== null && (
+                <Marker position={[latitude, longitude]} />
+            )}
+        </MapContainer>
+    );
 }
 
 // ── Format file size ──
@@ -129,6 +132,7 @@ export default function RegistrasiBSIPage() {
     const [provinsi, setProvinsi] = useState("");
     const [kota, setKota] = useState("");
     const [kecamatan, setKecamatan] = useState("");
+    const [kelurahan, setKelurahan] = useState("");
     const [alamat, setAlamat] = useState("");
     const [foto, setFoto] = useState<File | null>(null);
     const [fotoPreview, setFotoPreview] = useState<string | null>(null);
@@ -136,68 +140,57 @@ export default function RegistrasiBSIPage() {
     const [longitude, setLongitude] = useState<number | null>(null);
     const [dragging, setDragging] = useState(false);
     const [afiliasiBsi, setAfiliasiBsi] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [geocodedPos, setGeocodedPos] = useState<[number, number] | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [notif, setNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
+    const [notifNavigateTo, setNotifNavigateTo] = useState<string | null>(null);
 
     const [listBsi, setListBsi] = useState<{ label: string; value: string }[]>([]);
 
-    const listProvinsi = [
-        { label: "Jawa Barat", value: "JBR" },
-        { label: "Jawa Tengah", value: "JTG" },
-        { label: "Jawa Timur", value: "JTM" },
-    ];
+    const listProvinsi = [{ label: "Sumatera Barat", value: "Sumatera Barat" }];
+    const listKota = [{ label: "Padang", value: "Padang" }];
 
-    const listKota: Record<string, { label: string; value: string }[]> = {
-        "JBR": [
-            { label: "Kota Bandung", value: "BDG" },
-            { label: "Kota Bekasi", value: "BKS" },
-        ],
-        "JTG": [
-            { label: "Kota Semarang", value: "SMG" },
-            { label: "Kota Surakarta", value: "SRK" },
-        ],
-        "JTM": [
-            { label: "Kota Surabaya", value: "SBY" },
-            { label: "Kota Malang", value: "MLG" },
-        ]
-    };
+    const [kecamatanData, setKecamatanData] = useState<Kecamatan[]>([]);
+    const [kelurahanData, setKelurahanData] = useState<Kelurahan[]>([]);
 
-    const listKecamatan: Record<string, { label: string; value: string }[]> = {
-        "BDG": [
-            { label: "Coblong", value: "CBL" },
-            { label: "Lengkong", value: "LKG" },
-        ],
-        "BKS": [
-            { label: "Bekasi Selatan", value: "BKS_S" },
-            { label: "Bekasi Barat", value: "BKS_B" },
-        ],
-        "SMG": [
-            { label: "Banyumanik", value: "BMK" },
-            { label: "Tembalang", value: "TBL" },
-        ],
-        "SRK": [
-            { label: "Banjarsari", value: "BJS" },
-            { label: "Laweyan", value: "LWY" },
-        ],
-        "SBY": [
-            { label: "Gubeng", value: "GBG" },
-            { label: "Tegalsari", value: "TGS" },
-        ],
-        "MLG": [
-            { label: "Blimbing", value: "BLM" },
-            { label: "Lowokwaru", value: "LWK" },
-        ]
-    };
+    const listKecamatanOptions = kecamatanData.map(k => ({
+        label: k.kecamatan,
+        value: String(k.id_kecamatan),
+    }));
+    const listKelurahanOptions = kelurahanData.map(k => ({
+        label: k.kelurahan,
+        value: String(k.id_kelurahan),
+    }));
 
     const handleProvinsiChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setProvinsi(e.target.value);
         setKota("");
         setKecamatan("");
+        setKelurahan("");
+        setKelurahanData([]);
     };
 
     const handleKotaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setKota(e.target.value);
         setKecamatan("");
+        setKelurahan("");
+        setKelurahanData([]);
+    };
+
+    const handleKecamatanChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const id = e.target.value;
+        setKecamatan(id);
+        setKelurahan("");
+        setKelurahanData([]);
+        if (!id) return;
+        try {
+            const res = await LokasiService.getKelurahanByKecamatan(parseInt(id));
+            setKelurahanData(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            setKelurahanData([]);
+        }
     };
 
     // Handle file select
@@ -227,10 +220,26 @@ export default function RegistrasiBSIPage() {
         if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    // Map location
-    const handleLocationSelect = (lat: number, lng: number) => {
+    // Map location — also reverse-geocodes the clicked point to fill alamat
+    const handleLocationSelect = async (lat: number, lng: number) => {
         setLatitude(lat);
         setLongitude(lng);
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+                { headers: { "Accept-Language": "id", "User-Agent": "enviroo-web/1.0" } }
+            );
+            const data = await res.json();
+            if (data?.address) {
+                const { road, house_number } = data.address;
+                const streetAddress = road
+                    ? (house_number ? `${road} No. ${house_number}` : road)
+                    : (data.display_name?.split(",")[0]?.trim() ?? "");
+                if (streetAddress) {
+                    setAlamat(streetAddress);
+                }
+            }
+        } catch {}
     };
 
     // Animate sections on mount
@@ -247,6 +256,40 @@ export default function RegistrasiBSIPage() {
                 .catch((err) => console.error("Failed to fetch available admins:", err));
         }
     }, [step, availableAdmins.length]);
+
+    // Fetch kecamatan list on mount
+    useEffect(() => {
+        LokasiService.getAllKecamatan()
+            .then(res => setKecamatanData(Array.isArray(res.data) ? res.data : []))
+            .catch(() => {});
+    }, []);
+
+    // Geocode lokasi berdasarkan kecamatan/kelurahan yang dipilih
+    useEffect(() => {
+        if (!kecamatan) return;
+        const kecamatanLabel = kecamatanData.find(k => String(k.id_kecamatan) === kecamatan)?.kecamatan ?? "";
+        if (!kecamatanLabel) return;
+        const kelurahanLabel = kelurahanData.find(k => String(k.id_kelurahan) === kelurahan)?.kelurahan ?? "";
+        const query = [kelurahanLabel, kecamatanLabel, "Padang", "Sumatera Barat", "Indonesia"]
+            .filter(Boolean).join(", ");
+        const timer = setTimeout(async () => {
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=id`,
+                    { headers: { "Accept-Language": "id", "User-Agent": "enviroo-web/1.0" } }
+                );
+                const data = await res.json();
+                if (data?.[0]) {
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    setLatitude(lat);
+                    setLongitude(lng);
+                    setGeocodedPos([lat, lng]);
+                }
+            } catch {}
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [kecamatan, kelurahan, kecamatanData, kelurahanData]);
 
     // Fetch BSI list if registering BSU (only for superadmin)
     useEffect(() => {
@@ -285,81 +328,91 @@ export default function RegistrasiBSIPage() {
     };
 
     const handleFinalSubmit = async () => {
+        setIsSubmitting(true);
         try {
             if (!foto) {
-                alert("Mohon unggah foto bank sampah!");
+                setNotif({ message: "Mohon unggah foto bank sampah!", type: "error" });
                 return;
             }
             if (latitude === null || longitude === null) {
-                alert("Mohon pilih titik lokasi pada peta!");
+                setNotif({ message: "Mohon pilih titik lokasi pada peta!", type: "error" });
                 return;
             }
 
             // Dapatkan userId untuk dikirim ke backend
             const userIds = selectedAdmins;
 
+            const namaLengkap = `${bankTypeShort} ${nama.trim()}`;
+
             if (isBsm) {
                 const payload = {
-                    nama_bsm: nama,
+                    nama_bsm: namaLengkap,
                     deskripsi: deskripsi,
                     foto: foto,
                     provinsi: provinsi,
                     kabupaten_kota: kota,
-                    kecamatan: kecamatan,
+                    id_kecamatan: kecamatan,
+                    id_kelurahan: kelurahan,
                     alamat_lengkap: alamat,
                     latitude: latitude,
                     longitude: longitude,
-                    user_id: userIds
+                    user_id: userIds,
+                    admin_id: user?.identity_id || ""
                 };
                 await BsmService.createBsm(payload);
                 console.log("Berhasil registrasi BSM:", payload);
             } else if (isBsu) {
                 const parentId = isAdminBsi ? user?.bank_id : afiliasiBsi;
                 if (!parentId) {
-                    alert("Pilih referensi afiliasi Bank Sampah Induk (BSI) terlebih dahulu!");
+                    setNotif({ message: "Pilih referensi afiliasi Bank Sampah Induk (BSI) terlebih dahulu!", type: "error" });
                     return;
                 }
-                
+
                 if (isAdminBsi) {
                     const payload = {
-                        nama_unit: nama,
+                        nama_unit: namaLengkap,
                         deskripsi: deskripsi,
                         foto: foto,
                         provinsi: provinsi,
                         kabupaten_kota: kota,
-                        kecamatan: kecamatan,
+                        id_kecamatan: kecamatan,
+                        id_kelurahan: kelurahan,
                         alamat_lengkap: alamat,
                         latitude: latitude,
                         longitude: longitude,
-                        user_id: userIds
+                        user_id: userIds,
+                        admin_id: user?.identity_id || ""
                     };
                     await BsiService.addUnit(parentId, payload);
                     console.log("Berhasil registrasi BSU (via Admin BSI):", payload);
                 } else {
                     const payload = {
-                        nama_bsu: nama,
+                        nama_bsu: namaLengkap,
                         parent_bank_id: parentId,
                         deskripsi: deskripsi,
                         foto: foto,
                         provinsi: provinsi,
                         kabupaten_kota: kota,
-                        kecamatan: kecamatan,
+                        id_kecamatan: kecamatan,
+                        id_kelurahan: kelurahan,
                         alamat_lengkap: alamat,
                         latitude: latitude,
                         longitude: longitude,
-                        user_id: userIds
+                        user_id: userIds,
+                        admin_id: user?.identity_id || ""
                     };
                     await BsuService.createBsu(payload);
                     console.log("Berhasil registrasi BSU (via Superadmin):", payload);
                 }
             } else {
                 const payload = {
-                    nama_bsi: nama,
+                    nama_bsi: namaLengkap,
                     deskripsi: deskripsi,
                     foto: foto,
                     provinsi: provinsi,
                     kabupaten_kota: kota,
-                    kecamatan: kecamatan,
+                    id_kecamatan: kecamatan,
+                    id_kelurahan: kelurahan,
                     alamat_lengkap: alamat,
                     latitude: latitude,
                     longitude: longitude,
@@ -370,11 +423,13 @@ export default function RegistrasiBSIPage() {
                 console.log("Berhasil registrasi BSI:", payload);
             }
 
-            alert("Registrasi Bank Sampah berhasil!");
-            navigate(backPath);
+            setNotif({ message: "Registrasi Bank Sampah berhasil!", type: "success" });
+            setNotifNavigateTo(backPath);
         } catch (error) {
             console.error("Gagal melakukan registrasi bank sampah:", error);
-            alert("Gagal melakukan registrasi bank sampah. Silakan coba lagi.");
+            setNotif({ message: getApiError(error, "Gagal melakukan registrasi bank sampah. Silakan coba lagi."), type: "error" });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -401,10 +456,10 @@ export default function RegistrasiBSIPage() {
             
             setIsAdminModalOpen(false);
             setNewAdminForm({ nik: "", nama: "", email: "", noWa: "" });
-            alert("Berhasil mendaftarkan admin baru!");
+            setNotif({ message: "Berhasil mendaftarkan admin baru!", type: "success" });
         } catch (error) {
             console.error("Gagal mendaftarkan admin:", error);
-            alert("Gagal mendaftarkan admin baru. Silakan coba lagi.");
+            setNotif({ message: getApiError(error, "Gagal mendaftarkan admin baru. Silakan coba lagi."), type: "error" });
         }
     };
 
@@ -476,7 +531,8 @@ export default function RegistrasiBSIPage() {
                                         variant="solid"
                                         inputSize="large"
                                         fullWidth
-                                        placeholder={`Contoh: ${bankTypeShort} Harapan Jaya`}
+                                        iconLeft={<span style={{ fontWeight: 700, lineHeight: 1, color: "var(--c-primary)", whiteSpace: "nowrap" }}>{bankTypeShort}</span>}
+                                        placeholder="Enviroo Andalas"
                                         value={nama}
                                         onChange={(e) => setNama(e.target.value)}
                                         required
@@ -644,7 +700,7 @@ export default function RegistrasiBSIPage() {
                                         Kabupaten/Kota <span className="required">*</span>
                                     </label>
                                     <Dropdown
-                                        options={provinsi ? (listKota[provinsi] || []) : []}
+                                        options={provinsi ? listKota : []}
                                         value={kota}
                                         onChange={handleKotaChange}
                                         placeholder="Pilih Kab/Kota"
@@ -658,13 +714,27 @@ export default function RegistrasiBSIPage() {
                                         Kecamatan <span className="required">*</span>
                                     </label>
                                     <Dropdown
-                                        options={kota ? (listKecamatan[kota] || []) : []}
+                                        options={kota ? listKecamatanOptions : []}
                                         value={kecamatan}
-                                        onChange={(e) => setKecamatan(e.target.value)}
+                                        onChange={handleKecamatanChange}
                                         placeholder="Pilih Kecamatan"
                                         dropdownSize="large"
                                         fullWidth
                                         disabled={!kota}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="regis-label">
+                                        Kelurahan <span className="required">*</span>
+                                    </label>
+                                    <Dropdown
+                                        options={listKelurahanOptions}
+                                        value={kelurahan}
+                                        onChange={(e) => setKelurahan(e.target.value)}
+                                        placeholder="Pilih Kelurahan"
+                                        dropdownSize="large"
+                                        fullWidth
+                                        disabled={!kecamatan}
                                     />
                                 </div>
                             </div>
@@ -711,15 +781,12 @@ export default function RegistrasiBSIPage() {
                                     Peta Lokasi <span className="required">*</span>
                                 </label>
                                 <div className="regis-map-container">
-                                    <Wrapper apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}>
-                                        <MapComponent
-                                            center={{ lat: -6.9175, lng: 107.6191 }}
-                                            zoom={13}
-                                            latitude={latitude}
-                                            longitude={longitude}
-                                            onLocationSelect={handleLocationSelect}
-                                        />
-                                    </Wrapper>
+                                    <MapComponent
+                                        latitude={latitude}
+                                        longitude={longitude}
+                                        onLocationSelect={handleLocationSelect}
+                                        geocodedPos={geocodedPos}
+                                    />
                                 </div>
 
                                 <div className="regis-map-hint">
@@ -897,12 +964,27 @@ export default function RegistrasiBSIPage() {
                                 size="default"
                                 icon={<FaFloppyDisk />}
                                 onClick={handleFinalSubmit}
+                                disabled={isSubmitting}
                             >
-                                Simpan & Selesai
+                                {isSubmitting ? "Memproses registrasi..." : "Simpan & Selesai"}
                             </Button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* ══════════════ POPUP NOTIFIKASI ══════════════ */}
+            {notif && (
+                <PopupNotifikasi
+                    message={notif.message}
+                    type={notif.type}
+                    onClose={() => {
+                        const dest = notifNavigateTo;
+                        setNotif(null);
+                        setNotifNavigateTo(null);
+                        if (dest) navigate(dest);
+                    }}
+                />
             )}
 
             {/* ══════════════ MODAL: Daftarkan Admin Baru ══════════════ */}

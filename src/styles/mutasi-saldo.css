@@ -1,0 +1,367 @@
+/* =========================================================
+   Mutasi Saldo Rekening
+   ========================================================= */
+
+.ms-page {
+    padding: 0 24px 32px;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: pmbFadeIn 0.35s ease both;
+}
+
+
+/* ── Filters row ── */
+.ms-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.ms-filters-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+/* ── Card ── */
+.ms-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(1, 50, 54, 0.07);
+    box-shadow: 0 2px 10px rgba(1, 50, 54, 0.05);
+    padding: 24px;
+}
+
+.ms-card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0 0 20px;
+}
+
+/* ── Bar Chart ── */
+.ms-chart {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.ms-chart-bars {
+    display: flex;
+    gap: 56px;
+    justify-content: center;
+}
+
+.ms-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 88px;
+}
+
+.ms-bar-label-top {
+    font-size: 12px;
+    font-weight: 700;
+    color: #013236;
+    text-align: center;
+    line-height: 1.3;
+    min-height: 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.ms-bar-track {
+    height: 160px;
+    width: 64px;
+    background: rgba(1, 50, 54, 0.05);
+    border-radius: 8px 8px 4px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.ms-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ms-bar--kredit {
+    background: linear-gradient(180deg, #4EA771 0%, #2d7a54 100%);
+}
+.ms-bar--debit {
+    background: linear-gradient(180deg, #F85A5A 0%, #c43b3b 100%);
+}
+
+.ms-bar-label-bot {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5a7a68;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ── Summary Chips ── */
+.ms-summary-chips {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ms-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 180px;
+}
+.ms-chip strong {
+    margin-left: auto;
+    font-weight: 700;
+}
+.ms-chip svg {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.ms-chip--kredit {
+    background: rgba(78, 167, 113, 0.08);
+    color: #2d7a54;
+    border: 1px solid rgba(78, 167, 113, 0.18);
+}
+.ms-chip--debit {
+    background: rgba(248, 90, 90, 0.07);
+    color: #c43b3b;
+    border: 1px solid rgba(248, 90, 90, 0.16);
+}
+
+/* ── Mutasi List ── */
+.ms-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ms-item {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+.ms-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.ms-item:first-child {
+    padding-top: 0;
+}
+
+.ms-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.ms-item--kredit .ms-item-icon {
+    background: rgba(78, 167, 113, 0.1);
+    color: #4EA771;
+}
+.ms-item--debit .ms-item-icon {
+    background: rgba(248, 90, 90, 0.08);
+    color: #F85A5A;
+}
+
+.ms-item-ket {
+    font-size: 13px;
+    font-weight: 500;
+    color: #013236;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ms-item-date {
+    font-size: 12px;
+    color: #7a9e8a;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.ms-item-nominal {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.ms-item-nominal.positive { color: #4EA771; }
+.ms-item-nominal.negative { color: #F85A5A; }
+
+/* ── Modal ── */
+.ms-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.28);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.ms-modal {
+    background: #fff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 24px 64px rgba(1, 50, 54, 0.18);
+}
+
+.ms-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.07);
+}
+
+.ms-modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0 0 3px;
+}
+
+.ms-modal-subtitle {
+    font-size: 12px;
+    color: #7a9e8a;
+    margin: 0;
+}
+
+.ms-modal-body {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.ms-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(1, 50, 54, 0.07);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.ms-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ms-form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3d5a48;
+}
+
+.ms-toggle-group {
+    display: flex;
+    gap: 8px;
+}
+
+.ms-toggle-btn {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+    background: rgba(1, 50, 54, 0.04);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #7a9e8a;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+}
+
+.ms-toggle-btn:hover {
+    background: rgba(1, 50, 54, 0.07);
+    color: #3d5a48;
+}
+
+.ms-toggle-btn.active--kredit {
+    border-color: rgba(78, 167, 113, 0.28);
+    background: rgba(78, 167, 113, 0.08);
+    color: #2d7a54;
+    font-weight: 600;
+}
+
+.ms-toggle-btn.active--debit {
+    border-color: rgba(248, 90, 90, 0.25);
+    background: rgba(248, 90, 90, 0.07);
+    color: #c43b3b;
+    font-weight: 600;
+}
+
+.ms-toggle-btn.active--uang,
+.ms-toggle-btn.active--poin {
+    border-color: rgba(1, 50, 54, 0.15);
+    background: rgba(1, 50, 54, 0.06);
+    color: #013236;
+    font-weight: 600;
+}
+
+.ms-input-neutral {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d9d4 !important;
+}
+
+.ms-input-neutral:focus-within {
+    border-color: transparent !important;
+}
+
+.ms-form-error {
+    font-size: 12px;
+    color: #c43b3b;
+    margin: -6px 0 0;
+}
+
+/* ── States ── */
+.ms-state {
+    text-align: center;
+    padding: 56px 24px;
+    color: #5a7a68;
+    font-size: 14px;
+}
+.ms-state--error {
+    color: #c43b3b;
+}
+
+.ms-empty {
+    text-align: center;
+    padding: 36px 24px;
+    color: #7a9e8a;
+    font-size: 13px;
+}

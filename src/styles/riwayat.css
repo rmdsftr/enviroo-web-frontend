@@ -1,0 +1,79 @@
+/* ── Page wrapper ─────────────────────────────────── */
+.riwayat-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 24px 24px;
+}
+
+/* ── Header ────────────────────────────────────────── */
+.riwayat-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 28px 0 8px;
+}
+
+.riwayat-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 280px;
+}
+
+.riwayat-hero-left h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f1f15;
+    margin: 0;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+}
+
+.riwayat-hero-left p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 560px;
+}
+
+.riwayat-hero-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* ── Filter row (above table) ───────────────────────── */
+.riwayat-filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* ── Loading / coming-soon states ──────────────────── */
+.riwayat-loading,
+.riwayat-coming-soon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 900px) {
+    .riwayat-hero-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

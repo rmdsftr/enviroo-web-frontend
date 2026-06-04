@@ -2,107 +2,81 @@ import { api } from "./api";
 import type {
     GetKategoriResponse,
     GetKatalogResponse,
-    GetKatalogHistoryResponse,
-    AddKatalogBSIRequest,
-    AddKatalogBSMRequest,
+    GetKatalogDetailResponse,
+    AddKatalogRequest,
     EditKatalogRequest,
-    UpdateHargaSchemaRequest,
 } from "../types/katalog.type";
-
 export const KatalogService = {
-    // ── Read ───────────────────────────────────────────────────────────────
+    // ── Kategori ───────────────────────────────────────────────────────────
 
     getKategori: async (): Promise<GetKategoriResponse> => {
         const res = await api.get<GetKategoriResponse>("/katalog/get-kategori");
         return res.data;
     },
 
+    addKategori: async (kategori: string): Promise<{ message: string; data: { KategoriID: number; Kategori: string } }> => {
+        const res = await api.post("/katalog/add-kategori", { kategori });
+        return res.data;
+    },
+
+    updateKategori: async (kategoriId: number, kategori: string): Promise<{ message: string; data: { KategoriID: number; Kategori: string } }> => {
+        const res = await api.patch(`/katalog/update-kategori/${kategoriId}`, { kategori });
+        return res.data;
+    },
+
+    deleteKategori: async (kategoriId: number): Promise<{ message: string }> => {
+        const res = await api.delete(`/katalog/delete-kategori/${kategoriId}`);
+        return res.data;
+    },
+
+    // ── Read ───────────────────────────────────────────────────────────────
+
     getKatalogSampahBank: async (bankId: string): Promise<GetKatalogResponse> => {
         const res = await api.get<GetKatalogResponse>(`/katalog/get-sampah/${bankId}`);
         return res.data;
     },
 
-    getHistoryKatalogSampah: async (sampahId: string): Promise<GetKatalogHistoryResponse> => {
-        const res = await api.get<GetKatalogHistoryResponse>(`/katalog/get-history/${sampahId}`);
+    /** GET /katalog/get-detail/:sampah_id — returns detail + harga_per_level + history */
+    getDetailSampah: async (sampahId: string): Promise<GetKatalogDetailResponse> => {
+        const res = await api.get<GetKatalogDetailResponse>(`/katalog/get-detail/${sampahId}`);
         return res.data;
     },
 
-    // ── BSI CRUD ───────────────────────────────────────────────────────────
+    // ── Write ──────────────────────────────────────────────────────────────
 
-    /** POST /katalog/bsi/add-sampah/:bank_id — multipart/form-data */
-    addKatalogBSI: async (bankId: string, data: AddKatalogBSIRequest) => {
+    /** POST /katalog/add-sampah/:bank_id — multipart/form-data */
+    addKatalog: async (bankId: string, data: AddKatalogRequest) => {
         const fd = new FormData();
         fd.append("nama_sampah", data.nama_sampah);
         fd.append("satuan", data.satuan);
         fd.append("kategori_id", data.kategori_id.toString());
-        fd.append("harga_nasabah", data.harga_nasabah.toString());
-        fd.append("harga_bsu", data.harga_bsu.toString());
-        fd.append("harga_eksternal", data.harga_eksternal.toString());
+        fd.append("reward_id", data.reward_id.toString());
+        if (data.syarat_pemilahan) fd.append("syarat_pemilahan", data.syarat_pemilahan);
         if (data.foto) fd.append("foto", data.foto);
-
-        const res = await api.post(`/katalog/bsi/add-sampah/${bankId}`, fd, {
+        const res = await api.post(`/katalog/add-sampah/${bankId}`, fd, {
             headers: { "Content-Type": "multipart/form-data" },
         });
         return res.data;
     },
 
-    /** PATCH /katalog/bsi/edit-sampah/:sampah_id — multipart/form-data */
-    editKatalogBSI: async (sampahId: string, data: EditKatalogRequest) => {
+    /** PATCH /katalog/edit-sampah/:sampah_id — multipart/form-data */
+    editKatalog: async (sampahId: string, data: EditKatalogRequest) => {
         const fd = new FormData();
         fd.append("nama_sampah", data.nama_sampah);
         fd.append("satuan", data.satuan);
         fd.append("kategori_id", data.kategori_id.toString());
+        fd.append("reward_id", data.reward_id.toString());
+        if (data.syarat_pemilahan) fd.append("syarat_pemilahan", data.syarat_pemilahan);
         if (data.foto) fd.append("foto", data.foto);
-
-        const res = await api.patch(`/katalog/bsi/edit-sampah/${sampahId}`, fd, {
+        const res = await api.patch(`/katalog/edit-sampah/${sampahId}`, fd, {
             headers: { "Content-Type": "multipart/form-data" },
         });
         return res.data;
     },
-
-    // ── BSM CRUD ───────────────────────────────────────────────────────────
-
-    /** POST /katalog/bsm/add-sampah/:bank_id — multipart/form-data */
-    addKatalogBSM: async (bankId: string, data: AddKatalogBSMRequest) => {
-        const fd = new FormData();
-        fd.append("nama_sampah", data.nama_sampah);
-        fd.append("satuan", data.satuan);
-        fd.append("kategori_id", data.kategori_id.toString());
-        fd.append("harga_nasabah", data.harga_nasabah.toString());
-        fd.append("harga_eksternal", data.harga_eksternal.toString());
-        if (data.foto) fd.append("foto", data.foto);
-
-        const res = await api.post(`/katalog/bsm/add-sampah/${bankId}`, fd, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-        return res.data;
-    },
-
-    /** PATCH /katalog/bsm/edit-sampah/:sampah_id — multipart/form-data */
-    editKatalogBSM: async (sampahId: string, data: EditKatalogRequest) => {
-        const fd = new FormData();
-        fd.append("nama_sampah", data.nama_sampah);
-        fd.append("satuan", data.satuan);
-        fd.append("kategori_id", data.kategori_id.toString());
-        if (data.foto) fd.append("foto", data.foto);
-
-        const res = await api.patch(`/katalog/bsm/edit-sampah/${sampahId}`, fd, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-        return res.data;
-    },
-
-    // ── Shared write ops ───────────────────────────────────────────────────
 
     /** DELETE /katalog/delete-sampah/:sampah_id */
     deleteKatalogSampah: async (sampahId: string) => {
         const res = await api.delete(`/katalog/delete-sampah/${sampahId}`);
-        return res.data;
-    },
-
-    /** PATCH /katalog/update-harga/:sampah_id — JSON body */
-    updateHargaSchema: async (sampahId: string, data: UpdateHargaSchemaRequest) => {
-        const res = await api.patch(`/katalog/update-harga/${sampahId}`, data);
         return res.data;
     },
 };

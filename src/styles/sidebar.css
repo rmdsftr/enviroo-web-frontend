@@ -1,118 +1,138 @@
 /* =========================================================
-   Sidebar
+   Sidebar — White Modern
    ========================================================= */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    width: 220px;
-    background: linear-gradient(165deg, #012b2f 0%, #011618 100%);
-    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    width: 228px;
+    background: #ffffff;
+    border-right: 1px solid rgba(1, 50, 54, 0.08);
     display: flex;
     flex-direction: column;
-    padding: 32px 0 24px;
+    padding: 0 0 24px;
     overflow: hidden;
     z-index: 1000;
-    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.18);
 }
 
-/* Subtle brand accent glow */
-.sidebar::before {
-    content: '';
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 180px;
-    height: 180px;
-    background: radial-gradient(circle, rgba(148, 223, 12, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-.sidebar::after {
-    content: '';
-    position: absolute;
-    bottom: -80px;
-    right: -40px;
-    width: 160px;
-    height: 160px;
-    background: radial-gradient(circle, rgba(78, 167, 113, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-}
-
-/* ── Profile ── */
-.profil {
+/* ── Logo aplikasi di atas ── */
+.sidebar-logo {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 0 16px 28px;
-    text-align: center;
-    position: relative;
+    padding: 0px 10px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo img {
+    width: 140px;
+    height: auto;
+    display: block;
+}
+
+/* ── Bank brand — footer ── */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(1, 50, 54, 0.07);
+    flex-shrink: 0;
+    background: white;
 }
 
 .foto-wrapper {
-    position: relative;
     flex-shrink: 0;
 }
 
 .foto {
-    width: 62px;
-    height: 62px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--c-accent), var(--c-primary));
+    background: #f1f9f3;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    padding: 3px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35),
-        0 0 0 3px rgba(148, 223, 12, 0.15);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.foto:hover {
-    transform: scale(1.06) rotate(-3deg);
+    border: 2px solid rgba(78, 167, 113, 0.35);
+    box-shadow: 0 2px 8px rgba(1, 50, 54, 0.10);
+    flex-shrink: 0;
 }
 
 .foto img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    object-fit: contain;
-    background: #ffffff;
+    object-fit: cover;
 }
 
 .bank-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
+    min-width: 0;
 }
 
 .bank-name {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #ffffff;
-    letter-spacing: 0.2px;
-    line-height: 1.25;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #013236;
+    letter-spacing: -0.1px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .bank-type {
-    font-size: 9px;
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    font-family: 'Poppins', sans-serif;
+    font-size: 8.5px;
     font-weight: 700;
-    color: var(--c-accent);
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    opacity: 0.9;
+    color: #4EA771;
+    background: #4ea7721b;
+    border-radius: 20px;
+    padding: 2px 7px;
 }
 
-/* ── Divider ── */
-.line {
-    width: 80%;
-    margin: 0 auto 22px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+/* Brand fallback (superadmin — no bank info) */
+.sidebar-brand-app {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.sidebar-brand-app .brand-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #013236;
+    letter-spacing: -0.3px;
+}
+
+.sidebar-brand-app .brand-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    color: #4EA771;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+/* ── Section label ── */
+.menu-section-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(1, 50, 54, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 18px 20px 8px;
     flex-shrink: 0;
 }
 
@@ -120,13 +140,12 @@
 .menu {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
-    padding: 0 12px;
-    position: relative;
+    padding: 8px 12px;
 }
 
 .menu::-webkit-scrollbar {
@@ -137,35 +156,35 @@
 .item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    border-radius: var(--r-md);
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 10px;
     cursor: pointer;
     position: relative;
-    overflow: hidden;
-    transition: background-color var(--t-base), color var(--t-base),
-        transform var(--t-base), box-shadow var(--t-base);
-    color: rgba(255, 255, 255, 0.55);
+    transition: background 0.15s ease, color 0.15s ease;
+    color: rgba(1, 50, 54, 0.636);
     white-space: nowrap;
     outline: none;
+    text-decoration: none;
 }
 
 .item:hover {
-    background-color: rgba(255, 255, 255, 0.04);
-    color: #ffffff;
+    background: rgba(1, 50, 54, 0.05);
+    color: #013236;
 }
 
 .item:focus-visible {
-    box-shadow: 0 0 0 2px rgba(148, 223, 12, 0.5);
+    box-shadow: 0 0 0 2px rgba(78, 167, 113, 0.40);
 }
 
+/* Active state */
 .item.active {
-    background: var(--c-accent);
-    color: var(--c-secondary-900);
+    background: rgba(1, 50, 54, 0.07);
+    color: #013236;
     font-weight: 700;
-    box-shadow: 0 8px 18px rgba(148, 223, 12, 0.25);
 }
 
+/* Left accent bar */
 .item.active::before {
     content: '';
     position: absolute;
@@ -173,32 +192,62 @@
     top: 50%;
     transform: translateY(-50%);
     width: 3px;
-    height: 60%;
-    background: var(--c-secondary-900);
+    height: 52%;
+    background: #94DF0C;
     border-radius: 0 3px 3px 0;
-    opacity: 0.5;
 }
 
+/* Active icon gets the green accent */
+.item.active .item-icon {
+    color: #94DF0C;
+}
+
+/* ── Icon ── */
 .item-icon {
-    font-size: 15px;
+    font-size: 14px;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 20px;
-    transition: transform var(--t-base);
+    transition: transform 0.15s ease;
 }
 
 .item:hover .item-icon {
-    transform: scale(1.1);
+    transform: scale(1.12);
 }
 
+/* ── Label ── */
 .item-label {
-    font-family: var(--ff-sans);
-    font-size: 11px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    letter-spacing: 0.1px;
+}
+
+/* ── Bottom version tag (optional) ── */
+.sidebar-footer {
+    padding: 12px 20px 0;
+    border-top: 1px solid rgba(1, 50, 54, 0.07);
+    flex-shrink: 0;
+}
+
+.sidebar-footer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #94DF0C;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.sidebar-footer-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(1, 50, 54, 0.30);
+    letter-spacing: 0.3px;
 }
 
 /* ── Mobile Hamburger ── */
@@ -207,31 +256,31 @@
     position: fixed;
     top: 14px;
     left: 14px;
-    width: 42px;
-    height: 42px;
-    background: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: var(--r-md);
+    width: 40px;
+    height: 40px;
+    background: #ffffff;
+    border: 1px solid rgba(1, 50, 54, 0.10);
+    border-radius: 10px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    color: var(--c-primary);
-    font-size: 18px;
+    color: #013236;
+    font-size: 16px;
     z-index: 1002;
-    box-shadow: var(--sh-sm);
-    transition: transform var(--t-base), box-shadow var(--t-base);
+    box-shadow: 0 2px 10px rgba(1, 50, 54, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .mobile-toggle:hover {
-    transform: scale(1.05);
-    box-shadow: var(--sh-md);
+    transform: scale(1.06);
+    box-shadow: 0 4px 16px rgba(1, 50, 54, 0.12);
 }
 
 /* ── Overlay (mobile) ── */
 .sidebar-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(1, 22, 24, 0.55);
+    background: rgba(1, 22, 24, 0.40);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
     z-index: 999;

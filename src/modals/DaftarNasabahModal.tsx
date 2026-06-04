@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NasabahService } from "../services/nasabah.service";
+import { formatThousands } from "../utils/number.utils";
 import { UsersService } from "../services/users.service";
 import type { NonAdminUser } from "../types/users.type";
 import Input from "../components/input";
@@ -16,6 +17,7 @@ interface DaftarNasabahModalProps {
     onSuccess: () => void;
     isAdminBsi: boolean;
     isAdminBsu: boolean;
+    isAdminBsm: boolean;
     bankId: string;
     identityId: string;
     afiliasiOptions: { label: string; value: string }[];
@@ -27,6 +29,7 @@ export default function DaftarNasabahModal({
     onSuccess,
     isAdminBsi,
     isAdminBsu,
+    isAdminBsm,
     bankId,
     identityId,
     afiliasiOptions,
@@ -37,7 +40,7 @@ export default function DaftarNasabahModal({
     const [selectedUser, setSelectedUser] = useState<NonAdminUser | null>(null);
     const [isBsuNasabah, setIsBsuNasabah] = useState(false);
     const [selectedAfiliasi, setSelectedAfiliasi] = useState("");
-    const [formData, setFormData] = useState({ nik: "", nama: "", email: "", noWa: "", afiliasi: "" });
+    const [formData, setFormData] = useState({ nik: "", nama: "", email: "", noWa: "", afiliasi: "", noRekening: "", saldoRupiah: "", saldoPoin: "" });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" | "warning" } | null>(null);
@@ -50,7 +53,7 @@ export default function DaftarNasabahModal({
         setSelectedAfiliasi("");
         setIsBsuNasabah(false);
         setSearchQuery("");
-        setFormData({ nik: "", nama: "", email: "", noWa: "", afiliasi: "" });
+        setFormData({ nik: "", nama: "", email: "", noWa: "", afiliasi: "", noRekening: "", saldoRupiah: "", saldoPoin: "" });
     };
 
     const handleClose = () => {
@@ -64,9 +67,7 @@ export default function DaftarNasabahModal({
         setSelectedAfiliasi("");
         setSearchQuery("");
 
-        const fetchPromise = (isAdminBsi && bankId)
-            ? UsersService.getNonNasabahNonAdminBSI(bankId)
-            : UsersService.getNonNasabahUsers();
+        const fetchPromise = UsersService.getNonNasabahUsers();
 
         fetchPromise
             .then((res) => setExistingUsers(res.data || []))
@@ -80,8 +81,8 @@ export default function DaftarNasabahModal({
         setIsSubmitting(true);
         
         try {
-            const effectiveBankId = isAdminBsu
-                ? bankId // BSU: selalu ke bank mereka sendiri
+            const effectiveBankId = (isAdminBsu || isAdminBsm)
+                ? bankId // BSU/BSM: selalu ke bank mereka sendiri
                 : isAdminBsi
                     ? (isBsuNasabah ? (isFromExisting ? selectedAfiliasi : formData.afiliasi) : bankId)
                     : (isFromExisting ? selectedAfiliasi : formData.afiliasi);
@@ -96,6 +97,9 @@ export default function DaftarNasabahModal({
                     user_id: selectedUser.UserID,
                     bank_id: effectiveBankId,
                     admin_id: identityId,
+                    ...(formData.noRekening && { no_rekening: formData.noRekening }),
+                    saldo_rupiah: formData.saldoRupiah ? parseFloat(formData.saldoRupiah) : 0,
+                    saldo_poin: formData.saldoPoin ? parseFloat(formData.saldoPoin) : 0,
                 });
             } else {
                 await NasabahService.createNasabah({
@@ -105,6 +109,9 @@ export default function DaftarNasabahModal({
                     no_whatsapp: formData.noWa,
                     bank_id: effectiveBankId,
                     admin_id: identityId,
+                    ...(formData.noRekening && { no_rekening: formData.noRekening }),
+                    saldo_rupiah: formData.saldoRupiah ? parseFloat(formData.saldoRupiah) : 0,
+                    saldo_poin: formData.saldoPoin ? parseFloat(formData.saldoPoin) : 0,
                 });
             }
             onSuccess();
@@ -143,7 +150,7 @@ export default function DaftarNasabahModal({
                                 <FaCircleInfo />
                                 <span>
                                     <strong>Informasi Aktivasi:</strong> Setelah didaftarkan, sistem akan otomatis
-                                    mengirimkan link aktivasi dan password sementara ke email nasabah.
+                                    mengirimkan kode aktivasi ke email nasabah terdaftar.
                                 </span>
                             </div>
 
@@ -172,7 +179,8 @@ export default function DaftarNasabahModal({
 
                             {isFromExisting ? (
                                  /* ── Mode: Pilih dari Akun yang Ada ── */
-                                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: isAdminBsu ? "1fr" : "1fr 1fr", gap: "20px", alignItems: "start" }}>
+                                <>
+                                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: (isAdminBsu || isAdminBsm) ? "1fr" : "1fr 1fr", gap: "20px", alignItems: "start" }}>
                                     {/* Kiri: daftar akun */}
                                     <div className="nasabah-form-group" style={{ margin: 0 }}>
                                         <label className="nasabah-label" style={{ marginBottom: 0 }}>Pilih Akun <span className="required">*</span></label>
@@ -229,8 +237,8 @@ export default function DaftarNasabahModal({
                                                 ))}
                                         </div>
 
-                                        {/* BSU: preview akun dipilih di bawah list (karena kolom kanan tidak ada) */}
-                                        {isAdminBsu && selectedUser && (
+                                        {/* BSU/BSM: preview akun dipilih di bawah list (karena kolom kanan tidak ada) */}
+                                        {(isAdminBsu || isAdminBsm) && selectedUser && (
                                             <div style={{ marginTop: "16px", padding: "12px", background: "rgba(78,167,113,0.08)", borderRadius: "10px", border: "1.5px solid rgba(78,167,113,0.25)" }}>
                                                 <div style={{ fontSize: "11px", color: "#5a7a68", marginBottom: "8px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Akun Dipilih</div>
                                                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -248,8 +256,8 @@ export default function DaftarNasabahModal({
                                         )}
                                     </div>
 
-                                    {/* Kanan: dropdown afiliasi — hanya untuk non-BSU */}
-                                    {!isAdminBsu && (
+                                    {/* Kanan: dropdown afiliasi — hanya untuk non-BSU dan non-BSM */}
+                                    {!isAdminBsu && !isAdminBsm && (
                                         <div className="nasabah-form-group" style={{ margin: 0 }}>
                                             <label className="nasabah-label">Afiliasi Bank Sampah <span className="required">*</span></label>
                                             <Dropdown
@@ -281,6 +289,21 @@ export default function DaftarNasabahModal({
                                         </div>
                                     )}
                                 </div>
+                                <div className="nasabah-form-group" style={{ gridColumn: "1 / -1" }}>
+                                    <label className="nasabah-label" htmlFor="noRekeningExisting">No. Rekening</label>
+                                    <Input id="noRekeningExisting" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="Kosongkan untuk menggunakan ID nasabah secara otomatis" value={formData.noRekening} onChange={(e) => setFormData({ ...formData, noRekening: e.target.value })} />
+                                </div>
+                                <div style={{ gridColumn: "1 / -1", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+                                    <div className="nasabah-form-group" style={{ margin: 0 }}>
+                                        <label className="nasabah-label" htmlFor="saldoRupiahExisting">Saldo Rupiah Awal</label>
+                                        <Input id="saldoRupiahExisting" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ lineHeight: 1, fontWeight: 600 }}>Rp</span>} value={formatThousands(formData.saldoRupiah)} onChange={(e) => setFormData({ ...formData, saldoRupiah: e.target.value.replace(/[^\d]/g, '') })} />
+                                    </div>
+                                    <div className="nasabah-form-group" style={{ margin: 0 }}>
+                                        <label className="nasabah-label" htmlFor="saldoPoinExisting">Saldo Poin Awal</label>
+                                        <Input id="saldoPoinExisting" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ lineHeight: 1, fontWeight: 500 }}>poin</span>} value={formatThousands(formData.saldoPoin)} onChange={(e) => setFormData({ ...formData, saldoPoin: e.target.value.replace(/[^\d]/g, '') })} />
+                                    </div>
+                                </div>
+                                </>
 
                             ) : (
                                 /* ── Mode: Input Manual ── */
@@ -293,8 +316,8 @@ export default function DaftarNasabahModal({
                                         <label className="nasabah-label" htmlFor="nama">Nama Lengkap <span className="required">*</span></label>
                                         <Input id="nama" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="Masukkan nama lengkap" value={formData.nama} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} required />
                                     </div>
-                                    {/* Afiliasi hanya untuk non-BSU */}
-                                    {!isAdminBsu && (
+                                    {/* Afiliasi hanya untuk non-BSU dan non-BSM */}
+                                    {!isAdminBsu && !isAdminBsm && (
                                         <div className="nasabah-form-group">
                                             <label className="nasabah-label">Afiliasi Bank Sampah <span className="required">*</span></label>
                                             <Dropdown
@@ -316,6 +339,18 @@ export default function DaftarNasabahModal({
                                     <div className="nasabah-form-group">
                                         <label className="nasabah-label" htmlFor="nowa">No. WhatsApp <span className="required">*</span></label>
                                         <Input id="nowa" type="tel" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="081234567890" value={formData.noWa} onChange={(e) => setFormData({ ...formData, noWa: e.target.value })} required />
+                                    </div>
+                                    <div className="nasabah-form-group" style={{ gridColumn: "1 / -1" }}>
+                                        <label className="nasabah-label" htmlFor="noRekening">No. Rekening</label>
+                                        <Input id="noRekening" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="Kosongkan untuk menggunakan ID nasabah secara otomatis" value={formData.noRekening} onChange={(e) => setFormData({ ...formData, noRekening: e.target.value })} />
+                                    </div>
+                                    <div className="nasabah-form-group">
+                                        <label className="nasabah-label" htmlFor="saldoRupiah">Saldo Rupiah Awal</label>
+                                        <Input id="saldoRupiah" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ lineHeight: 1, fontWeight: 600 }}>Rp</span>} value={formatThousands(formData.saldoRupiah)} onChange={(e) => setFormData({ ...formData, saldoRupiah: e.target.value.replace(/[^\d]/g, '') })} />
+                                    </div>
+                                    <div className="nasabah-form-group">
+                                        <label className="nasabah-label" htmlFor="saldoPoin">Saldo Poin Awal</label>
+                                        <Input id="saldoPoin" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ lineHeight: 1, fontWeight: 500 }}>poin</span>} value={formatThousands(formData.saldoPoin)} onChange={(e) => setFormData({ ...formData, saldoPoin: e.target.value.replace(/[^\d]/g, '') })} />
                                     </div>
                                 </>
                             )}

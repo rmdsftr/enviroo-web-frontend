@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { FaIdCard, FaCopy } from "react-icons/fa6";
 import CloseButton from "../components/close-button";
+import { PopupNotifikasi } from "./popup-notifikasi";
 import "../styles/popup-aktivasi.css";
 
 interface PopupAktivasiResultProps {
@@ -10,10 +12,19 @@ interface PopupAktivasiResultProps {
 }
 
 export default function PopupAktivasiResult({ isOpen, onClose, data, description }: PopupAktivasiResultProps) {
+    const [notifMsg, setNotifMsg] = useState<string | null>(null);
+
     if (!isOpen || !data) return null;
 
     return (
         <div className="aktivasi-modal-overlay">
+            {notifMsg && (
+                <PopupNotifikasi
+                    message={notifMsg}
+                    type="success"
+                    onClose={() => setNotifMsg(null)}
+                />
+            )}
             <div className="aktivasi-modal-content">
                 <CloseButton onClick={onClose} />
                 
@@ -35,7 +46,7 @@ export default function PopupAktivasiResult({ isOpen, onClose, data, description
                                 title="Salin ID"
                                 onClick={() => {
                                     navigator.clipboard.writeText(data.aktivasi_id);
-                                    window.alert("ID Aktivasi berhasil disalin");
+                                    setNotifMsg("ID Aktivasi berhasil disalin");
                                 }}
                             >
                                 <FaCopy />
@@ -52,7 +63,7 @@ export default function PopupAktivasiResult({ isOpen, onClose, data, description
                                 title="Salin OTP"
                                 onClick={() => {
                                     navigator.clipboard.writeText(data.otp);
-                                    window.alert("Kode OTP berhasil disalin");
+                                    setNotifMsg("Kode OTP berhasil disalin");
                                 }}
                             >
                                 <FaCopy />

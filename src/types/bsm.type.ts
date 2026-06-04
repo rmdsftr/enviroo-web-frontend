@@ -3,20 +3,23 @@ export interface NewBSM {
     deskripsi: string;
     provinsi: string;
     kabupaten_kota: string;
-    kecamatan: string;
+    id_kecamatan: string;
+    id_kelurahan: string;
     alamat_lengkap: string;
     latitude: number;
     longitude: number;
     user_id: string[];
     foto: File | null;
+    admin_id: string;
 }
 
 export interface BSMData {
-    BankID: string;
-    NamaBank: string;
-    PhotoURL: string;
-    IsActive: boolean;
+    bank_id: string;
+    nama_bsm: string;
+    photo_url: string;
+    is_active: boolean;
     jumlah_nasabah: number;
+    jumlah_staff: number;
 }
 
 export interface GetBSMResponse {

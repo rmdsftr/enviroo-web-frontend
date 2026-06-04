@@ -27,13 +27,6 @@
     min-width: 0;
 }
 
-.nav-logo img {
-    height: auto;
-    width: 125px;
-    display: block;
-    flex-shrink: 0;
-}
-
 /* ── Right ── */
 .nav-right {
     display: flex;

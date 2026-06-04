@@ -5,16 +5,33 @@ export interface KontenItem {
     Body: string;        // JSON string of BodyBlock[]
     Thumbnail: string;
     IsUploaded: boolean; // true = published, false = draft
-    BankID: string;
+    BankID?: string;
     AdminID: string;
-    nama_admin: string;  // Added author name field
+    nama_admin: string;
     CreatedAt: string;
     UpdatedAt: string;
+    nama_instansi?: string;
+}
+
+export interface KontenListItem {
+    konten_id: string;
+    judul: string;
+    deskripsi: string;
+    thumbnail: string;
+    nama_instansi: string;
+}
+
+export interface KontenPagination {
+    page: number;
+    per_page: number;
+    total: number;
+    total_pages: number;
 }
 
 export interface GetAllKontenResponse {
-    data: KontenItem[];
     message: string;
+    data: KontenListItem[];
+    pagination: KontenPagination;
 }
 
 export interface BodyBlock {

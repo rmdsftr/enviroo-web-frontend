@@ -1,0 +1,580 @@
+/* =========================================================
+   Setoran Sampah Dashboard (ssd)
+   ========================================================= */
+
+/* ── Page wrapper ── */
+.dash-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 24px 48px;
+}
+
+.dash-admin-header {
+    padding-bottom: 4px;
+}
+
+.dash-admin-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f1f15;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin: 0 0 6px;
+}
+
+.dash-admin-header p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #7a9e8a;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 560px;
+}
+
+/* ── Root ── */
+.ssd {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ── Section card ── */
+.ssd-section {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-xl);
+    padding: 24px;
+    box-shadow: var(--sh-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── Section header ── */
+.ssd-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ssd-section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ssd-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--c-primary-100);
+    border-radius: var(--r-lg);
+    color: var(--c-primary);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.ssd-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--c-text);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.ssd-sub {
+    font-size: 12px;
+    color: var(--c-text-muted);
+    margin: 3px 0 0;
+    font-family: var(--ff-sans);
+}
+
+.ssd-section-header-right {
+    flex-shrink: 0;
+}
+
+/* ── Charts grid ── */
+.ssd-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+}
+
+/* ── Chart card ── */
+.ssd-chart-card {
+    background: var(--c-surface-soft);
+    border: 1px solid var(--c-border-soft);
+    border-radius: var(--r-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ssd-chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ssd-chart-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--c-text);
+    font-family: var(--ff-sans);
+}
+
+.ssd-chart-total-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--c-primary-700);
+    background: var(--c-primary-100);
+    border: 1px solid var(--c-primary-200);
+    padding: 3px 10px;
+    border-radius: var(--r-pill);
+    white-space: nowrap;
+    font-family: var(--ff-sans);
+}
+
+/* ── Bar chart ── */
+.ssd-bar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.ssd-bar-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 96px;
+    align-items: center;
+    gap: 10px;
+}
+
+.ssd-bar-label {
+    font-size: 12px;
+    color: var(--c-text-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--ff-sans);
+}
+
+.ssd-bar-track {
+    height: 8px;
+    background: var(--c-border);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+}
+
+.ssd-bar-fill {
+    height: 100%;
+    border-radius: var(--r-pill);
+    min-width: 4px;
+    transition: width var(--t-slow);
+}
+
+/* ── Vertical bar chart ── */
+.ssd-vbar-list {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    gap: 14px;
+    padding: 8px 4px 0;
+    min-height: 220px;
+}
+
+.ssd-vbar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    max-width: 110px;
+}
+
+.ssd-vbar-value {
+    font-family: var(--ff-sans);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--c-text);
+    text-align: center;
+    line-height: 1.25;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 30px;
+}
+
+.ssd-vbar-value small {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    margin-top: 1px;
+}
+
+.ssd-vbar-track {
+    flex: 1;
+    width: 100%;
+    max-width: 56px;
+    min-height: 140px;
+    border-radius: 8px 8px 4px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.ssd-vbar-fill {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    min-height: 4px;
+    transition: height var(--t-slow);
+}
+
+.ssd-vbar-label {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    color: var(--c-text-soft);
+    text-align: center;
+    line-height: 1.3;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ssd-bar-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    text-align: right;
+    white-space: nowrap;
+    font-family: var(--ff-sans);
+}
+
+/* ── Pie / Donut chart ── */
+.ssd-pie-body {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 6px 4px 0;
+}
+
+.ssd-pie-chart {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ssd-pie-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.ssd-pie-center-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--c-text);
+    line-height: 1.1;
+}
+
+.ssd-pie-center-label {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--c-text-muted);
+    margin-top: 2px;
+    text-transform: lowercase;
+}
+
+.ssd-pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.ssd-pie-legend-item {
+    display: grid;
+    grid-template-columns: 10px 1fr auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.ssd-pie-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.ssd-pie-legend-label {
+    font-family: var(--ff-sans);
+    font-size: 12px;
+    color: var(--c-text-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ssd-pie-legend-value {
+    font-family: var(--ff-sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--c-text);
+    white-space: nowrap;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.ssd-pie-legend-value small {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--c-text-muted);
+}
+
+/* ── States (loading / empty / error) ── */
+.ssd-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 52px 20px;
+    color: var(--c-text-muted);
+    font-size: 13px;
+    font-family: var(--ff-sans);
+}
+
+.ssd-state-icon {
+    font-size: 36px;
+    opacity: 0.35;
+}
+
+.ssd-state--error {
+    color: var(--c-danger);
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+    .ssd-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .ssd-section {
+        padding: 16px;
+    }
+
+    .ssd-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ssd-bar-row {
+        grid-template-columns: 100px 1fr 80px;
+        gap: 8px;
+    }
+}
+
+/* =========================================================
+   Kontribusi Nasabah Section (kns)
+   ========================================================= */
+
+.kns-icon {
+    background: var(--c-secondary);
+    color: #fff;
+}
+
+/* ── List ── */
+.kns-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ── Row ── */
+.kns-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--c-surface-soft);
+    border: 1px solid var(--c-border-soft);
+    border-radius: var(--r-lg);
+    transition: background var(--t-base), border-color var(--t-base);
+}
+
+.kns-row:hover {
+    background: var(--c-primary-50);
+    border-color: var(--c-primary-200);
+}
+
+/* ── Rank badge ── */
+.kns-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--r-pill);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--ff-sans);
+    flex-shrink: 0;
+}
+
+.kns-rank--1 {
+    background: var(--c-warning-bg);
+    color: var(--c-warning-700);
+}
+
+.kns-rank--2 {
+    background: var(--c-border-soft);
+    color: var(--c-text-soft);
+}
+
+.kns-rank--3 {
+    background: var(--c-primary-100);
+    color: var(--c-primary-700);
+}
+
+.kns-rank--other {
+    background: var(--c-border);
+    color: var(--c-text-muted);
+}
+
+/* ── Nasabah info ── */
+.kns-nasabah-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.kns-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-pill);
+    background: var(--c-primary-100);
+    color: var(--c-primary);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--ff-sans);
+    flex-shrink: 0;
+}
+
+.kns-nasabah-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.kns-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--c-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--ff-sans);
+}
+
+.kns-bank {
+    font-size: 11px;
+    color: var(--c-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--ff-sans);
+}
+
+/* ── Stats ── */
+.kns-stats {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.kns-setoran-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--c-text);
+    font-family: var(--ff-sans);
+    white-space: nowrap;
+}
+
+.kns-unit-pill {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--c-text-muted);
+    background: var(--c-border-soft);
+    border: 1px solid var(--c-border);
+    padding: 2px 8px;
+    border-radius: var(--r-pill);
+    white-space: nowrap;
+    font-family: var(--ff-sans);
+}
+
+/* ── Show more button ── */
+.kns-show-more {
+    align-self: center;
+    background: none;
+    border: 1.5px solid var(--c-border-strong);
+    border-radius: var(--r-pill);
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--ff-sans);
+    color: var(--c-text-muted);
+    cursor: pointer;
+    transition: all var(--t-base);
+    margin-top: 4px;
+}
+
+.kns-show-more:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    background: var(--c-primary-50);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+    .kns-row {
+        grid-template-columns: 36px 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .kns-stats {
+        grid-column: 2;
+        justify-content: flex-start;
+        margin-top: 2px;
+    }
+}

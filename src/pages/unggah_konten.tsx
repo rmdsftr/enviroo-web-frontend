@@ -10,6 +10,8 @@ import Button from "../components/button";
 import { useAuth } from "../contexts/AuthContext";
 import { KontenService } from "../services/konten.service";
 import type { BodyBlock } from "../types/konten.type";
+import { PopupNotifikasi } from "../layouts/popup-notifikasi";
+import { getApiError } from "../utils/error.utils";
 import "../styles/unggah_konten.css";
 
 /* ── Block Types ── */
@@ -50,6 +52,7 @@ export default function UnggahKontenPage() {
     const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(isEditMode);
+    const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
     // Block image file refs
     const blockFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -79,7 +82,7 @@ export default function UnggahKontenPage() {
                     }
                 } catch (err) {
                     console.error("Gagal mengambil detail konten:", err);
-                    alert("Gagal mengambil data konten.");
+                    setNotif({ message: getApiError(err, "Gagal mengambil data konten."), type: "error" });
                 } finally {
                     setIsLoading(false);
                 }
@@ -155,11 +158,11 @@ export default function UnggahKontenPage() {
     // ── Submit ──
     const handlePublish = async (isPublished: boolean) => {
         if (!judul.trim()) {
-            alert("Judul tidak boleh kosong.");
+            setNotif({ message: "Judul tidak boleh kosong.", type: "warning" });
             return;
         }
-        if (!user?.bank_id || !user?.identity_id) {
-            alert("Sesi tidak valid. Silakan login ulang.");
+        if (!user?.identity_id) {
+            setNotif({ message: "Sesi tidak valid. Silakan login ulang.", type: "error" });
             return;
         }
 
@@ -186,7 +189,7 @@ export default function UnggahKontenPage() {
         const hasImages = bodyBlocks.some(b => b.type === "image");
 
         if (bodyBlocks.length === 0 || (nonEmptyText.length === 0 && !hasImages)) {
-            alert("Isi konten tidak boleh kosong.");
+            setNotif({ message: "Isi konten tidak boleh kosong.", type: "warning" });
             return;
         }
 
@@ -205,15 +208,15 @@ export default function UnggahKontenPage() {
 
             if (isEditMode && id) {
                 await KontenService.editKonten(id, payload);
-                alert("Konten berhasil diperbarui!");
+                setNotif({ message: "Konten berhasil diperbarui!", type: "success" });
             } else {
                 await KontenService.addKonten(payload);
-                alert(isPublished ? "Konten berhasil dipublikasikan!" : "Draft berhasil disimpan!");
+                setNotif({ message: isPublished ? "Konten berhasil dipublikasikan!" : "Draft berhasil disimpan!", type: "success" });
             }
-            navigate(-1);
+            setTimeout(() => navigate(-1), 1500);
         } catch (err) {
             console.error("Failed to submit konten", err);
-            alert("Gagal memproses konten. Silakan coba lagi.");
+            setNotif({ message: getApiError(err, "Gagal memproses konten. Silakan coba lagi."), type: "error" });
         } finally {
             setIsSubmitting(false);
         }
@@ -233,6 +236,13 @@ export default function UnggahKontenPage() {
 
     return (
         <div className="uc-page">
+            {notif && (
+                <PopupNotifikasi
+                    message={notif.message}
+                    type={notif.type}
+                    onClose={() => setNotif(null)}
+                />
+            )}
             {/* ── Top Bar ── */}
             <div className="uc-topbar">
                 <button className="uc-back-btn" onClick={() => navigate(-1)}>
@@ -356,16 +366,6 @@ export default function UnggahKontenPage() {
                                         {block.content ? (
                                             <div className="uc-block-image-wrap">
                                                 <img src={block.content} alt="Block image" />
-                                                <div className="uc-block-image-overlay">
-                                                    <Button 
-                                                        size="small" 
-                                                        color="white" 
-                                                        variant="outline"
-                                                        onClick={(e) => { e.stopPropagation(); blockFileRefs.current[block.id]?.click(); }}
-                                                    >
-                                                        Ganti Gambar
-                                                    </Button>
-                                                </div>
                                             </div>
                                         ) : (
                                             <div

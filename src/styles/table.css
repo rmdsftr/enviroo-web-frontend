@@ -49,9 +49,18 @@
 
 .table td {
     padding: 14px 18px;
-    font-size: 12.5px;
+    font-size: 12px;
+    font-weight: 500;
     color: var(--c-text);
     vertical-align: middle;
+}
+
+/* ── Cell: ID / mono-style value ── */
+.table-id {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--c-text);
+    letter-spacing: -0.1px;
 }
 
 /* Empty state */

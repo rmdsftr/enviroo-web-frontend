@@ -26,8 +26,6 @@ function rewardIcon(nama: string) {
     const lower = (nama || "").toLowerCase();
     if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah"))
         return <FaMoneyBillWave />;
-    if (lower.includes("emas") || lower.includes("gold"))
-        return <FaCoins />;
     return <FaGift />;
 }
 

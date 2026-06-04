@@ -1,0 +1,114 @@
+/* ── Filter Range container ─────────────────────── */
+.filter-range {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-range-group {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.filter-range-sep {
+    font-size: 0.75rem;
+    color: #013236;
+    opacity: 0.35;
+    user-select: none;
+}
+
+/* ── Trigger button ─────────────────────────────── */
+.fr-select {
+    position: relative;
+    display: inline-block;
+}
+
+.fr-trigger {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 6px 15px;
+    border: 1px solid rgba(1, 50, 54, 0.18);
+    border-radius: 10px;
+    background: rgba(1, 50, 54, 0.04);
+    color: #013236;
+    cursor: pointer;
+    outline: none;
+    white-space: nowrap;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.fr-trigger:hover {
+    background: rgba(1, 50, 54, 0.07);
+    border-color: rgba(1, 50, 54, 0.25);
+}
+
+.fr-trigger.open {
+    border-color: rgba(1, 50, 54, 0.35);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(1, 50, 54, 0.07);
+}
+
+.fr-trigger svg {
+    width: 9px;
+    height: 9px;
+    opacity: 0.45;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+}
+
+.fr-trigger.open svg {
+    transform: rotate(180deg);
+}
+
+/* ── Dropdown panel ─────────────────────────────── */
+.fr-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    background: #fff;
+    border: 1px solid rgba(1, 50, 54, 0.12);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10), 0 2px 6px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    z-index: 1000;
+    min-width: 100%;
+    animation: fr-in 0.12s ease;
+}
+
+@keyframes fr-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Option items ───────────────────────────────── */
+.fr-option {
+    display: block;
+    width: 100%;
+    padding: 7px 14px;
+    font-size: 0.73rem;
+    font-family: inherit;
+    font-weight: 400;
+    color: #334155;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    transition: background 0.1s;
+}
+
+.fr-option:hover {
+    background: rgba(1, 50, 54, 0.05);
+    color: #013236;
+}
+
+.fr-option.active {
+    background: rgba(1, 50, 54, 0.08);
+    font-weight: 600;
+    color: #013236;
+}

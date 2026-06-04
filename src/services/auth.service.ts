@@ -36,4 +36,19 @@ export const AuthService = {
         const response = await api.post("/auth/reactivate-akun", { user_id, otp });
         return response.data;
     },
+
+    async sendEmailForgetPassword(email: string): Promise<any> {
+        const response = await api.post("/auth/forget-password/send-email", { email });
+        return response.data;
+    },
+
+    async verifikasiOTPForgetPassword(email: string, otp: string): Promise<any> {
+        const response = await api.post("/auth/forget-password/verifikasi-otp", { email, otp });
+        return response.data;
+    },
+
+    async resetPassword(email: string, otp: string, password_baru: string, konfirmasi_password_baru: string): Promise<any> {
+        const response = await api.post("/auth/forget-password/reset-password", { email, otp, password_baru, konfirmasi_password_baru });
+        return response.data;
+    },
 };

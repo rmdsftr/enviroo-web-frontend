@@ -7,6 +7,7 @@ export interface BankSampahProfile {
     provinsi?: string;
     kabupaten_kota?: string;
     kecamatan?: string;
+    kelurahan?: string;
     alamat_lengkap?: string;
     parent_id?: string;
     bank_induk?: string;
@@ -27,19 +28,70 @@ export interface ProfilNasabah {
     nama: string;
     email: string;
     no_whatsapp: string;
-    foto: string;
-    created_at: string;
-    updated_at: string;
-    bsi_id: string | null;
-    nama_bsi: string | null;
-    bsu_id: string | null;
-    nama_bsu: string | null;
-    saldo_poin: number;
+    photo_url: string;
+    nomor_rekening: string;
+    nama_bank: string;
+    is_admin: boolean;
+    admin_id?: string;
+    role_admin?: string;
+    nama_bank_admin?: string;
 }
 
 export interface GetProfilNasabahResponse {
     message: string;
     data: ProfilNasabah;
+}
+
+export interface SaldoNasabah {
+    uang: { total_uang: number; satuan_uang: string };
+    poin: { total_poin: number; satuan_poin: string };
+}
+
+export interface GetSaldoNasabahResponse {
+    message: string;
+    data: SaldoNasabah;
+}
+
+export interface DetailBankAdmin {
+    admin_id: string;
+    nama_admin: string;
+    photo_url: string;
+    role_admin: string;
+}
+
+export interface DetailBank {
+    bank_id: string;
+    nama_bank: string;
+    photo_url: string;
+    is_bsu: boolean;
+    bank_induk_nama: string;
+    jenis_bank: string;
+    alamat: string;
+    provinsi: string;
+    kabupaten_kota: string;
+    kecamatan: string;
+    kelurahan: string;
+    deskripsi: string;
+    is_active: boolean;
+    joined_at: string;
+    latitude: number;
+    longitude: number;
+    admins: DetailBankAdmin[];
+}
+
+export interface GetDetailBankResponse {
+    message: string;
+    data: DetailBank;
+}
+
+export interface SaldoBank {
+    uang: { total_uang: number; satuan_uang: string };
+    poin: { total_poin: number; satuan_poin: string };
+}
+
+export interface GetSaldoBankResponse {
+    message: string;
+    data: SaldoBank;
 }
 
 export interface HistoryAkunBank {

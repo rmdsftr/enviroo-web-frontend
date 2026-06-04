@@ -1,0 +1,187 @@
+/* =========================================================
+   Detail Penjualan — Additional Styles
+   (imports alongside detail-penimbangan.css for dp- classes)
+   ========================================================= */
+
+/* ── Foto Button ── */
+.dpj-foto-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4EA771;
+    background: rgba(78, 167, 113, 0.08);
+    border: 1.5px solid rgba(78, 167, 113, 0.20);
+    border-radius: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    width: fit-content;
+}
+
+.dpj-foto-btn:hover {
+    background: rgba(78, 167, 113, 0.14);
+    border-color: rgba(78, 167, 113, 0.40);
+}
+
+.dpj-foto-btn svg {
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+/* ── Items List ── */
+.dpj-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dpj-item-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(1, 50, 54, 0.07);
+    background: #ffffff;
+}
+
+.dpj-item-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ddf0e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #3d8a5c;
+    flex-shrink: 0;
+}
+
+.dpj-item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.dpj-item-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dpj-item-detail {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #7a9e8a;
+    font-weight: 500;
+}
+
+.dpj-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.dpj-item-subtotal {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+}
+
+.dpj-item-unit-price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    color: #7a9e8a;
+    font-weight: 500;
+}
+
+/* =========================================================
+   Bukti Foto Popup
+   ========================================================= */
+.dpj-foto-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.50);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: dpFadeIn 0.2s ease both;
+}
+
+.dpj-foto-popup {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 24px 64px rgba(1, 50, 54, 0.18);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dpj-foto-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+}
+
+.dpj-foto-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+.dpj-foto-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(1, 50, 54, 0.06);
+    color: #7a9e8a;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.dpj-foto-close:hover {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dpj-foto-img {
+    width: 100%;
+    display: block;
+    max-height: 70vh;
+    object-fit: contain;
+    background: #f8faf9;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .dpj-foto-popup {
+        max-width: 100%;
+    }
+}

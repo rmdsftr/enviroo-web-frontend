@@ -48,8 +48,11 @@ function StatusBadge({ status }: { status: StatusNasabah }) {
 export function buildColumns(
     isAdminBsi: boolean,
     isAdminBsu: boolean,
-    navigate: (path: string) => void
+    navigate: (path: string) => void,
+    isAdminBsm?: boolean,
 ): ColumnDef<NasabahRow>[] {
+    const basePath = isAdminBsu ? '/bsu' : isAdminBsi ? '/bsi' : isAdminBsm ? '/bsm' : '/superadmin';
+
     const cols: ColumnDef<NasabahRow>[] = [
         {
             key: "foto",
@@ -64,7 +67,7 @@ export function buildColumns(
             render: (row) => (
                 <span
                     className="table-name table-name--link"
-                    onClick={() => navigate(`${isAdminBsu ? '/bsu' : isAdminBsi ? '/bsi' : '/superadmin'}/nasabah/${row.id}`)}
+                    onClick={() => navigate(`${basePath}/nasabah/${row.id}`)}
                     style={{ cursor: "pointer" }}
                 >
                     {row.id}
@@ -82,7 +85,7 @@ export function buildColumns(
         },
     ];
 
-    if (isAdminBsi || isAdminBsu) {
+    if (isAdminBsi || isAdminBsu || isAdminBsm) {
         cols.push({
             key: "email",
             header: "Email",
@@ -107,7 +110,7 @@ export function buildColumns(
             <TableActionBtn
                 icon={FaEye}
                 title="Lihat Detail"
-                onClick={() => navigate(`${isAdminBsu ? '/bsu' : isAdminBsi ? '/bsi' : '/superadmin'}/nasabah/${row.id}`)}
+                onClick={() => navigate(`${basePath}/nasabah/${row.id}`)}
             />
         ),
     });

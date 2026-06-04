@@ -24,35 +24,47 @@ export interface NilaiRewardBank {
     NilaiRewardID: string;
     BankID: string;
     RewardID: number;
-    NilaiPoin: number;
-    NilaiKonversi: number;
+    LevelUser: string;
+    PersenBagiHasil: number;
     CreatedAt: string;
     UpdatedAt: string;
     CreatedBy?: string | null;
     UpdatedBy?: string | null;
+    IsActive: boolean;
     Reward?: Reward;
+}
+
+export interface RewardPersentase {
+    level_user: string;
+    persen_bagi_hasil: number;
 }
 
 export interface AddNilaiRewardRequest {
     reward_id: number;
-    nilai_poin: number;
-    nilai_konversi: number;
+    persentase: RewardPersentase[];
     created_by?: string;
 }
 
 export interface UpdateNilaiRewardRequest {
-    nilai_poin: number;
-    nilai_konversi: number;
+    persentase: RewardPersentase[];
     updated_by?: string;
 }
 
 export interface HistoryNilaiReward {
-    HistoryID: number;
-    NilaiRewardID: string;
-    OldNilaiPoin?: number | null;
-    NewNilaiPoin?: number | null;
-    OldNilaiKonversi?: number | null;
-    NewNilaiKonversi?: number | null;
-    ChangedBy?: string | null;
-    ChangedAt: string;
+    history_reward_id: number;
+    nilai_reward_id: string;
+    level_user: string;
+    old_persen?: number | null;
+    new_persen?: number | null;
+    changed_by: string;
+    changed_at: string;
+}
+
+export interface DetailNilaiRewardBank {
+    bank_id: string;
+    reward_id: number;
+    nama_reward: string;
+    satuan: string;
+    persentase: RewardPersentase[];
+    history: HistoryNilaiReward[];
 }

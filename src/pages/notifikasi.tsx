@@ -1,136 +1,168 @@
-import React, { useState, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-    FaBell, FaCircleCheck, FaCircleInfo, FaTriangleExclamation,
-    FaGear, FaBolt, FaRecycle, FaTrash, FaCalendarCheck, FaArrowDown
+    FaBell, FaCircleCheck, FaTriangleExclamation, FaGear,
+    FaArrowDown, FaCheckDouble, FaCalendarCheck, FaBoxOpen,
+    FaMoneyBillWave, FaTruck, FaFileCircleCheck,
 } from "react-icons/fa6";
+import { useAuth } from "../contexts/AuthContext";
+import { NotifikasiService, type NotifikasiItem, type NotifRefType } from "../services/notifikasi.service";
 import "../styles/notifikasi.css";
 
-/* ── Types ── */
-type NotifKategori = "sistem" | "aktivitas" | "peringatan";
-
-interface Notifikasi {
-    id: string;
-    judul: string;
-    pesan: string;
-    waktu: string;        // relative label
-    timestamp: number;    // for sorting
-    kategori: NotifKategori;
-    dibaca: boolean;
-    icon: "check" | "info" | "warning" | "gear" | "bolt" | "recycle" | "trash" | "calendar" | "deposit";
+/* ── Helpers ── */
+function formatRelativeTime(iso: string): string {
+    const diff = Date.now() - new Date(iso).getTime();
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return "Baru saja";
+    if (min < 60) return `${min} menit lalu`;
+    const hour = Math.floor(min / 60);
+    if (hour < 24) return `${hour} jam lalu`;
+    const day = Math.floor(hour / 24);
+    if (day === 1) return "Kemarin";
+    return `${day} hari lalu`;
 }
 
-/* ── Dummy Data ── */
-const DUMMY_NOTIF: Notifikasi[] = [
-    {
-        id: "n1", judul: "Setoran Baru Diterima", pesan: "BSI Sukamaju telah menerima setoran dari Andi Pratama sebesar 5 kg plastik.",
-        waktu: "2 menit lalu", timestamp: Date.now() - 2 * 60 * 1000, kategori: "aktivitas", dibaca: false, icon: "deposit",
-    },
-    {
-        id: "n2", judul: "Pembaruan Sistem", pesan: "Sistem Enviroo telah diperbarui ke versi 2.4.1. Periksa log perubahan untuk detail.",
-        waktu: "15 menit lalu", timestamp: Date.now() - 15 * 60 * 1000, kategori: "sistem", dibaca: false, icon: "gear",
-    },
-    {
-        id: "n3", judul: "Jadwal Pengangkutan Hari Ini", pesan: "BSU Sejahtera dijadwalkan melakukan pengangkutan pukul 08:00 – 10:00 WIB.",
-        waktu: "1 jam lalu", timestamp: Date.now() - 60 * 60 * 1000, kategori: "aktivitas", dibaca: false, icon: "calendar",
-    },
-    {
-        id: "n4", judul: "BSM Bersih Kota Belum Aktif", pesan: "Bank Sampah BSM Bersih Kota belum melakukan aktivitas dalam 7 hari terakhir.",
-        waktu: "3 jam lalu", timestamp: Date.now() - 3 * 60 * 60 * 1000, kategori: "peringatan", dibaca: true, icon: "warning",
-    },
-    {
-        id: "n5", judul: "Nasabah Baru Terdaftar", pesan: "Siti Rahayu berhasil mendaftarkan diri sebagai nasabah BSI Cimahi Utara.",
-        waktu: "5 jam lalu", timestamp: Date.now() - 5 * 60 * 60 * 1000, kategori: "aktivitas", dibaca: true, icon: "check",
-    },
-    {
-        id: "n6", judul: "Backup Database Selesai", pesan: "Backup otomatis database berhasil diselesaikan tanpa error pada pukul 03:00 WIB.",
-        waktu: "Kemarin", timestamp: Date.now() - 24 * 60 * 60 * 1000, kategori: "sistem", dibaca: true, icon: "bolt",
-    },
-    {
-        id: "n7", judul: "Stok Katalog Diperbarui", pesan: "Katalog sembako pada BSU Sejahtera telah diperbarui. 3 item baru ditambahkan.",
-        waktu: "Kemarin", timestamp: Date.now() - 26 * 60 * 60 * 1000, kategori: "aktivitas", dibaca: true, icon: "recycle",
-    },
-    {
-        id: "n8", judul: "Kapasitas Penyimpanan Hampir Penuh", pesan: "Kapasitas server telah mencapai 85%. Pertimbangkan untuk menambah kapasitas.",
-        waktu: "2 hari lalu", timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000, kategori: "peringatan", dibaca: true, icon: "warning",
-    },
-    {
-        id: "n9", judul: "Laporan Bulanan Tersedia", pesan: "Laporan bulanan Maret 2026 telah siap diunduh di halaman laporan.",
-        waktu: "2 hari lalu", timestamp: Date.now() - 50 * 60 * 60 * 1000, kategori: "sistem", dibaca: true, icon: "info",
-    },
-    {
-        id: "n10", judul: "Admin BSI Sukamaju Ditambahkan", pesan: "Budi Santoso berhasil ditambahkan sebagai admin BSI Sukamaju oleh Superadmin.",
-        waktu: "3 hari lalu", timestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, kategori: "aktivitas", dibaca: true, icon: "check",
-    },
-    {
-        id: "n11", judul: "Item Kedaluwarsa Dihapus", pesan: "5 item katalog yang sudah tidak aktif telah dihapus secara otomatis oleh sistem.",
-        waktu: "4 hari lalu", timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000, kategori: "sistem", dibaca: true, icon: "trash",
-    },
-    {
-        id: "n12", judul: "BSI Cimahi Utara Belum Input Jadwal", pesan: "BSI Cimahi Utara belum mengatur jadwal penimbangan untuk minggu depan.",
-        waktu: "5 hari lalu", timestamp: Date.now() - 5 * 24 * 60 * 60 * 1000, kategori: "peringatan", dibaca: true, icon: "warning",
-    },
-];
+/* ── ref_type → visual category ── */
+type VisualKat = "sistem" | "aktivitas" | "peringatan";
 
-type FilterType = "semua" | "belum_dibaca" | "sistem" | "aktivitas";
+function getKategori(refType: NotifRefType): VisualKat {
+    if (!refType) return "sistem";
+    if (refType === "kontrak") return "peringatan";
+    return "aktivitas";
+}
 
-const FILTERS: { key: FilterType; label: string }[] = [
-    { key: "semua",       label: "SEMUA" },
-    { key: "belum_dibaca", label: "BELUM DIBACA" },
-    { key: "sistem",      label: "SISTEM" },
-    { key: "aktivitas",   label: "AKTIVITAS" },
-];
-
-const ICON_MAP: Record<Notifikasi["icon"], React.ReactNode> = {
-    check:    <FaCircleCheck />,
-    info:     <FaCircleInfo />,
-    warning:  <FaTriangleExclamation />,
-    gear:     <FaGear />,
-    bolt:     <FaBolt />,
-    recycle:  <FaRecycle />,
-    trash:    <FaTrash />,
-    calendar: <FaCalendarCheck />,
-    deposit:  <FaArrowDown />,
+/* ── Icon map by ref_type ── */
+const ICON_BY_REF: Partial<Record<NonNullable<NotifRefType>, React.ReactNode>> = {
+    setoran:                 <FaArrowDown />,
+    bagi_hasil:              <FaMoneyBillWave />,
+    penarikan:               <FaMoneyBillWave />,
+    kontrak:                 <FaTriangleExclamation />,
+    pengajuan:               <FaFileCircleCheck />,
+    pengangkutan:            <FaTruck />,
+    distribusi_sembako:      <FaBoxOpen />,
+    jadwal_penimbangan:      <FaCalendarCheck />,
+    jadwal_pengangkutan:     <FaCalendarCheck />,
+    pengajuan_pengangkutan:  <FaFileCircleCheck />,
 };
 
-const KATEGORI_COLOR: Record<NotifKategori, string> = {
-    sistem:     "notif-cat-sistem",
-    aktivitas:  "notif-cat-aktivitas",
-    peringatan: "notif-cat-peringatan",
-};
+function getIcon(refType: NotifRefType): React.ReactNode {
+    if (!refType) return <FaGear />;
+    return ICON_BY_REF[refType] ?? <FaCircleCheck />;
+}
 
-const ICON_COLOR: Record<NotifKategori, string> = {
+const ICON_COLOR: Record<VisualKat, string> = {
     sistem:     "notif-icon-sistem",
     aktivitas:  "notif-icon-aktivitas",
     peringatan: "notif-icon-peringatan",
 };
 
-/* ── Main Page ── */
+const KATEGORI_COLOR: Record<VisualKat, string> = {
+    sistem:     "notif-cat-sistem",
+    aktivitas:  "notif-cat-aktivitas",
+    peringatan: "notif-cat-peringatan",
+};
+
+const KATEGORI_LABEL: Record<VisualKat, string> = {
+    sistem:     "sistem",
+    aktivitas:  "aktivitas",
+    peringatan: "peringatan",
+};
+
+/* ── Filter ── */
+type FilterType = "semua" | "belum_dibaca";
+
+const FILTERS: { key: FilterType; label: string }[] = [
+    { key: "semua",        label: "SEMUA" },
+    { key: "belum_dibaca", label: "BELUM DIBACA" },
+];
+
+const LIMIT = 20;
+
+/* ── Page ── */
 export default function NotifikasiPage() {
+    const { user } = useAuth();
     const [filter, setFilter] = useState<FilterType>("semua");
-    const [notifs, setNotifs] = useState<Notifikasi[]>(DUMMY_NOTIF);
+    const [notifs, setNotifs] = useState<NotifikasiItem[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [markingAll, setMarkingAll] = useState(false);
+
+    const userId = user?.user_id;
+
+    const fetchPage = useCallback(async (pageNum: number, append: boolean) => {
+        if (!userId) return;
+        if (pageNum === 1) setLoading(true); else setLoadingMore(true);
+        try {
+            const res = await NotifikasiService.getList(userId, pageNum, LIMIT);
+            setNotifs(prev => append ? [...prev, ...res.data] : res.data);
+            setHasMore(pageNum < res.meta.total_halaman);
+        } finally {
+            setLoading(false);
+            setLoadingMore(false);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        setPage(1);
+        fetchPage(1, false);
+    }, [fetchPage]);
+
+    const handleLoadMore = () => {
+        const next = page + 1;
+        setPage(next);
+        fetchPage(next, true);
+    };
+
+    const handleMarkRead = async (item: NotifikasiItem) => {
+        if (item.is_read) return;
+        setNotifs(prev => prev.map(n =>
+            n.notifikasi_id === item.notifikasi_id ? { ...n, is_read: true } : n
+        ));
+        try {
+            await NotifikasiService.markAsRead(item.notifikasi_id);
+        } catch {
+            setNotifs(prev => prev.map(n =>
+                n.notifikasi_id === item.notifikasi_id ? { ...n, is_read: false } : n
+            ));
+        }
+    };
+
+    const handleMarkAll = async () => {
+        if (!userId || markingAll) return;
+        setMarkingAll(true);
+        setNotifs(prev => prev.map(n => ({ ...n, is_read: true })));
+        try {
+            await NotifikasiService.markAllAsRead(userId);
+        } catch {
+            setPage(1);
+            fetchPage(1, false);
+        } finally {
+            setMarkingAll(false);
+        }
+    };
 
     const filtered = useMemo(() => {
-        switch (filter) {
-            case "belum_dibaca": return notifs.filter(n => !n.dibaca);
-            case "sistem":       return notifs.filter(n => n.kategori === "sistem");
-            case "aktivitas":    return notifs.filter(n => n.kategori === "aktivitas" || n.kategori === "peringatan");
-            default:             return notifs;
-        }
+        if (filter === "belum_dibaca") return notifs.filter(n => !n.is_read);
+        return notifs;
     }, [filter, notifs]);
 
-    const unreadCount = notifs.filter(n => !n.dibaca).length;
-
-
-
-    const markRead = (id: string) =>
-        setNotifs(prev => prev.map(n => n.id === id ? { ...n, dibaca: true } : n));
+    const unreadCount = notifs.filter(n => !n.is_read).length;
 
     return (
         <div className="notif-page">
 
+            {/* ── Header ── */}
+            <div className="notif-header">
+                <div className="notif-header-left">
+                    <p className="notif-title">Notifikasi</p>
+                    {unreadCount > 0 && (
+                        <span className="notif-unread-badge">{unreadCount} belum dibaca</span>
+                    )}
+                </div>
+            </div>
 
-
-            {/* ── Filter Chips ── */}
+            {/* ── Filter Chips + Tandai Semua ── */}
             <div className="notif-filters">
                 {FILTERS.map(f => (
                     <button
@@ -144,45 +176,73 @@ export default function NotifikasiPage() {
                         )}
                     </button>
                 ))}
-            </div>
-
-            {/* ── Notification List ── */}
-            <div className="notif-list">
-                {filtered.length === 0 ? (
-                    <div className="notif-empty">
-                        <FaBell />
-                        <span>Tidak ada notifikasi</span>
-                    </div>
-                ) : (
-                    filtered.map(notif => (
-                        <div
-                            key={notif.id}
-                            className={`notif-item${notif.dibaca ? "" : " unread"}`}
-                            onClick={() => markRead(notif.id)}
-                        >
-                            {/* Icon */}
-                            <div className={`notif-icon-wrap ${ICON_COLOR[notif.kategori]}`}>
-                                {ICON_MAP[notif.icon]}
-                            </div>
-
-                            {/* Content */}
-                            <div className="notif-content">
-                                <div className="notif-content-top">
-                                    <span className="notif-judul">{notif.judul}</span>
-                                    <span className={`notif-kategori-tag ${KATEGORI_COLOR[notif.kategori]}`}>
-                                        {notif.kategori}
-                                    </span>
-                                </div>
-                                <p className="notif-pesan">{notif.pesan}</p>
-                                <span className="notif-waktu">{notif.waktu}</span>
-                            </div>
-
-                            {/* Unread dot */}
-                            {!notif.dibaca && <span className="notif-unread-dot" />}
-                        </div>
-                    ))
+                {unreadCount > 0 && (
+                    <button
+                        className="notif-mark-all-btn"
+                        onClick={handleMarkAll}
+                        disabled={markingAll}
+                        style={{ marginLeft: "auto" }}
+                    >
+                        <FaCheckDouble />
+                        {markingAll ? "Memproses…" : "Tandai semua dibaca"}
+                    </button>
                 )}
             </div>
+
+            {/* ── List ── */}
+            {loading ? (
+                <div className="notif-empty">Memuat notifikasi…</div>
+            ) : (
+                <div className="notif-list">
+                    {filtered.length === 0 ? (
+                        <div className="notif-empty">
+                            <FaBell />
+                            <span>Tidak ada notifikasi</span>
+                        </div>
+                    ) : (
+                        filtered.map(notif => {
+                            const kat = getKategori(notif.ref_type);
+                            return (
+                                <div
+                                    key={notif.notifikasi_id}
+                                    className={`notif-item${notif.is_read ? "" : " unread"}`}
+                                    onClick={() => handleMarkRead(notif)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={e => e.key === "Enter" && handleMarkRead(notif)}
+                                >
+                                    <div className={`notif-icon-wrap ${ICON_COLOR[kat]}`}>
+                                        {getIcon(notif.ref_type)}
+                                    </div>
+                                    <div className="notif-content">
+                                        <div className="notif-content-top">
+                                            <span className="notif-judul">{notif.judul}</span>
+                                            <span className={`notif-kategori-tag ${KATEGORI_COLOR[kat]}`}>
+                                                {KATEGORI_LABEL[kat]}
+                                            </span>
+                                        </div>
+                                        <p className="notif-pesan">{notif.pesan}</p>
+                                        <span className="notif-waktu">
+                                            {formatRelativeTime(notif.created_at)}
+                                        </span>
+                                    </div>
+                                    {!notif.is_read && <span className="notif-unread-dot" />}
+                                </div>
+                            );
+                        })
+                    )}
+
+                    {hasMore && filter === "semua" && (
+                        <button
+                            className="notif-load-more"
+                            onClick={handleLoadMore}
+                            disabled={loadingMore}
+                        >
+                            {loadingMore ? "Memuat…" : "Muat lebih banyak"}
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

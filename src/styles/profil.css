@@ -4,7 +4,6 @@
 
 .profil-page {
     padding: 0 24px 24px;
-    margin-top: 25px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -23,13 +22,33 @@
     }
 }
 
+/* ── Settings icon button (top right of card) ── */
+.profil-settings-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(78, 167, 113, 0.2);
+    background: rgba(78, 167, 113, 0.06);
+    color: #4EA771;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.profil-settings-btn:hover {
+    background: rgba(78, 167, 113, 0.12);
+    border-color: rgba(78, 167, 113, 0.35);
+}
+
 /* ── Section Title ── */
 .profil-section-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     color: #013236;
-    margin: 0 0 14px 0;
+    margin: 10px 0 10px 10px;
     letter-spacing: -0.2px;
     display: flex;
     align-items: center;
@@ -47,77 +66,101 @@
 .profil-card {
     background: #ffffff;
     border-radius: 18px;
-    padding: 32px 36px;
-    position: relative;
     overflow: hidden;
     border: 1px solid rgba(1, 50, 54, 0.06);
     box-shadow: 0 2px 12px rgba(1, 50, 54, 0.05);
+    position: relative;
 }
 
-/* Decorative accent bar */
-.profil-card::before {
-    content: '';
+.profil-edit-btn {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #013236, #4EA771, #94DF0C);
-}
-
-/* ── Card content layout ── */
-.profil-card-content {
+    top: 20px;
+    right: 20px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(78, 167, 113, 0.2);
+    background: rgba(78, 167, 113, 0.06);
+    color: #4EA771;
+    font-size: 13px;
     display: flex;
-    gap: 32px;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
 }
 
-/* ── Photo Section ── */
-.profil-photo-section {
+.profil-edit-btn:hover {
+    background: rgba(78, 167, 113, 0.14);
+    border-color: rgba(78, 167, 113, 0.35);
+}
+
+
+/* ── Baris 1: Identity ── */
+.profil-identity {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+.profil-avatar-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
-.profil-photo-wrapper {
-    position: relative;
-    width: 130px;
-    height: 130px;
-}
-
-.profil-photo {
-    width: 130px;
-    height: 130px;
+.profil-avatar {
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid rgba(78, 167, 113, 0.2);
-    box-shadow: 0 4px 20px rgba(1, 50, 54, 0.1);
-    transition: border-color 0.3s ease;
+    flex-shrink: 0;
+    border: 3px solid rgba(78, 167, 113, 0.18);
+    box-shadow: 0 4px 16px rgba(1, 50, 54, 0.1);
 }
 
-.profil-photo:hover {
-    border-color: rgba(148, 223, 12, 0.5);
-}
-
-.profil-photo img {
+.profil-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.profil-photo-fallback {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #013236, #024a44);
+
+.profil-identity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.profil-id-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #7a9e8a;
+    background: rgba(1, 50, 54, 0.04);
+    border-radius: 8px;
+    padding: 4px 10px;
+    width: fit-content;
+}
+
+.profil-id-chip svg {
+    font-size: 11px;
+}
+
+.profil-identity-meta {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 44px;
-    color: #94DF0C;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 /* Photo toggle button */
@@ -125,7 +168,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 20px;
     border: 1px solid rgba(78, 167, 113, 0.2);
     background: rgba(78, 167, 113, 0.06);
@@ -143,13 +186,70 @@
 }
 
 .profil-photo-toggle svg {
-    font-size: 12px;
+    font-size: 11px;
 }
 
-/* ── Info Section ── */
-.profil-info {
-    flex: 1;
+/* ── Baris 2: Detail Info ── */
+.profil-detail-section {
+    padding: 24px 32px 28px;
+}
+
+.profil-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 20px;
+}
+
+.profil-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.profil-info-row:hover {
+    background: rgba(78, 167, 113, 0.05);
+}
+
+.profil-info-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: #4ea77226;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: #2e7d52;
+    flex-shrink: 0;
+}
+
+.profil-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     min-width: 0;
+}
+
+.profil-info-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profil-info-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .profil-name {
@@ -162,66 +262,6 @@
     line-height: 1.3;
 }
 
-.profil-role-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 8px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    background: linear-gradient(135deg, #94DF0C, #7bc40a);
-    color: #013236;
-    margin-bottom: 20px;
-}
-
-.profil-role-badge svg {
-    font-size: 10px;
-    color: #013236;
-}
-
-/* ── Detail Grid ── */
-.profil-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px 28px;
-}
-
-.profil-detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.profil-detail-label {
-    font-family: 'Poppins', sans-serif;
-    font-size: 10.5px;
-    font-weight: 600;
-    color: #7a9e8a;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-}
-
-.profil-detail-value {
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #013236;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    line-height: 1.5;
-    word-break: break-all;
-}
-
-.profil-detail-value svg {
-    font-size: 13px;
-    color: #4EA771;
-    flex-shrink: 0;
-}
 
 /* =========================================================
    SECTION 2 — Settings
@@ -389,7 +429,8 @@
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     background: #fafcfb;
-    max-width: 380px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .profil-form-input:focus {
@@ -468,6 +509,253 @@
     width: 280px;
 }
 
+/* ── Identity Row (status + admin ID badges) ── */
+.profil-identity-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.profil-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    text-transform: capitalize;
+}
+
+.profil-status-badge.status-aktif {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e8b57;
+    border: 1px solid rgba(78, 167, 113, 0.25);
+}
+
+.profil-status-badge.status-nonaktif,
+.profil-status-badge.status-non-aktif {
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.profil-admin-id-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4a6e5e;
+    background: rgba(1, 50, 54, 0.05);
+    border: 1px solid rgba(1, 50, 54, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.profil-admin-id-badge svg {
+    font-size: 11px;
+    color: #4EA771;
+}
+
+/* ── Section Divider ── */
+.profil-info-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 14px;
+}
+
+.profil-info-divider::before,
+.profil-info-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(1, 50, 54, 0.08);
+}
+
+.profil-info-divider span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* ── 3-column detail grid ── */
+.profil-detail-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ── Nasabah Banner ── */
+.profil-nasabah-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(148, 223, 12, 0.07), rgba(78, 167, 113, 0.05));
+    border: 1px solid #4ea7725d;
+}
+
+.profil-nasabah-icon {
+    font-size: 18px;
+    color: #4EA771;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.profil-nasabah-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #013236b2;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.profil-nasabah-text strong {
+    font-weight: 600;
+    color: #013236b2;
+}
+
+/* ── Modal Edit Profil ── */
+.profil-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: profilUserFadeIn 0.2s ease;
+}
+
+.profil-modal {
+    background: #ffffff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(1, 50, 54, 0.2);
+    overflow: hidden;
+}
+
+.profil-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.07);
+}
+
+.profil-modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+}
+
+
+.profil-modal-body {
+    padding: 24px 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profil-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 24px;
+    border-top: 1px solid rgba(1, 50, 54, 0.07);
+}
+
+/* ── Edit notice (is_nasabah) ── */
+.profil-edit-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #4ea77216;
+    border: 1px solid #4ea77234;
+    border-radius: 10px;
+}
+
+.profil-edit-notice svg {
+    font-size: 14px;
+    color: #4ea772bf;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.profil-edit-notice span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #013236a3;
+    line-height: 1.5;
+}
+
+/* ── Avatar uploader ── */
+.profil-edit-avatar-section {
+    display: flex;
+    justify-content: center;
+}
+
+.profil-edit-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border: 3px solid rgba(78, 167, 113, 0.2);
+    box-shadow: 0 4px 16px rgba(1, 50, 54, 0.1);
+    flex-shrink: 0;
+}
+
+.profil-edit-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.profil-edit-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.profil-edit-avatar:hover .profil-edit-avatar-overlay {
+    opacity: 1;
+}
+
+.profil-edit-avatar-overlay svg {
+    font-size: 20px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .profil-page {
@@ -478,13 +766,26 @@
         padding: 24px 20px;
     }
 
-    .profil-card-content {
+    .profil-identity {
+        padding: 24px 20px;
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
 
-    .profil-detail-grid {
+    .profil-identity-info {
+        align-items: center;
+    }
+
+    .profil-identity-meta {
+        justify-content: center;
+    }
+
+    .profil-detail-section {
+        padding: 20px 20px 24px;
+    }
+
+    .profil-info-grid {
         grid-template-columns: 1fr;
     }
 

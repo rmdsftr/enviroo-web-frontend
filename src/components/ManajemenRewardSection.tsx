@@ -1,41 +1,34 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState} from "react";
+import { formatTanggalJam } from "../utils/date.utils";
+import { createPortal } from "react-dom";
 import {
     FaGift,
-    FaPlus,
     FaMoneyBillWave,
-    FaCoins,
-    FaPenToSquare,
-    FaTrashCan,
+    FaGear,
     FaLock,
+    FaBuilding,
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import { RewardService } from "../services/reward.service";
-import type { NilaiRewardBank, Reward } from "../types/reward.type";
-import RewardPickerModal from "../modals/RewardPickerModal";
+import type { NilaiRewardBank, Reward, DetailNilaiRewardBank } from "../types/reward.type";
+import CloseButton from "../components/close-button";
 import NilaiRewardFormModal from "../modals/NilaiRewardFormModal";
 import type { NilaiRewardFormData } from "../modals/NilaiRewardFormModal";
 import PopupConfirmation from "../layouts/popup-confirmation";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
 import "../styles/manajemen-reward.css";
 
-function rewardVariant(nama: string): "uang" | "emas" | "default" {
+function rewardVariant(nama: string): "uang" | "default" {
     const lower = (nama || "").toLowerCase();
     if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah")) return "uang";
-    if (lower.includes("emas") || lower.includes("gold")) return "emas";
     return "default";
 }
 
 function rewardIcon(nama: string) {
-    const v = rewardVariant(nama);
-    if (v === "uang") return <FaMoneyBillWave />;
-    if (v === "emas") return <FaCoins />;
+    if (rewardVariant(nama) === "uang") return <FaMoneyBillWave />;
     return <FaGift />;
 }
 
-function formatNumber(n: number): string {
-    if (!isFinite(n)) return "-";
-    return new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(n);
-}
 
 export default function ManajemenRewardSection() {
     const { user } = useAuth();
@@ -56,10 +49,16 @@ export default function ManajemenRewardSection() {
     const [pickerOpen, setPickerOpen] = useState(false);
     const [pickedReward, setPickedReward] = useState<Reward | null>(null);
     const [formOpen, setFormOpen] = useState(false);
-    const [editTarget, setEditTarget] = useState<NilaiRewardBank | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [initialData, setInitialData] = useState<NilaiRewardFormData | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<NilaiRewardBank | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [popup, setPopup] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+    // Detail state
+    const [detailTarget, setDetailTarget] = useState<NilaiRewardBank | null>(null);
+    const [detailData, setDetailData] = useState<DetailNilaiRewardBank | null>(null);
+    const [isDetailLoading, setIsDetailLoading] = useState(false);
 
     /* ── Fetchers ─────────────────────────────────────────── */
     const fetchNilaiRewards = useCallback(async () => {
@@ -96,65 +95,69 @@ export default function ManajemenRewardSection() {
     }, []);
 
     useEffect(() => {
+        fetchMasterRewards();
         fetchNilaiRewards();
-    }, [fetchNilaiRewards]);
+    }, [fetchMasterRewards, fetchNilaiRewards]);
 
     /* ── Flow handlers ────────────────────────────────────── */
-    const openPicker = async () => {
-        setPickerOpen(true);
-        if (rewards.length === 0) fetchMasterRewards();
-    };
-
-    const handlePick = (reward: Reward) => {
-        setPickedReward(reward);
-        setEditTarget(null);
-        setPickerOpen(false);
-        setFormOpen(true);
-    };
-
-    const handleBackToPicker = () => {
-        setFormOpen(false);
-        setPickedReward(null);
-        setPickerOpen(true);
-    };
-
     const handleCloseAll = () => {
-        setPickerOpen(false);
         setFormOpen(false);
         setPickedReward(null);
-        setEditTarget(null);
+        setIsEditMode(false);
+        setInitialData(null);
     };
 
-    const openEdit = (nr: NilaiRewardBank) => {
+    const openDetail = async (nr: NilaiRewardBank) => {
+        setDetailTarget(nr);
+        setDetailData(null);
+        setIsDetailLoading(true);
+        try {
+            const res = await RewardService.getDetailNilaiReward(nr.NilaiRewardID);
+            setDetailData(res.data);
+        } catch (err: any) {
+            setPopup({ message: err?.response?.data?.error || "Gagal memuat detail reward.", type: "error" });
+            setDetailTarget(null);
+        } finally {
+            setIsDetailLoading(false);
+        }
+    };
+
+    const openEdit = (masterReward: Reward) => {
         if (readOnly) return;
-        const rewardInfo: Reward = nr.Reward || {
-            RewardID: nr.RewardID,
-            NamaReward: `Reward #${nr.RewardID}`,
-            Satuan: "-",
-            CreatedAt: "",
-            UpdatedAt: "",
-        };
-        setPickedReward(rewardInfo);
-        setEditTarget(nr);
+        setPickedReward(masterReward);
+
+        const configs = nilaiRewards.filter(nr => nr.RewardID === masterReward.RewardID);
+        if (configs.length > 0) {
+            setIsEditMode(true);
+            setInitialData({
+                persentase: configs.map(c => ({
+                    level_user: c.LevelUser,
+                    persen_bagi_hasil: c.PersenBagiHasil
+                }))
+            });
+        } else {
+            setIsEditMode(false);
+            setInitialData(null);
+        }
         setFormOpen(true);
     };
 
     const handleSubmit = async (data: NilaiRewardFormData) => {
-        if (editTarget) {
-            await RewardService.updateNilaiReward(editTarget.NilaiRewardID, {
-                nilai_poin: data.nilai_poin,
-                nilai_konversi: data.nilai_konversi,
+        if (!pickedReward) return;
+
+        if (isEditMode) {
+            await RewardService.updateNilaiReward(bankId, pickedReward.RewardID, {
+                persentase: data.persentase,
                 updated_by: identityId || undefined,
             });
-            setPopup({ message: "Nilai reward berhasil diperbarui.", type: "success" });
-        } else if (pickedReward) {
+            setPopup({ message: "Konfigurasi reward berhasil diperbarui.", type: "success" });
+        } else {
             await RewardService.addNilaiReward(bankId, {
                 reward_id: pickedReward.RewardID,
-                nilai_poin: data.nilai_poin,
-                nilai_konversi: data.nilai_konversi,
+                persentase: data.persentase,
                 created_by: identityId || undefined,
             });
-            setPopup({ message: "Reward berhasil ditambahkan.", type: "success" });
+            setPopup({ message: "Konfigurasi reward berhasil ditambahkan.", type: "success" });
         }
         handleCloseAll();
         fetchNilaiRewards();
@@ -177,11 +180,6 @@ export default function ManajemenRewardSection() {
             setIsDeleting(false);
         }
     };
-
-    const excludeIds = useMemo(
-        () => nilaiRewards.map(nr => nr.RewardID),
-        [nilaiRewards],
-    );
 
     /* ── Render ───────────────────────────────────────────── */
     return (
@@ -224,110 +222,153 @@ export default function ManajemenRewardSection() {
                             </div>
                         )}
 
-                        {nilaiRewards.map(nr => {
-                            const nama = nr.Reward?.NamaReward || `Reward #${nr.RewardID}`;
-                            const satuan = nr.Reward?.Satuan || "-";
+                        {rewards.map(r => {
+                            const nama = r.NamaReward;
+                            const satuan = r.Satuan || "-";
                             const variant = rewardVariant(nama);
+                            
+                            const configs = nilaiRewards.filter(nr => nr.RewardID === r.RewardID);
+                            const isConfigured = configs.length > 0;
+                            const mainConfig = isConfigured ? configs[0] : null;
+
                             return (
                                 <div
-                                    key={nr.NilaiRewardID}
+                                    key={r.RewardID}
                                     className={`mr-card mr-card--${variant}`}
+                                    onClick={() => {
+                                        if (mainConfig) openDetail(mainConfig);
+                                    }}
+                                    style={{ cursor: mainConfig ? "pointer" : "default" }}
                                 >
-                                    <div className="mr-card-top">
-                                        <div className={`mr-card-icon mr-card-icon--${variant}`}>
-                                            {rewardIcon(nama)}
-                                        </div>
-                                        {!readOnly && (
-                                            <div className="mr-card-actions">
-                                                <button
-                                                    type="button"
-                                                    className="mr-card-action-btn"
-                                                    title="Edit nilai reward"
-                                                    onClick={() => openEdit(nr)}
-                                                >
-                                                    <FaPenToSquare />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="mr-card-action-btn mr-card-action-btn--danger"
-                                                    title="Hapus nilai reward"
-                                                    onClick={() => setDeleteTarget(nr)}
-                                                >
-                                                    <FaTrashCan />
-                                                </button>
-                                            </div>
-                                        )}
+                                    <div className={`mr-card-icon mr-card-icon--${variant}`}>
+                                        {rewardIcon(nama)}
                                     </div>
 
                                     <div className="mr-card-body">
-                                        <h3 className="mr-card-name">{nama}</h3>
+                                        <div className="mr-card-header">
+                                            <h3 className="mr-card-name">{nama}</h3>
+                                            {!readOnly && (
+                                                <button
+                                                    type="button"
+                                                    className="mr-card-action-btn"
+                                                    title={isConfigured ? "Edit konfigurasi reward" : "Atur konfigurasi reward"}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        openEdit(r);
+                                                    }}
+                                                >
+                                                    <FaGear />
+                                                </button>
+                                            )}
+                                        </div>
                                         <span className="mr-card-satuan">Satuan: {satuan}</span>
 
-                                        <div className="mr-card-conversion">
-                                            <div className="mr-card-conversion-part">
-                                                <span className="mr-card-conversion-num">
-                                                    {formatNumber(nr.NilaiPoin)}
+                                        {isConfigured ? (
+                                            <p className="mr-card-desc" style={{ fontSize: '13px', color: 'var(--k-muted)', marginTop: '4px', lineHeight: 1.4 }}>
+                                                {r.Deskripsi}
+                                            </p>
+                                        ) : (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '4px' }}>
+                                                <span style={{ fontSize: '11px', fontWeight: 600, color: '#dc2626', background: '#fee2e2', padding: '2px 8px', borderRadius: '12px', width: 'fit-content' }}>
+                                                    Belum dikonfigurasi
                                                 </span>
-                                                <span className="mr-card-conversion-unit">poin</span>
+                                                <p className="mr-card-desc" style={{ fontSize: '13px', color: 'var(--k-muted)', lineHeight: 1.4 }}>
+                                                    {r.Deskripsi}
+                                                </p>
                                             </div>
-                                            <span className="mr-card-conversion-sep">=</span>
-                                            <div className="mr-card-conversion-part">
-                                                <span className="mr-card-conversion-num">
-                                                    {formatNumber(nr.NilaiKonversi)}
-                                                </span>
-                                                <span className="mr-card-conversion-unit">{satuan}</span>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             );
                         })}
-
-                        {/* Plus Card — only for non-read-only roles */}
-                        {!readOnly && (
-                            <button
-                                type="button"
-                                className="mr-card mr-card--add"
-                                onClick={openPicker}
-                                aria-label="Tambah reward"
-                            >
-                                <div className="mr-card-add-icon">
-                                    <FaPlus />
-                                </div>
-                                <div className="mr-card-add-label">Tambah Reward</div>
-                                <div className="mr-card-add-hint">
-                                    Pilih jenis reward & atur nilai konversinya
-                                </div>
-                            </button>
-                        )}
                     </>
                 )}
             </div>
-
-            {/* ── Picker Modal ── */}
-            <RewardPickerModal
-                isOpen={pickerOpen}
-                onClose={() => setPickerOpen(false)}
-                onPick={handlePick}
-                rewards={rewards}
-                isLoading={isLoadingMaster}
-                error={masterError}
-                excludeIds={excludeIds}
-            />
 
             {/* ── Form Modal ── */}
             <NilaiRewardFormModal
                 isOpen={formOpen}
                 reward={pickedReward}
-                isEdit={!!editTarget}
-                initialData={editTarget ? {
-                    nilai_poin: editTarget.NilaiPoin,
-                    nilai_konversi: editTarget.NilaiKonversi,
-                } : null}
+                isEdit={isEditMode}
+                initialData={initialData}
                 onClose={handleCloseAll}
-                onBack={editTarget ? undefined : handleBackToPicker}
                 onSubmit={handleSubmit}
             />
+
+            {/* ── Detail Modal ── */}
+            {detailTarget && typeof document !== "undefined" && createPortal(
+                <div className="mr-modal-overlay" onClick={() => setDetailTarget(null)}>
+                    <div className="mr-modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                        <div className="mr-modal-header">
+                            <div>
+                                <h3 className="mr-modal-title">Detail Reward: {detailTarget.Reward?.NamaReward || "Reward"}</h3>
+                                <p className="mr-modal-sub">Informasi konfigurasi dan riwayat perubahan nilai reward.</p>
+                            </div>
+                            <CloseButton onClick={() => setDetailTarget(null)} />
+                        </div>
+                        
+                        <div className="mr-modal-body" style={{ padding: '24px', overflowY: 'auto', maxHeight: '70vh' }}>
+                            {isDetailLoading || !detailData ? (
+                                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--k-muted)' }}>Memuat detail...</div>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '24px' }}>
+                                    {/* Kolom Kiri: Info */}
+                                    <div>
+                                        <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--k-dark)', marginBottom: '16px' }}>Konfigurasi Saat Ini</h4>
+                                        <div className="kd-stat-card" style={{ padding: '16px', gap: '16px', display: 'flex', flexDirection: 'column', background: '#f8faf9', borderRadius: '12px', border: '1px solid var(--k-border)' }}>
+                                            {/* Bagi Hasil Section */}
+                                            <div>
+                                                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--k-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bagi Hasil</span>
+                                                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                    {detailData.persentase.map((p, idx) => (
+                                                        <div key={idx} className="kd-stat-row" style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between' }}>
+                                                            <span style={{ color: 'var(--k-muted)', textTransform: 'capitalize' }}>{p.level_user}</span>
+                                                            <span style={{ fontWeight: 600, color: 'var(--k-dark)' }}>{p.persen_bagi_hasil}%</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Kolom Kanan: History */}
+                                    <div>
+                                        <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--k-dark)', marginBottom: '16px' }}>Riwayat Perubahan</h4>
+                                        <div className="kd-timeline-wrap">
+                                            {detailData.history.length === 0 ? (
+                                                <div className="kd-timeline-empty" style={{ fontSize: '12.5px', padding: '32px 16px', color: 'var(--k-muted)', textAlign: 'center', background: '#fcfdfc', borderRadius: '12px', border: '1px dashed var(--k-border)' }}>
+                                                    Belum ada riwayat perubahan nilai untuk reward ini.
+                                                </div>
+                                            ) : (
+                                                <div className="kd-timeline" style={{ gap: '16px' }}>
+                                                    {detailData.history.map((rw, idx) => (
+                                                        <div className="kd-timeline-item" key={idx}>
+                                                            <div className="kd-timeline-dot" style={{ top: 4, width: '8px', height: '8px', left: '-23px' }}></div>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                                                <span style={{ fontSize: '11px', fontWeight: 600, color: '#3b82f6', textTransform: 'uppercase' }}>{rw.level_user}</span>
+                                                                <span className="kd-timeline-date" style={{ fontSize: '10.5px' }}>{formatTanggalJam(rw.changed_at)}</span>
+                                                            </div>
+                                                            <div className="kd-timeline-content" style={{ padding: '12px' }}>
+                                                                <div className="kd-timeline-price" style={{ fontSize: '12.5px', color: 'var(--k-dark)' }}>
+                                                                    Bagi Hasil: <span style={{ color: 'var(--k-muted)', textDecoration: 'line-through' }}>{rw.old_persen ?? 0}%</span> &rarr; <span style={{ fontWeight: 600 }}>{rw.new_persen}%</span>
+                                                                </div>
+                                                                <div className="kd-timeline-admin" style={{ fontSize: '10.5px', marginTop: '10px', color: 'var(--k-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                                    <FaBuilding size={10} /> Oleh {rw.changed_by}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
             {/* ── Delete confirmation ── */}
             <PopupConfirmation

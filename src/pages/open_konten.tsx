@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaCalendar, FaCircleNotch, FaPen, FaTrash, FaPenToSquare } from "react-icons/fa6";
+import { FaArrowLeft, FaCalendar, FaCircleNotch, FaPen, FaTrash, FaPenToSquare, FaLocationDot } from "react-icons/fa6";
 import { KontenService } from "../services/konten.service";
+import { formatTanggalPanjang } from "../utils/date.utils";
 import { useAuth } from "../contexts/AuthContext";
-import type { KontenItem, BodyBlock } from "../types/konten.type";
+import type { KontenItem, KontenListItem, BodyBlock } from "../types/konten.type";
+import { PopupNotifikasi } from "../layouts/popup-notifikasi";
+import PopupConfirmation from "../layouts/popup-confirmation";
+import { getApiError } from "../utils/error.utils";
 import "../styles/open_konten.css";
 
 export default function OpenKontenPage() {
@@ -15,9 +19,11 @@ export default function OpenKontenPage() {
     const [blocks, setBlocks] = useState<BodyBlock[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Sidebar: other content from the same bank
-    const [otherKonten, setOtherKonten] = useState<KontenItem[]>([]);
+    const [otherKonten, setOtherKonten] = useState<KontenListItem[]>([]);
 
     useEffect(() => {
         if (!id) return;
@@ -39,7 +45,7 @@ export default function OpenKontenPage() {
                     try {
                         const allRes = await KontenService.getAllKonten(res.data.BankID, true);
                         // Exclude current article, take up to 5
-                        setOtherKonten((allRes.data || []).filter(k => k.KontenID !== id).slice(0, 5));
+                        setOtherKonten((allRes.data || []).filter(k => k.konten_id !== id).slice(0, 5));
                     } catch { /* ignore */ }
                 }
             } catch (err) {
@@ -82,29 +88,45 @@ export default function OpenKontenPage() {
         );
     }
 
-    const tanggal = new Date(konten.CreatedAt).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+    const tanggal = formatTanggalPanjang(konten.CreatedAt);
 
     // Cek apakah user yang login adalah penulis konten ini
     const isOwner = user?.identity_id === konten.AdminID;
 
-    const handleDelete = async () => {
-        const label = konten.IsUploaded ? "konten" : "draft";
-        if (!window.confirm(`Apakah Anda yakin ingin menghapus ${label} ini?`)) return;
+    const handleDelete = () => {
+        setShowDeleteConfirm(true);
+    };
+
+    const doDelete = async () => {
+        if (!konten) return;
+        setShowDeleteConfirm(false);
         try {
             await KontenService.deleteKonten(konten.KontenID);
             navigate(-1);
         } catch (err) {
             console.error("Gagal menghapus konten", err);
-            alert("Gagal menghapus konten. Silakan coba lagi.");
+            setNotif({ message: getApiError(err, "Gagal menghapus konten. Silakan coba lagi."), type: "error" });
         }
     };
 
     return (
         <div className="ok-page">
+            {notif && (
+                <PopupNotifikasi
+                    message={notif.message}
+                    type={notif.type}
+                    onClose={() => setNotif(null)}
+                />
+            )}
+            <PopupConfirmation
+                isOpen={showDeleteConfirm}
+                type="danger"
+                title={konten.IsUploaded ? "Hapus Konten" : "Hapus Draft"}
+                message={`Apakah Anda yakin ingin menghapus ${konten.IsUploaded ? "konten" : "draft"} ini? Tindakan ini tidak dapat dibatalkan.`}
+                confirmText="Ya, Hapus"
+                onConfirm={doDelete}
+                onCancel={() => setShowDeleteConfirm(false)}
+            />
             {/* ── Header Row ── */}
             <div className="ok-header-row">
                 <button className="ok-back-btn" onClick={() => navigate(-1)}>
@@ -159,7 +181,8 @@ export default function OpenKontenPage() {
                         <div className="ok-footer">
                             <div className="ok-footer-meta">
                                 <div className="ok-footer-meta-info">
-                                    <span className="ok-footer-author"><FaPen /> {konten.nama_admin || konten.AdminID}</span>
+                                    <span className="ok-footer-author"><FaPen /> {konten.nama_admin}</span>
+                                    <span className="ok-footer-author"><FaLocationDot /> {konten.nama_instansi}</span>
                                     <span className="ok-footer-date"><FaCalendar /> {tanggal}</span>
                                 </div>
                             </div>
@@ -172,6 +195,10 @@ export default function OpenKontenPage() {
                                             path = `/superadmin/informasi/edit/${konten.KontenID}`;
                                         } else if (user?.role === "admin_bsi") {
                                             path = `/bsi/konten/edit/${konten.KontenID}`;
+                                        } else if (user?.role === "admin_bsu") {
+                                            path = `/bsu/konten/edit/${konten.KontenID}`;
+                                        } else if (user?.role === "admin_bsm") {
+                                            path = `/bsm/konten/edit/${konten.KontenID}`;
                                         }
 
                                         if (path) {
@@ -197,32 +224,27 @@ export default function OpenKontenPage() {
                             <p className="ok-sidebar-empty">Belum ada konten lain.</p>
                         ) : (
                             <div className="ok-sidebar-list">
-                                {otherKonten.map(item => {
-                                    const itemDate = new Date(item.CreatedAt).toLocaleDateString("id-ID", {
-                                        day: "numeric", month: "short", year: "numeric",
-                                    });
-                                    return (
-                                        <div
-                                            key={item.KontenID}
-                                            className="ok-sidebar-item"
-                                            onClick={() => navigate(`../${item.KontenID}`, { relative: 'path' })}
-                                        >
-                                            <div className="ok-sidebar-item-thumb">
-                                                {item.Thumbnail ? (
-                                                    <img src={item.Thumbnail} alt={item.Judul} />
-                                                ) : (
-                                                    <span>{item.Judul.charAt(0)}</span>
-                                                )}
-                                            </div>
-                                            <div className="ok-sidebar-item-info">
-                                                <span className="ok-sidebar-item-title">{item.Judul}</span>
-                                                <span className="ok-sidebar-item-date">
-                                                    <FaCalendar /> {itemDate}
-                                                </span>
-                                            </div>
+                                {otherKonten.map(item => (
+                                    <div
+                                        key={item.konten_id}
+                                        className="ok-sidebar-item"
+                                        onClick={() => navigate(`../${item.konten_id}`, { relative: 'path' })}
+                                    >
+                                        <div className="ok-sidebar-item-thumb">
+                                            {item.thumbnail ? (
+                                                <img src={item.thumbnail} alt={item.judul} />
+                                            ) : (
+                                                <span>{item.judul.charAt(0)}</span>
+                                            )}
                                         </div>
-                                    );
-                                })}
+                                        <div className="ok-sidebar-item-info">
+                                            <span className="ok-sidebar-item-title">{item.judul}</span>
+                                            <span className="ok-sidebar-item-date">
+                                                <FaLocationDot /> {item.nama_instansi}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>

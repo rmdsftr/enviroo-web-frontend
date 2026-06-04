@@ -3,7 +3,7 @@
    Palette: #013236 (dark) · #4EA771 (green) · #94DF0C (lime)
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;700&display=swap');
 
 :root {
     --n-dark:   #013236;
@@ -35,6 +35,90 @@
 
 
 
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+.notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.notif-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notif-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--n-dark);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.notif-unread-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--n-dark);
+    background: var(--n-lime);
+    padding: 3px 12px;
+    border-radius: 20px;
+}
+
+.notif-mark-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--n-green);
+    background: rgba(78,167,113,0.1);
+    border: none;
+    border-radius: 50px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.notif-mark-all-btn:hover:not(:disabled) {
+    background: rgba(78,167,113,0.18);
+}
+
+.notif-mark-all-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Load More ── */
+.notif-load-more {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--n-green);
+    background: none;
+    border: none;
+    border-top: 1px solid var(--n-border);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.notif-load-more:hover:not(:disabled) {
+    background: rgba(78,167,113,0.05);
+}
+
+.notif-load-more:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 
 /* =========================================================
    FILTER CHIPS  (matches reference image)
@@ -81,7 +165,7 @@
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 700;
     background: var(--n-dark);
     color: var(--n-lime);
     border-radius: 20px;

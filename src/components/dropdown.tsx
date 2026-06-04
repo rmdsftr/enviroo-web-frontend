@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, type SelectHTMLAttributes } from "react";
+import { createPortal } from "react-dom";
 import { FaChevronDown, FaCheck } from "react-icons/fa6";
 import "../styles/dropdown.css";
 
@@ -6,7 +7,7 @@ interface DropdownProps extends SelectHTMLAttributes<HTMLSelectElement> {
     options: { label: string; value: string | number }[];
     placeholder?: string;
     fullWidth?: boolean;
-    dropdownSize?: "default" | "large";
+    dropdownSize?: "small" | "default" | "large";
     isRounded?: boolean;
 }
 
@@ -23,19 +24,29 @@ export default function Dropdown({
     ...rest
 }: DropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [menuPos, setMenuPos] = useState({ top: 0, left: 0, width: 0 });
     const containerRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-            setIsOpen(false);
-        }
+    const updateMenuPos = () => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setMenuPos({ top: rect.bottom + 6, left: rect.left, width: rect.width });
     };
 
     useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+        if (isOpen) updateMenuPos();
+    }, [isOpen]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+            const inContainer = containerRef.current?.contains(target);
+            const inMenu = menuRef.current?.contains(target);
+            if (!inContainer && !inMenu) setIsOpen(false);
         };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const handleOptionSelect = (val: string | number) => {
@@ -63,8 +74,8 @@ export default function Dropdown({
 
     return (
         <div className={classes} ref={containerRef}>
-            <div 
-                className="custom-dropdown-header" 
+            <div
+                className="custom-dropdown-header"
                 onClick={() => !disabled && setIsOpen(!isOpen)}
                 tabIndex={disabled ? -1 : 0}
             >
@@ -75,35 +86,42 @@ export default function Dropdown({
                     <FaChevronDown />
                 </span>
             </div>
-            
-            <div className={`custom-dropdown-menu-wrapper ${isOpen ? "open" : ""}`}>
-                <div className="custom-dropdown-menu">
-                    {options.length > 0 ? (
-                        options.map((opt) => {
-                            const isSelected = opt.value === value;
-                            return (
-                                <div
-                                    key={opt.value}
-                                    className={`custom-dropdown-item ${isSelected ? "selected" : ""}`}
-                                    onClick={() => handleOptionSelect(opt.value)}
-                                >
-                                    <span className="item-label">{opt.label}</span>
-                                    {isSelected && <FaCheck className="item-check" />}
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <div className="custom-dropdown-empty">Tidak ada pilihan</div>
-                    )}
-                </div>
-            </div>
+
+            {isOpen && createPortal(
+                <div
+                    ref={menuRef}
+                    className="custom-dropdown-menu-wrapper open"
+                    style={{ position: "fixed", top: menuPos.top, left: menuPos.left, width: menuPos.width, zIndex: 99999 }}
+                >
+                    <div className="custom-dropdown-menu">
+                        {options.length > 0 ? (
+                            options.map((opt) => {
+                                const isSelected = opt.value === value;
+                                return (
+                                    <div
+                                        key={opt.value}
+                                        className={`custom-dropdown-item ${isSelected ? "selected" : ""}`}
+                                        onClick={() => handleOptionSelect(opt.value)}
+                                    >
+                                        <span className="item-label">{opt.label}</span>
+                                        {isSelected && <FaCheck className="item-check" />}
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="custom-dropdown-empty">Tidak ada pilihan</div>
+                        )}
+                    </div>
+                </div>,
+                document.body
+            )}
 
             {/* Hidden select for form compatibility */}
-            <select 
-                style={{ display: 'none' }} 
-                value={value} 
-                disabled={disabled} 
-                onChange={onChange} 
+            <select
+                style={{ display: 'none' }}
+                value={value}
+                disabled={disabled}
+                onChange={onChange}
                 {...rest}
             >
                 <option value="" disabled hidden>{placeholder}</option>

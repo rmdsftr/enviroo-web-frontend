@@ -28,7 +28,7 @@
 .jbsu-header-left h1 {
     font-family: 'Poppins', sans-serif;
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 700;
     color: #013236;
     margin: 0;
 }
@@ -96,10 +96,11 @@
    CALENDAR
    ========================================================= */
 .jbsu-calendar {
-    background: #013236;
+    background: #ffffff;
     border-radius: 18px;
     padding: 22px;
-    box-shadow: 0 6px 20px rgba(1, 50, 54, 0.2);
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 14px rgba(1, 50, 54, 0.05);
 }
 
 .jbsu-cal-header {
@@ -113,7 +114,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: #013236;
     margin: 0;
     text-transform: capitalize;
 }
@@ -122,7 +123,7 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #94DF0C;
+    color: #013236;
     padding: 5px;
     border-radius: 7px;
     display: flex;
@@ -132,7 +133,7 @@
 }
 
 .jbsu-cal-header button:hover {
-    background: rgba(148, 223, 12, 0.15);
+    background: rgba(1, 50, 54, 0.08);
 }
 
 .jbsu-cal-grid {
@@ -154,7 +155,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
     font-weight: 500;
-    color: rgba(255,255,255,0.85);
+    color: #013236;
     background: transparent;
     border: none;
     border-radius: 7px;
@@ -169,16 +170,16 @@
 }
 
 .jbsu-cal-day:hover:not(.empty) {
-    background: rgba(148, 223, 12, 0.18);
-    color: #94DF0C;
+    background: rgba(1, 50, 54, 0.06);
+    color: #013236;
 }
 
 .jbsu-cal-day.empty { visibility: hidden; pointer-events: none; }
 
 .jbsu-cal-day.today {
     font-weight: 700;
-    color: #94DF0C;
-    border: 1px dashed rgba(148, 223, 12, 0.5);
+    color: #4EA771;
+    border: 1px dashed rgba(78, 167, 113, 0.5);
 }
 
 .jbsu-cal-day.selected {
@@ -200,7 +201,7 @@
     border-radius: 50%;
 }
 
-.jbsu-cal-dot.penimbangan { background: #94DF0C; }
+.jbsu-cal-dot.penimbangan { background: #4EA771; }
 .jbsu-cal-dot.pengangkutan { background: #f59e0b; }
 
 .jbsu-cal-day.selected .jbsu-cal-dot.penimbangan { background: #013236; }
@@ -654,7 +655,7 @@
 .jmodal-title {
     font-family: 'Poppins', sans-serif;
     font-size: 17px;
-    font-weight: 800;
+    font-weight: 700;
     color: #013236;
     margin: 0;
 }
@@ -812,4 +813,880 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* =========================================================
+   JADWAL BSM — Weekly Grid Layout
+   ========================================================= */
+
+/* Top grid: calendar | jadwal card, both stretch to same height */
+.jbsm-top-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    align-items: stretch;
+}
+
+@media (max-width: 960px) {
+    .jbsm-top-grid { grid-template-columns: 1fr; }
+}
+
+/* Card stretches to fill the grid cell and distributes rows evenly */
+.jbsm-jadwal-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Scrollable rows container that fills remaining card height */
+.jbsm-weekly-rows {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Each of the 5 rows gets equal height */
+.jbsm-week-row {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 2px;
+    border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+    min-height: 0;
+}
+
+.jbsm-week-row:last-child {
+    border-bottom: none;
+}
+
+.jbsm-week-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #013236;
+    min-width: 80px;
+    padding-top: 5px;
+    flex-shrink: 0;
+}
+
+.jbsm-week-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.jbsm-week-empty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    color: #d1dbd6;
+    padding-top: 3px;
+}
+
+/* ── Chip base ── */
+.jbsm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    transition: box-shadow 0.15s;
+}
+
+/* ── Rutin: green ── */
+.jbsm-chip.rutin {
+    background: rgba(78, 167, 113, 0.1);
+    color: #2a6645;
+    border: 1.5px solid rgba(78, 167, 113, 0.22);
+}
+
+.jbsm-chip.rutin:hover {
+    box-shadow: 0 2px 8px rgba(78, 167, 113, 0.2);
+}
+
+/* ── Spesial: blue, 2-row layout ── */
+.jbsm-chip.spesial {
+    background: rgba(59, 130, 246, 0.07);
+    color: #1d4ed8;
+    border: 1.5px solid rgba(59, 130, 246, 0.2);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.jbsm-chip.spesial:hover {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+/* ── Angkut (pengangkutan rutin): amber ── */
+.jbsm-chip.angkut {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+    border: 1.5px solid rgba(245, 158, 11, 0.25);
+}
+
+.jbsm-chip.angkut:hover {
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+/* First row of spesial chip: day | time + action buttons */
+.jbsm-chip-row1 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+/* Second row of spesial chip: nama jadwal spesial */
+.jbsm-chip-row2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: #3b82f6;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.jbsm-chip-day {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.jbsm-chip-sep {
+    color: rgba(0, 0, 0, 0.18);
+    font-weight: 400;
+}
+
+.jbsm-chip-time {
+    white-space: nowrap;
+}
+
+/* Action buttons inside chips */
+.jbsm-chip-actions {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+}
+
+.jbsm-chip-actions .jbsu-row-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+    border-radius: 6px;
+}
+
+/* =========================================================
+   JADWAL BSM — Detail Date Popup
+   ========================================================= */
+
+.jbsm-detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(1, 50, 54, 0.35);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: jmodalOverlayIn 0.2s ease both;
+}
+
+.jbsm-detail-popup {
+    background: #ffffff;
+    border-radius: 20px;
+    width: 100%;
+    min-width: 320px;
+    max-width: 480px;
+    padding: 22px 24px;
+    box-shadow: 0 20px 60px rgba(1, 50, 54, 0.2);
+    animation: jmodalBoxIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.jbsm-detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.jbsm-detail-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.jbsm-detail-sub {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    color: #7a9e8a;
+    margin: 4px 0 0;
+    text-transform: capitalize;
+}
+
+.jbsm-detail-empty {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12.5px;
+    color: #a3bfb0;
+    text-align: center;
+    padding: 14px 0 6px;
+    margin: 0;
+}
+
+.jbsm-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.jbsm-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+}
+
+.jbsm-detail-item.rutin {
+    background: rgba(78, 167, 113, 0.08);
+    border: 1.5px solid rgba(78, 167, 113, 0.18);
+}
+
+.jbsm-detail-item.spesial {
+    background: rgba(59, 130, 246, 0.06);
+    border: 1.5px solid rgba(59, 130, 246, 0.15);
+}
+
+.jbsm-detail-item.angkut {
+    background: rgba(245, 158, 11, 0.07);
+    border: 1.5px solid rgba(245, 158, 11, 0.2);
+}
+
+.jbsm-detail-item-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #013236;
+    background: rgba(1, 50, 54, 0.07);
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.jbsm-detail-item-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+    flex: 1;
+    word-break: break-word;
+}
+
+.jbsm-detail-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.jbsm-detail-badge.rutin {
+    background: rgba(78, 167, 113, 0.15);
+    color: #2a6645;
+}
+
+.jbsm-detail-badge.spesial {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+}
+
+.jbsm-detail-badge.angkut {
+    background: rgba(245, 158, 11, 0.12);
+    color: #b45309;
+}
+
+/* =========================================================
+   Pengangkutan Matrix — admin_bsi (jbsi-angkut-*)
+   ========================================================= */
+
+/* ── Week navigator pill ── */
+.jbsi-angkut-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(1, 50, 54, 0.05);
+    border: 1px solid rgba(1, 50, 54, 0.11);
+    border-radius: 40px;
+    padding: 5px 10px 5px 6px;
+}
+
+.jbsi-angkut-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #013236;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.jbsi-angkut-nav-btn:hover {
+    background: rgba(1, 50, 54, 0.09);
+}
+
+.jbsi-angkut-nav-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    padding: 0 4px;
+}
+
+/* ── Scrollable wrapper ── */
+.jbsi-angkut-scroll {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(1, 50, 54, 0.09);
+}
+
+/* ── Table ── */
+.jbsi-angkut-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 780px;
+}
+
+/* ── Header cells ── */
+.jbsi-angkut-th {
+    padding: 11px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #013236;
+    background: rgba(1, 50, 54, 0.04);
+    border-bottom: 2px solid rgba(1, 50, 54, 0.1);
+    border-right: 1px solid rgba(1, 50, 54, 0.08);
+    white-space: nowrap;
+}
+
+.jbsi-angkut-th-bsu {
+    text-align: left;
+    min-width: 160px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #f5f7f7; /* solid — prevents bleed-through on scroll */
+}
+
+.jbsi-angkut-th-day {
+    text-align: center;
+    min-width: 118px;
+}
+
+.jbsi-angkut-th-day.today {
+    background: rgba(148, 223, 12, 0.1);
+}
+
+.jbsi-angkut-th-day-name {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.jbsi-angkut-th-day-date {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: #7a9e8a;
+    margin-top: 2px;
+}
+
+.jbsi-angkut-th-day.today .jbsi-angkut-th-day-name {
+    color: #2a6645;
+}
+
+/* ── Body cells ── */
+.jbsi-angkut-table tbody tr:hover .jbsi-angkut-td-cell {
+    background: rgba(1, 50, 54, 0.018);
+}
+/* solid bg on sticky column — rgba would show scrolling content through it */
+.jbsi-angkut-table tbody tr:hover .jbsi-angkut-td-bsu {
+    background: #f7fafa;
+}
+
+.jbsi-angkut-td {
+    border-bottom: 1px solid rgba(1, 50, 54, 0.07);
+    border-right: 1px solid rgba(1, 50, 54, 0.07);
+    vertical-align: top;
+}
+
+.jbsi-angkut-td-bsu {
+    padding: 12px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+    white-space: nowrap;
+    vertical-align: middle;
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+    transition: background 0.15s;
+}
+
+.jbsi-angkut-td-cell {
+    padding: 8px;
+    min-width: 118px;
+    transition: background 0.15s;
+}
+
+.jbsi-angkut-td-cell.today {
+    background: rgba(148, 223, 12, 0.04);
+}
+
+/* ── Empty cell ── */
+.jbsi-angkut-empty {
+    display: block;
+    text-align: center;
+    color: rgba(1, 50, 54, 0.22);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    padding: 6px 0;
+}
+
+/* ── Chips inside cells ── */
+.jbsi-angkut-chip {
+    border-radius: 8px;
+    padding: 6px 8px;
+    margin-bottom: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    cursor: default;
+}
+
+.jbsi-angkut-chip:last-child {
+    margin-bottom: 0;
+}
+
+.jbsi-angkut-chip.rutin {
+    background: rgba(78, 167, 113, 0.1);
+    border: 1px solid rgba(78, 167, 113, 0.22);
+    color: #2a6645;
+}
+
+.jbsi-angkut-chip.spesial {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    color: #92400e;
+}
+
+.jbsi-angkut-chip-time {
+    display: block;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.jbsi-angkut-chip-date {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.jbsi-angkut-chip-special {
+    display: block;
+    font-size: 10px;
+    font-style: italic;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+/* ── Edit/delete actions — appear on chip hover ── */
+.jbsi-angkut-chip-actions {
+    display: none;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+.jbsi-angkut-chip:hover .jbsi-angkut-chip-actions {
+    display: flex;
+}
+
+
+/* =========================================================
+   JADWAL PENIMBANGAN — Monthly Calendar Matrix
+   (used by JadwalPenimbanganCalendar layout component)
+   ========================================================= */
+
+.jadwal-cal-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(1, 50, 54, 0.06);
+    box-shadow: 0 2px 14px rgba(1, 50, 54, 0.05);
+    overflow: hidden;
+}
+
+/* ── Header ── */
+.jadwal-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.jadwal-cal-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* ── Month navigation ── */
+.jadwal-cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.jadwal-cal-nav button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #013236;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+    font-size: 11px;
+}
+
+.jadwal-cal-nav button:hover {
+    background: rgba(1, 50, 54, 0.08);
+}
+
+.jadwal-cal-nav span {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    text-transform: capitalize;
+    min-width: 145px;
+    text-align: center;
+}
+
+/* ── Day-of-week header row ── */
+.jadwal-cal-grid-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-top: 1px solid rgba(1, 50, 54, 0.06);
+    border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+    background: rgba(1, 50, 54, 0.02);
+}
+
+.jadwal-cal-dh {
+    padding: 10px 0;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #7a9e8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-right: 1px solid rgba(1, 50, 54, 0.05);
+}
+
+.jadwal-cal-dh:last-child { border-right: none; }
+
+/* ── Calendar body ── */
+.jadwal-cal-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.jadwal-cal-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid rgba(1, 50, 54, 0.06);
+}
+
+.jadwal-cal-week:last-child { border-bottom: none; }
+
+/* ── Date cells ── */
+.jadwal-cal-cell {
+    min-height: 100px;
+    padding: 8px 8px;
+    border-right: 1px solid rgba(1, 50, 54, 0.06);
+    cursor: pointer;
+    transition: background 0.15s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.jadwal-cal-cell:last-child { border-right: none; }
+.jadwal-cal-cell:hover:not(.empty) { background: rgba(1, 50, 54, 0.025); }
+.jadwal-cal-cell.empty              { cursor: default; background: rgba(1, 50, 54, 0.012); }
+.jadwal-cal-cell.selected           { background: rgba(148, 223, 12, 0.07); }
+.jadwal-cal-cell.today,
+.jadwal-cal-cell.today.selected     { background: rgba(149, 223, 12, 0.119); }
+.jadwal-cal-cell.today:hover,
+.jadwal-cal-cell.today.selected:hover { background: rgba(148, 223, 12, 0.6); }
+
+/* ── Date number ── */
+.jadwal-cal-date-num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a6358;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.jadwal-cal-cell.today .jadwal-cal-date-num {
+    background: #013236;
+    color: #94DF0C;
+    font-weight: 700;
+}
+
+.jadwal-cal-cell.today .jadwal-cal-chip {
+    background: rgba(1, 50, 54, 0.14);
+}
+
+.jadwal-cal-cell.today .jadwal-cal-chip-dot  { background: #013236; }
+.jadwal-cal-cell.today .jadwal-cal-chip-text { color: #013236; }
+.jadwal-cal-cell.today .jadwal-cal-overflow  { color: #2a5a3a; }
+
+.jadwal-cal-cell.selected:not(.today) .jadwal-cal-date-num {
+    background: #94DF0C;
+    color: #013236;
+    font-weight: 700;
+}
+
+/* ── Chips inside cells ── */
+.jadwal-cal-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    width: 100%;
+}
+
+.jadwal-cal-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 6px;
+    border-radius: 5px;
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* penimbangan variants */
+.jadwal-cal-chip.rutin   { background: rgba(78,  167, 113, 0.10); }
+.jadwal-cal-chip.spesial { background: rgba(234,  88,  12,  0.09); }
+
+/* pengangkutan variants */
+.jadwal-cal-chip.angkut-rutin   { background: rgba(2,  132, 199, 0.10); }
+.jadwal-cal-chip.angkut-spesial { background: rgba(234, 88,  12,  0.09); }
+
+.jadwal-cal-chip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.jadwal-cal-chip.rutin   .jadwal-cal-chip-dot { background: #4EA771; }
+.jadwal-cal-chip.spesial .jadwal-cal-chip-dot { background: #ea580c; }
+.jadwal-cal-chip.angkut-rutin   .jadwal-cal-chip-dot { background: #0284c7; }
+.jadwal-cal-chip.angkut-spesial .jadwal-cal-chip-dot { background: #ea580c; }
+
+.jadwal-cal-chip-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.jadwal-cal-chip.rutin   .jadwal-cal-chip-text { color: #2e7d52; }
+.jadwal-cal-chip.spesial .jadwal-cal-chip-text { color: #c2410c; }
+.jadwal-cal-chip.angkut-rutin   .jadwal-cal-chip-text { color: #0369a1; }
+.jadwal-cal-chip.angkut-spesial .jadwal-cal-chip-text { color: #c2410c; }
+
+.jadwal-cal-overflow {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    padding: 1px 6px;
+}
+
+/* ── Selected-date detail strip ── */
+.jadwal-cal-detail-panel {
+    border-top: 1px solid rgba(1, 50, 54, 0.06);
+    background: rgba(1, 50, 54, 0.02);
+    padding: 18px 24px;
+}
+
+.jadwal-cal-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.jadwal-cal-detail-icon {
+    color: #4EA771;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.jadwal-cal-detail-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #013236;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.jadwal-cal-detail-count {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #7a9e8a;
+    margin: 2px 0 0;
+}
+
+.jadwal-cal-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.jadwal-cal-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+}
+
+.jadwal-cal-detail-item.rutin {
+    background: rgba(78, 167, 113, 0.05);
+    border-color: rgba(78, 167, 113, 0.16);
+}
+
+.jadwal-cal-detail-item.spesial {
+    background: rgba(234, 88, 12, 0.05);
+    border-color: rgba(234, 88, 12, 0.16);
+}
+
+.jadwal-cal-detail-item.angkut-rutin {
+    background: rgba(2, 132, 199, 0.05);
+    border-color: rgba(2, 132, 199, 0.16);
+}
+
+.jadwal-cal-detail-item.angkut-spesial {
+    background: rgba(234, 88, 12, 0.05);
+    border-color: rgba(234, 88, 12, 0.16);
+}
+
+/* Bank label chip (BSI → shows target BSU) */
+.jadwal-cal-detail-bank {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #0369a1;
+    background: rgba(2, 132, 199, 0.10);
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Today cell — angkut chip overrides */
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-rutin,
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-spesial { background: rgba(1, 50, 54, 0.14); }
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-rutin   .jadwal-cal-chip-dot,
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-spesial .jadwal-cal-chip-dot { background: #013236; }
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-rutin   .jadwal-cal-chip-text,
+.jadwal-cal-cell.today .jadwal-cal-chip.angkut-spesial .jadwal-cal-chip-text { color: #013236; }
+
+.jadwal-cal-detail-time {
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #013236;
+    background: rgba(1, 50, 54, 0.07);
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.jadwal-cal-detail-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #013236;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.jadwal-cal-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .jadwal-cal-header { flex-direction: column; align-items: flex-start; }
+    .jadwal-cal-cell   { min-height: 68px; padding: 6px 4px; }
+    .jadwal-cal-chip-text { display: none; }
+    .jadwal-cal-overflow  { display: none; }
 }

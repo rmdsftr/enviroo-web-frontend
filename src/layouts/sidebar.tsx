@@ -6,15 +6,18 @@ import {
     FaBoxOpen,
     FaArrowDown,
     FaArrowUp,
-    FaGift,
     FaCalendar,
     FaCircleInfo,
     FaUserShield,
     FaBars,
     FaXmark,
+    FaClockRotateLeft,
+    FaGear,
 } from "react-icons/fa6";
 import "../styles/sidebar.css";
 import photo from "../assets/logo-enviroo-new.png";
+import dlhPhoto from "../assets/dlh-padang.png";
+import logo from "../assets/logo-enviroo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
@@ -29,12 +32,11 @@ type MenuItemData = {
 const SUPERADMIN_MENU: MenuItemData[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "superadmin" },
     { icon: FaRecycle, menu: "Bank Sampah", id: "superadmin/bank-sampah" },
-    { icon: FaUsers, menu: "Nasabah", id: "superadmin/nasabah" },
+    { icon: FaUsers, menu: "Pengguna", id: "superadmin/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "superadmin/katalog" },
     { icon: FaCalendar, menu: "Jadwal", id: "superadmin/jadwal" },
-    { icon: FaGift, menu: "Reward", id: "superadmin/reward" },
+    { icon: FaGear, menu: "Konfigurasi", id: "superadmin/reward" },
     { icon: FaCircleInfo, menu: "Informasi", id: "superadmin/informasi" },
-    { icon: FaUserShield, menu: "Log Admin", id: "superadmin/log-admin" },
 ];
 
 const ADMIN_BSI_MENU: MenuItemData[] = [
@@ -43,9 +45,8 @@ const ADMIN_BSI_MENU: MenuItemData[] = [
     { icon: FaUsers, menu: "Nasabah", id: "bsi/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "bsi/katalog" },
     { icon: FaCalendar, menu: "Jadwal", id: "bsi/jadwal" },
-    { icon: FaArrowDown, menu: "Setoran", id: "bsi/setoran" },
-    { icon: FaArrowUp, menu: "Penarikan", id: "bsi/penarikan" },
-    { icon: FaGift, menu: "Penjualan", id: "bsi/penjualan" },
+    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsi/riwayat" },
+    { icon: FaGear, menu: "Konfigurasi", id: "bsi/penjualan" },
     { icon: FaCircleInfo, menu: "Konten", id: "bsi/konten" },
 ];
 
@@ -54,9 +55,9 @@ const ADMIN_BSU_MENU: MenuItemData[] = [
     { icon: FaUsers, menu: "Nasabah", id: "bsu/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "bsu/katalog" },
     { icon: FaCalendar, menu: "Jadwal", id: "bsu/jadwal" },
-    { icon: FaArrowDown, menu: "Setoran", id: "bsu/setoran" },
-    { icon: FaArrowUp, menu: "Penarikan", id: "bsu/penarikan" },
-    { icon: FaGift, menu: "Penjualan", id: "bsu/penjualan" },
+    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsu/riwayat" },
+    { icon: FaGear, menu: "Konfigurasi", id: "bsu/penjualan" },
+    { icon: FaCircleInfo, menu: "Konten", id: "bsu/konten" },
 ];
 
 const ADMIN_BSM_MENU: MenuItemData[] = [
@@ -64,9 +65,9 @@ const ADMIN_BSM_MENU: MenuItemData[] = [
     { icon: FaUsers, menu: "Nasabah", id: "bsm/nasabah" },
     { icon: FaBoxOpen, menu: "Katalog", id: "bsm/katalog" },
     { icon: FaCalendar, menu: "Jadwal", id: "bsm/jadwal" },
-    { icon: FaArrowDown, menu: "Setoran", id: "bsm/setoran" },
-    { icon: FaArrowUp, menu: "Penarikan", id: "bsm/penarikan" },
-    { icon: FaGift, menu: "Penjualan", id: "bsm/penjualan" },
+    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },
+    { icon: FaGear, menu: "Konfigurasi", id: "bsm/penjualan" },
+    { icon: FaCircleInfo, menu: "Konten", id: "bsm/konten" },
 ];
 
 const DEFAULT_MENU: MenuItemData[] = [
@@ -174,28 +175,13 @@ export default function SidebarLayout() {
                 className={`sidebar${isMobile && !mobileOpen ? " hidden" : ""}`}
                 aria-label="Main navigation"
             >
-                {/* Profile */}
-                <div className="profil" style={{ paddingBottom: bankName ? "16px" : "24px" }}>
-                    <div className="foto-wrapper">
-                        <div className="foto">
-                            <img src={bankPhoto ? bankPhoto : photo} alt="Bank Logo" />
-                        </div>
-                    </div>
-                    {bankName && (
-                        <div className="bank-info">
-                            <div className="bank-name">
-                                {bankName}
-                            </div>
-                            {bankTypeName && (
-                                <div className="bank-type">
-                                    {bankTypeName}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                {/* Logo aplikasi */}
+                <div className="sidebar-logo">
+                    <img src={logo} alt="Enviroo" />
                 </div>
 
-                <div className="line" />
+                {/* Section label */}
+                <div className="menu-section-label">Menu</div>
 
                 {/* Menu */}
                 <div className="menu">
@@ -211,6 +197,32 @@ export default function SidebarLayout() {
                             }}
                         />
                     ))}
+                </div>
+
+                {/* Bank brand — footer */}
+                <div
+                    className="sidebar-brand"
+                    onClick={() => {
+                        if (isMobile) setMobileOpen(false);
+                        if (user?.role === "superadmin") {
+                            navigate("/superadmin/profil-dlh");
+                        } else {
+                            navigate("/profil-bank");
+                        }
+                    }}
+                    style={{ cursor: "pointer" }}
+                    title={user?.role === "superadmin" ? "Lihat profil instansi" : "Lihat profil bank"}
+                >
+                    <div className="foto">
+                        <img
+                            src={user?.role === "superadmin" ? dlhPhoto : (bankPhoto ?? photo)}
+                            alt="Bank Logo"
+                        />
+                    </div>
+                    <div className="bank-info">
+                        <div className="bank-name">{user?.role === "superadmin" ? "DLH Padang" : (bankName ?? "Enviroo")}</div>
+                        <div className="bank-type">{bankTypeName ?? "Superadmin"}</div>
+                    </div>
                 </div>
             </nav>
         </>
