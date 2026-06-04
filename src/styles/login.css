@@ -257,17 +257,19 @@
 @media (max-width: 480px) {
     .login-left {
         display: none;
+        background-color: #013236;
     }
 
     .login-right {
-        padding: 24px;
+        padding: 30px;
         min-height: 100vh;
+        background-color: #013236;
     }
 
     .login-right-logo {
-        align-self: center;
+        align-self: start;
         width: 220px;
-        margin-left: 0;
+        margin-left: -15px;
         margin-bottom: -20px;
     }
 }
