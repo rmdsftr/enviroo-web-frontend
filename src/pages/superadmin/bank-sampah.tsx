@@ -7,7 +7,7 @@ import BreadcrumbLayout from "../../layouts/breadcrumb";
 import BankSampahStatistikLayout from "../../layouts/bank_sampah_statistik";
 import { StatistikService } from "../../services/statistik.service";
 import { LokasiService } from "../../services/lokasi.service";
-import { api } from "../../services/api";
+import { SuperadminService } from "../../services/superadmin.service";
 import type { BankSampahLokasi, StatistikKecamatan } from "../../types/lokasi.type";
 import "../../styles/layout.css";
 import "../../styles/bank_sampah_overview.css";
@@ -73,8 +73,8 @@ export default function BankSuperadminPage() {
     const handleExportLaporan = async () => {
         setIsExporting(true);
         try {
-            const response = await api.get("/laporan/bank-sampah", { responseType: "blob" });
-            const url = URL.createObjectURL(new Blob([response.data]));
+            const blob = await SuperadminService.exportLaporan();
+            const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = "laporan-bank-sampah.xlsx";

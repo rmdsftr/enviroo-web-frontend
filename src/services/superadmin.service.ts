@@ -32,4 +32,9 @@ export const SuperadminService = {
     async nonaktifkan(adminId: string): Promise<void> {
         await api.patch(`/superadmin/nonaktif/${adminId}`);
     },
+
+    async exportLaporan(): Promise<Blob> {
+        const response = await api.get("/laporan/bank-sampah", { responseType: "blob" });
+        return response.data;
+    },
 };

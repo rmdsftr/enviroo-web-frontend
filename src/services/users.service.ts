@@ -69,4 +69,14 @@ export const UsersService = {
         const response = await api.delete(`/users/delete-user/${user_id}`);
         return response.data;
     },
+
+    async getActiveAdmin(identity_id: string): Promise<any> {
+        const response = await api.get(`/users/active-admin/${identity_id}`);
+        return response.data;
+    },
+
+    async exportLaporanNasabah(bank_id: string): Promise<Blob> {
+        const response = await api.get(`/laporan/nasabah/${bank_id}`, { responseType: "blob" });
+        return response.data;
+    },
 }

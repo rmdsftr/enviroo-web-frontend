@@ -51,4 +51,9 @@ export const AuthService = {
         const response = await api.post("/auth/forget-password/reset-password", { email, otp, password_baru, konfirmasi_password_baru });
         return response.data;
     },
+
+    async changePassword(data: { password_lama: string; password_baru: string; konfirmasi_password_baru: string }): Promise<any> {
+        const response = await api.post("/auth/change-password", data);
+        return response.data;
+    },
 };

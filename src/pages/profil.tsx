@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { api } from "../services/api";
+import { ProfilService } from "../services/profil.service";
+import { AuthService } from "../services/auth.service";
 import {
     FaUser,
     FaEnvelope,
@@ -77,8 +78,8 @@ export default function ProfilPage() {
     const fetchProfil = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/profil/detail-petugas/${user?.identity_id}`);
-            setProfil(response.data.data);
+            const response = await ProfilService.getDetailPetugas(user?.identity_id!);
+            setProfil(response.data);
         } catch (err) {
             console.error("Failed to fetch profil:", err);
         } finally {
@@ -118,9 +119,7 @@ export default function ProfilPage() {
             if (editWhatsapp !== profil?.no_whatsapp) formData.append("no_whatsapp", editWhatsapp);
             if (editPhotoFile) formData.append("photo_profile", editPhotoFile);
 
-            await api.post(`/users/update-profil/${user?.user_id}`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+            await ProfilService.updateProfil(user?.user_id!, formData);
             await fetchProfil();
             setShowEditModal(false);
         } catch (err: any) {
@@ -152,7 +151,7 @@ export default function ProfilPage() {
                 if (!formOldPassword) { setFormError("Password lama wajib diisi."); return; }
                 if (!formValue || formValue.length < 8) { setFormError("Password baru minimal 8 karakter."); return; }
                 if (formValue !== formValueConfirm) { setFormError("Konfirmasi password tidak cocok."); return; }
-                await api.post(`/auth/change-password`, {
+                await AuthService.changePassword({
                     password_lama: formOldPassword,
                     password_baru: formValue,
                     konfirmasi_password_baru: formValueConfirm,

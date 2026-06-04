@@ -51,4 +51,16 @@ export const ProfilService = {
         const response = await api.get<GetSaldoBankResponse>(`/dashboard/saldo-bank/${bank_id}`);
         return response.data;
     },
+
+    async getDetailPetugas(identity_id: string): Promise<any> {
+        const response = await api.get(`/profil/detail-petugas/${identity_id}`);
+        return response.data;
+    },
+
+    async updateProfil(user_id: string, formData: FormData): Promise<any> {
+        const response = await api.post(`/users/update-profil/${user_id}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        return response.data;
+    },
 };

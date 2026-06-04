@@ -12,7 +12,7 @@ import SearchBar from "../components/search";
 import Pagination from "../components/pagination";
 import SkeletonTable from "../components/skeleton-table";
 import EmptyState from "../components/empty-state";
-import { api } from "../services/api";
+import { UsersService } from "../services/users.service";
 import {
     FaUsers,
     FaCircleCheck,
@@ -66,10 +66,8 @@ export default function NasabahPage() {
         if (!user?.bank_id) return;
         setIsExporting(true);
         try {
-            const response = await api.get(`/laporan/nasabah/${user.bank_id}`, {
-                responseType: "blob",
-            });
-            const url = URL.createObjectURL(new Blob([response.data]));
+            const blob = await UsersService.exportLaporanNasabah(user.bank_id);
+            const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = `laporan-nasabah-${user.bank_id}.xlsx`;

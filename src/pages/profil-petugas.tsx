@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { api } from "../services/api";
 import { AdminService } from "../services/admin.service";
+import { ProfilService } from "../services/profil.service";
 import { AuthService } from "../services/auth.service";
 import { useAuth } from "../contexts/AuthContext";
 import type { ReactivateNasabahResponse } from "../types/auth.type";
@@ -72,12 +72,12 @@ export default function ProfilPetugasPage() {
     useEffect(() => {
         if (!admin_id) return;
         setLoading(true);
-        api.get(`/profil/detail-petugas/${admin_id}`)
+        ProfilService.getDetailPetugas(admin_id)
             .then((res) => {
-                setProfil(res.data.data);
-                setStatusPetugas(res.data.data.status_petugas);
+                setProfil(res.data);
+                setStatusPetugas(res.data.status_petugas);
             })
-            .catch((err) => console.error("Gagal menarik profil petugas:", err))
+            .catch((err: unknown) => console.error("Gagal menarik profil petugas:", err))
             .finally(() => setLoading(false));
     }, [admin_id]);
 

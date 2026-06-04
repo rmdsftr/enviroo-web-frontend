@@ -17,7 +17,7 @@ import dlhPhoto from "../assets/dlh-padang.png";
 import logo from "../assets/logo-enviroo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { api } from "../services/api";
+import { UsersService } from "../services/users.service";
 
 export type MenuItemData = {
     icon: ElementType;
@@ -122,13 +122,12 @@ export default function SidebarLayout() {
     /* ── Fetch Bank Name for active admin ── */
     useEffect(() => {
         if (user && user.role !== "superadmin" && user.identity_id) {
-            api.get(`/users/active-admin/${user.identity_id}`)
+            UsersService.getActiveAdmin(user.identity_id)
                 .then(res => {
-                    const data = res.data?.data;
+                    const data = res?.data;
                     if (data?.nama_bank) {
                         setBankName(data.nama_bank);
                         setBankPhoto(data.photo_url || null);
-                        
                         let typeName = "";
                         switch (data.jenis_bank) {
                             case "bsi": typeName = "Bank Sampah Induk"; break;
@@ -138,7 +137,7 @@ export default function SidebarLayout() {
                         setBankTypeName(typeName);
                     }
                 })
-                .catch(err => console.error("Failed to fetch bank info:", err));
+                .catch((err: unknown) => console.error("Failed to fetch bank info:", err));
         } else {
             setBankName(null);
             setBankTypeName(null);
