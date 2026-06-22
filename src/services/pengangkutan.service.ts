@@ -28,14 +28,15 @@ export interface SampahItem {
 }
 
 export interface PengangkutanDetailHeader {
-    paket_id: string;
     pengangkutan_id: string;
     nama_bsi: string;
     nama_bsu: string;
     nama_admin_bsi: string;
+    nama_admin_bsu: string;
     total_item: number;
-    status_setoran: string;
-    created_at: string;
+    is_mandiri: boolean;
+    status_terkini: string;
+    bukti_foto: string | null;
 }
 
 export interface PengangkutanDetail {
@@ -61,8 +62,10 @@ export interface PengangkutanSesiActive {
 }
 
 export const PengangkutanService = {
-    async getPengangkutanByBank(bankId: string): Promise<PengangkutanItem[]> {
-        const response = await api.get<GetPengangkutanResponse>(`/pengangkutan/get-all/${bankId}`);
+    async getPengangkutanByBank(bankId: string, startDate?: string, endDate?: string): Promise<PengangkutanItem[]> {
+        const response = await api.get<GetPengangkutanResponse>(`/pengangkutan/get-all/${bankId}`, {
+            params: { start_date: startDate, end_date: endDate },
+        });
         return response.data.data;
     },
 

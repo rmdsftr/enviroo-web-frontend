@@ -44,8 +44,10 @@ interface GetListSetoranResponse {
 }
 
 export const PenimbanganService = {
-    async getPenimbanganByBank(bankId: string): Promise<PenimbanganItem[]> {
-        const response = await api.get<GetPenimbanganResponse>(`/penimbangan/get/${bankId}`);
+    async getPenimbanganByBank(bankId: string, startDate?: string, endDate?: string): Promise<PenimbanganItem[]> {
+        const response = await api.get<GetPenimbanganResponse>(`/penimbangan/get/${bankId}`, {
+            params: { start_date: startDate, end_date: endDate },
+        });
         return response.data.data;
     },
 

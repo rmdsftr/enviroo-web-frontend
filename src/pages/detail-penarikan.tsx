@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import {
     FaCalendarDays,
@@ -10,8 +9,8 @@ import {
     FaImage,
     FaBoxOpen,
     FaBasketShopping,
-    FaXmark,
 } from "react-icons/fa6";
+import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
@@ -61,11 +60,6 @@ export default function DetailPenarikanPage() {
             .catch(() => setError(true))
             .finally(() => setLoading(false));
     }, [id]);
-
-    useEffect(() => {
-        document.body.style.overflow = fotoOpen ? "hidden" : "";
-        return () => { document.body.style.overflow = ""; };
-    }, [fotoOpen]);
 
     const breadcrumbItems = [
         { label: "Riwayat", path: riwayatPath },
@@ -279,24 +273,12 @@ export default function DetailPenarikanPage() {
                 />
             )}
 
-            {/* ── Bukti Foto Popup ── */}
-            {fotoOpen && detail?.bukti_foto && createPortal(
-                <div className="dpj-foto-overlay" onClick={() => setFotoOpen(false)}>
-                    <div className="dpj-foto-popup" onClick={(e) => e.stopPropagation()}>
-                        <div className="dpj-foto-header">
-                            <p className="dpj-foto-title">Bukti Foto Penarikan</p>
-                            <button className="dpj-foto-close" onClick={() => setFotoOpen(false)}>
-                                <FaXmark />
-                            </button>
-                        </div>
-                        <img
-                            src={detail.bukti_foto}
-                            alt="Bukti foto penarikan"
-                            className="dpj-foto-img"
-                        />
-                    </div>
-                </div>,
-                document.body
+            {fotoOpen && detail?.bukti_foto && (
+                <ViewPhoto
+                    src={detail.bukti_foto}
+                    alt="Bukti foto penarikan"
+                    onClose={() => setFotoOpen(false)}
+                />
             )}
         </>
     );

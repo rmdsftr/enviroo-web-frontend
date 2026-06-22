@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import type { KontenItem, KontenListItem, BodyBlock } from "../types/konten.type";
 import { PopupNotifikasi } from "../layouts/popup-notifikasi";
 import PopupConfirmation from "../layouts/popup-confirmation";
+import ViewPhoto from "../components/view-photo";
 import { getApiError } from "../utils/error.utils";
 import "../styles/open_konten.css";
 
@@ -21,6 +22,7 @@ export default function OpenKontenPage() {
     const [error, setError] = useState<string | null>(null);
     const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [viewPhotoSrc, setViewPhotoSrc] = useState<string | null>(null);
 
     // Sidebar: other content from the same bank
     const [otherKonten, setOtherKonten] = useState<KontenListItem[]>([]);
@@ -111,6 +113,9 @@ export default function OpenKontenPage() {
 
     return (
         <div className="ok-page">
+            {viewPhotoSrc && (
+                <ViewPhoto src={viewPhotoSrc} onClose={() => setViewPhotoSrc(null)} />
+            )}
             {notif && (
                 <PopupNotifikasi
                     message={notif.message}
@@ -142,7 +147,12 @@ export default function OpenKontenPage() {
                         {/* Banner — clean image only */}
                         <div className="ok-banner">
                             {konten.Thumbnail ? (
-                                <img src={konten.Thumbnail} alt={konten.Judul} />
+                                <img
+                                    src={konten.Thumbnail}
+                                    alt={konten.Judul}
+                                    onClick={() => setViewPhotoSrc(konten.Thumbnail!)}
+                                    style={{ cursor: "zoom-in" }}
+                                />
                             ) : (
                                 <div className="ok-banner-placeholder">
                                     <span>{konten.Judul.charAt(0)}</span>
@@ -167,7 +177,12 @@ export default function OpenKontenPage() {
                                     }
                                     if (b.type === "image" && b.media_url) {
                                         return (
-                                            <figure key={idx} className="ok-figure">
+                                            <figure
+                                                key={idx}
+                                                className="ok-figure"
+                                                onClick={() => setViewPhotoSrc(b.media_url!)}
+                                                style={{ cursor: "zoom-in" }}
+                                            >
                                                 <img src={b.media_url} alt={`Ilustrasi ${idx + 1}`} />
                                             </figure>
                                         );

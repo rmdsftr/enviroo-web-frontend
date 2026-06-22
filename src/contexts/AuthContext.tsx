@@ -2,12 +2,16 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from "
 import type { UserData, LoginRequest } from "../types/auth.type";
 import { AuthService } from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
+import type { CoreUser } from "../types/users.type";
+import { UsersService } from "../services/users.service";
 
 interface AuthContextType {
   user: UserData | null;
+  activeUser: CoreUser | null;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,6 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [isAuthenticated]);
 
+  const [activeUser, setActiveUser] = useState<CoreUser | null>(null);
+
+  const refreshUser = async() => {
+    if (!user?.user_id) return;
+    const res = await UsersService.getActiveUser(user.user_id);
+    setActiveUser(res.data)
+  }
+
 
   const login = async (data: LoginRequest) => {
     const response = await AuthService.login(data);
@@ -75,8 +87,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  useEffect(() => {
+    if (!user?.user_id) return;
+
+    refreshUser();
+  }, [user?.user_id]);
+
   const logout = () => {
     setUser(null);
+    setActiveUser(null);
     localStorage.removeItem("userData");
     AuthService.logout().catch(console.error);
     navigate("/");
@@ -86,8 +105,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     login,
     logout,
-    isAuthenticated: !!user
-  }), [user]);
+    activeUser,
+    refreshUser,
+    isAuthenticated
+  }), [user, activeUser, isAuthenticated]);
 
   return (
     <AuthContext.Provider value={authValue}>

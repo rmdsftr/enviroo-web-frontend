@@ -6,8 +6,14 @@ import FilterPill from "./filter-pill";
 import "../styles/setoran-dashboard.css";
 
 const PALETTE = [
-    "#4EA771", "#3B82F6", "#F59E0B", "#7C5DFA",
-    "#FB7185", "#06B6D4", "#84CC16", "#EC4899",
+    // "#013236",
+    // "#025C5B",
+    // "#4EA771",
+    // "#7DC468",
+    "#94DF0C",
+    // "#B8F04A",
+    // "#1B6E5A",
+    // "#CAEC8A",
 ];
 const colorAt = (i: number) => PALETTE[i % PALETTE.length];
 
@@ -31,6 +37,9 @@ export default function PenjualanSampahSection({ bankId }: Props) {
     const [items,   setItems]   = useState<PenjualanSampahItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error,   setError]   = useState<string | null>(null);
+    const [expanded, setExpanded] = useState(false);
+
+    const PREVIEW_COUNT = 5;
 
     const [fromYear, fromMonth] = from.split("-").map(Number);
     const [toYear,   toMonth]   = to.split("-").map(Number);
@@ -40,9 +49,7 @@ export default function PenjualanSampahSection({ bankId }: Props) {
         setLoading(true);
         setError(null);
         try {
-            const res = await StatistikService.getPenjualanSampah(
-                bankId, fromMonth, fromYear, toMonth, toYear
-            );
+            const res = await StatistikService.getPenjualanSampah(bankId, fromMonth, fromYear, toMonth, toYear);
             setItems(res.data ?? []);
         } catch {
             setError("Gagal memuat data penjualan sampah.");
@@ -84,36 +91,36 @@ export default function PenjualanSampahSection({ bankId }: Props) {
             </div>
             <hr style={{ border: "none", borderTop: "1px solid #e8f0eb", margin: "0" }} />
 
-            {/* Summary chips */}
-            {!loading && items.length > 0 && (
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                    {[
-                        ...(totalRp   > 0 ? [{ label: "Nilai Uang",    val: fmtNilai(totalRp,   "Rp")   }] : []),
-                        ...(totalPoin > 0 ? [{ label: "Nilai Sembako", val: fmtNilai(totalPoin, "poin") }] : []),
-                    ].map(({ label, val }) => (
-                        <div key={label} style={{
-                            background: "rgba(78,167,113,0.07)",
-                            border: "1px solid rgba(78,167,113,0.2)",
-                            borderRadius: "10px",
-                            padding: "8px 14px",
-                        }}>
-                            <p style={{ margin: 0, fontSize: "10px", fontWeight: 600, color: "#4EA771",
-                                textTransform: "uppercase", letterSpacing: "0.4px" }}>{label}</p>
-                            <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: 700, color: "#013236" }}>{val}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Filter satuan nilai */}
-            <FilterPill
-                options={[
-                    { label: "Uang",    value: "Rp"   },
-                    { label: "Sembako", value: "poin" },
-                ]}
-                activeValue={filterSatuan}
-                onChange={(v) => setFilterSatuan(v as typeof filterSatuan)}
-            />
+            {/* Summary chips + filter pill */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                {!loading && items.length > 0 && (
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                        {[
+                            ...(totalRp   > 0 ? [{ label: "Nilai Uang",    val: fmtNilai(totalRp,   "Rp")   }] : []),
+                            ...(totalPoin > 0 ? [{ label: "Nilai Sembako", val: fmtNilai(totalPoin, "poin") }] : []),
+                        ].map(({ label, val }) => (
+                            <div key={label} style={{
+                                background: "rgba(78,167,113,0.07)",
+                                border: "1px solid rgba(78,167,113,0.2)",
+                                borderRadius: "10px",
+                                padding: "8px 14px",
+                            }}>
+                                <p style={{ margin: 0, fontSize: "10px", fontWeight: 600, color: "#013236",
+                                    textTransform: "uppercase", letterSpacing: "0.4px" }}>{label}</p>
+                                <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: 700, color:  "#699c0a" }}>{val}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                <FilterPill
+                    options={[
+                        { label: "Uang",    value: "Rp"   },
+                        { label: "Sembako", value: "poin" },
+                    ]}
+                    activeValue={filterSatuan}
+                    onChange={(v) => setFilterSatuan(v as typeof filterSatuan)}
+                />
+            </div>
 
             {/* Body */}
             {loading ? (
@@ -124,10 +131,9 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                 <div className="ssd-state">Belum ada data penjualan sampah pada periode ini.</div>
             ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {sorted.map((item, i) => {
+                    {(expanded ? sorted : sorted.slice(0, PREVIEW_COUNT)).map((item, i) => {
                         const pct   = maxNilai > 0 ? ((item.total_nilai ?? 0) / maxNilai) * 100 : 0;
                         const color = colorAt(i);
-                        const isRp  = item.satuan_nilai === "Rp";
                         return (
                             <div key={`${item.sampah_id}-${item.satuan_nilai}`} style={{
                                 display: "grid",
@@ -136,14 +142,12 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                                 alignItems: "center",
                                 padding: "10px 14px",
                                 borderRadius: "10px",
-                                background: "#f8faf9",
+                                background: "transparent",
                                 border: "1px solid #e8f0eb",
                             }}>
                                 {/* Left: name + bar */}
                                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                                        <span style={{ width: 8, height: 8, borderRadius: "50%",
-                                            background: color, flexShrink: 0 }} />
                                         <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0f1f15",
                                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                             {item.nama_sampah}
@@ -153,27 +157,12 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                                             borderRadius: "99px", flexShrink: 0 }}>
                                             {item.kategori}
                                         </span>
-                                        <span style={{
-                                            fontSize: "10px", fontWeight: 600, flexShrink: 0,
-                                            marginLeft: "auto",
-                                            color: isRp ? "#4EA771" : "#F59E0B",
-                                            background: isRp ? "rgba(78,167,113,0.1)" : "rgba(245,158,11,0.1)",
-                                            padding: "1px 6px", borderRadius: "99px",
-                                        }}>
-                                            {isRp ? "Uang" : "Sembako"}
-                                        </span>
                                     </div>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                        <div style={{ flex: 1, height: "6px", borderRadius: "99px",
-                                            background: "#e8f0eb", overflow: "hidden" }}>
-                                            <div style={{ height: "100%", width: `${pct}%`,
-                                                background: color, borderRadius: "99px",
-                                                transition: "width 0.4s ease" }} />
-                                        </div>
-                                        <span style={{ fontSize: "11px", color: "#7a9e8a",
-                                            whiteSpace: "nowrap", flexShrink: 0 }}>
-                                            {(item.total_qty ?? 0).toLocaleString("id-ID", { maximumFractionDigits: 1 })} {item.satuan}
-                                        </span>
+                                    <div style={{ width: "100%", height: "10px", borderRadius: "99px",
+                                        background: "#e8f0eb", overflow: "hidden" }}>
+                                        <div style={{ height: "100%", width: `${pct}%`,
+                                            background: color, borderRadius: "99px",
+                                            transition: "width 0.4s ease" }} />
                                     </div>
                                 </div>
 
@@ -185,6 +174,21 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                             </div>
                         );
                     })}
+                    {sorted.length > PREVIEW_COUNT && (
+                        <button
+                            onClick={() => setExpanded(prev => !prev)}
+                            style={{
+                                alignSelf: "center", marginTop: "4px",
+                                background: "none", border: "none", cursor: "pointer",
+                                fontSize: "12px", color: "#4EA771", fontWeight: 600,
+                                padding: "4px 8px", fontFamily: "inherit",
+                            }}
+                        >
+                            {expanded
+                                ? "Tampilkan lebih sedikit"
+                                : `Tampilkan ${sorted.length - PREVIEW_COUNT} lainnya`}
+                        </button>
+                    )}
                 </div>
             )}
         </div>

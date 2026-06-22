@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import {
-    FaCalendarDays,
     FaBuilding,
     FaUser,
     FaClockRotateLeft,
@@ -11,6 +10,7 @@ import {
     FaXmark,
     FaFileExport,
 } from "react-icons/fa6";
+import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
@@ -22,20 +22,17 @@ import {
 } from "../services/pengangkutan.service";
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-pengangkutan.css";
-import { formatTanggalPanjang, formatTanggalJamBullet } from "../utils/date.utils";
+import { formatTanggalJamBullet } from "../utils/date.utils";
 
 /* ── Status maps ── */
-const PAKET_STATUS_MAP: Record<string, { label: string; cls: string }> = {
-    berhasil: { label: "Berhasil", cls: "selesai"    },
-    gagal:    { label: "Gagal",    cls: "dibatalkan" },
-    pending:  { label: "Menunggu", cls: "aktif"      },
-};
-
 const SESI_STATUS_MAP: Record<string, { label: string; cls: string }> = {
-    completed: { label: "Selesai",          cls: "completed" },
-    otw:       { label: "Dalam Perjalanan", cls: "otw"       },
     requested: { label: "Diminta",          cls: "requested" },
+    approved:  { label: "Disetujui",        cls: "approved"  },
+    otw:       { label: "Dalam Perjalanan", cls: "otw"       },
     arrived:   { label: "Tiba di Lokasi",   cls: "arrived"   },
+    completed: { label: "Selesai",          cls: "completed" },
+    rejected:  { label: "Ditolak",          cls: "rejected"  },
+    canceled:  { label: "Dibatalkan",       cls: "canceled"  },
 };
 
 /* ── Component ── */
@@ -54,6 +51,7 @@ export default function DetailPengangkutanPage() {
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [exporting, setExporting] = useState(false);
 
+    const [lightboxOpen, setLightboxOpen] = useState(false);
     const [sesiOpen, setSesiOpen] = useState(false);
     const [sesiData, setSesiData] = useState<PengangkutanSesiActive | null>(null);
     const [sesiLoading, setSesiLoading] = useState(false);
@@ -117,7 +115,7 @@ export default function DetailPengangkutanPage() {
     ];
 
     const statusConf = detail
-        ? (PAKET_STATUS_MAP[detail.header.status_setoran] ?? { label: detail.header.status_setoran, cls: "" })
+        ? (SESI_STATUS_MAP[detail.header.status_terkini] ?? { label: detail.header.status_terkini, cls: "" })
         : null;
 
     return (
@@ -181,14 +179,6 @@ export default function DetailPengangkutanPage() {
                             {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
-                                    <div className="dp-info-icon-wrap"><FaCalendarDays /></div>
-                                    <div className="dp-info-text">
-                                        <span className="dp-info-label">Tanggal</span>
-                                        <span className="dp-info-value">{formatTanggalPanjang(detail.header.created_at)}</span>
-                                    </div>
-                                </div>
-
-                                <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaBuilding /></div>
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Bank Sampah Induk</span>
@@ -210,6 +200,16 @@ export default function DetailPengangkutanPage() {
                                         <div className="dp-info-text">
                                             <span className="dp-info-label">Admin BSI</span>
                                             <span className="dp-info-value">{detail.header.nama_admin_bsi}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {detail.header.nama_admin_bsu && (
+                                    <div className="dp-info-row">
+                                        <div className="dp-info-icon-wrap"><FaUser /></div>
+                                        <div className="dp-info-text">
+                                            <span className="dp-info-label">Admin BSU</span>
+                                            <span className="dp-info-value">{detail.header.nama_admin_bsu}</span>
                                         </div>
                                     </div>
                                 )}
@@ -258,11 +258,35 @@ export default function DetailPengangkutanPage() {
                                     ))}
                                 </div>
                             )}
+
+                            {detail.header.bukti_foto && (
+                                <div className="dps-bukti-section">
+                                    <span className="dps-bukti-label">
+                                        Bukti Foto
+                                    </span>
+                                    <div
+                                        className="dps-bukti-thumb"
+                                        onClick={() => setLightboxOpen(true)}
+                                        title="Klik untuk memperbesar"
+                                    >
+                                        <img src={detail.header.bukti_foto} alt="Bukti pengangkutan" />
+                                        <div className="dps-bukti-overlay">Lihat Gambar</div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                     </div>
                 )}
             </div>
+
+            {lightboxOpen && detail?.header.bukti_foto && (
+                <ViewPhoto
+                    src={detail.header.bukti_foto}
+                    alt="Bukti pengangkutan"
+                    onClose={() => setLightboxOpen(false)}
+                />
+            )}
 
             {/* Popup Notifikasi */}
             {popupNotif && (

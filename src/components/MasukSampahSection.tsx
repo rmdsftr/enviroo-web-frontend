@@ -4,10 +4,7 @@ import type { MasukSampahItem } from "../types/statistik.type";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import "../styles/setoran-dashboard.css";
 
-const PALETTE = [
-    "#4EA771", "#3B82F6", "#F59E0B", "#7C5DFA",
-    "#FB7185", "#06B6D4", "#84CC16", "#EC4899",
-];
+const PALETTE = ["#94DF0C"];
 const colorAt = (i: number) => PALETTE[i % PALETTE.length];
 
 function fmtQty(n: number, satuan: string) {
@@ -23,6 +20,9 @@ export default function MasukSampahSection({ bankId }: Props) {
     const [items,   setItems]   = useState<MasukSampahItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error,   setError]   = useState<string | null>(null);
+    const [expanded, setExpanded] = useState(false);
+
+    const PREVIEW_COUNT = 5;
 
     const [fromYear, fromMonth] = from.split("-").map(Number);
     const [toYear,   toMonth]   = to.split("-").map(Number);
@@ -32,9 +32,7 @@ export default function MasukSampahSection({ bankId }: Props) {
         setLoading(true);
         setError(null);
         try {
-            const res = await StatistikService.getMasukSampah(
-                bankId, fromMonth, fromYear, toMonth, toYear
-            );
+            const res = await StatistikService.getMasukSampah(bankId, fromMonth, fromYear, toMonth, toYear);
             setItems(res.data ?? []);
         } catch {
             setError("Gagal memuat data sampah masuk.");
@@ -77,7 +75,7 @@ export default function MasukSampahSection({ bankId }: Props) {
                 <div className="ssd-state">Belum ada data sampah masuk pada periode ini.</div>
             ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {sorted.map((item, i) => {
+                    {(expanded ? sorted : sorted.slice(0, PREVIEW_COUNT)).map((item, i) => {
                         const pct     = maxMasuk > 0 ? ((item.total_masuk ?? 0) / maxMasuk) * 100 : 0;
                         const sisaPct = (item.total_masuk ?? 0) > 0
                             ? ((item.stok_tersisa ?? 0) / (item.total_masuk ?? 1)) * 100
@@ -92,14 +90,11 @@ export default function MasukSampahSection({ bankId }: Props) {
                                 alignItems: "center",
                                 padding: "10px 14px",
                                 borderRadius: "10px",
-                                background: "#f8faf9",
                                 border: "1px solid #e8f0eb",
                             }}>
                                 {/* Left */}
                                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                                        <span style={{ width: 8, height: 8, borderRadius: "50%",
-                                            background: color, flexShrink: 0 }} />
                                         <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0f1f15",
                                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                             {item.nama_sampah}
@@ -112,7 +107,7 @@ export default function MasukSampahSection({ bankId }: Props) {
                                     </div>
 
                                     {/* Bar track: total_masuk sebagai bar penuh, stok_tersisa overlay */}
-                                    <div style={{ position: "relative", height: "6px", borderRadius: "99px",
+                                    <div style={{ position: "relative", height: "10px", borderRadius: "99px",
                                         background: "#e8f0eb", overflow: "hidden" }}>
                                         {/* Total masuk bar */}
                                         <div style={{ position: "absolute", left: 0, top: 0,
@@ -131,7 +126,7 @@ export default function MasukSampahSection({ bankId }: Props) {
                                             Masuk: <strong style={{ color: "#4a5f52" }}>{fmtQty(item.total_masuk, item.satuan)}</strong>
                                         </span>
                                         <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
-                                            Sisa: <strong style={{ color: color }}>{fmtQty(item.stok_tersisa, item.satuan)}</strong>
+                                            Sisa: <strong style={{ color: "#4EA771" }}>{fmtQty(item.stok_tersisa, item.satuan)}</strong>
                                         </span>
                                     </div>
                                 </div>
@@ -146,6 +141,21 @@ export default function MasukSampahSection({ bankId }: Props) {
                             </div>
                         );
                     })}
+                    {sorted.length > PREVIEW_COUNT && (
+                        <button
+                            onClick={() => setExpanded(prev => !prev)}
+                            style={{
+                                alignSelf: "center", marginTop: "4px",
+                                background: "none", border: "none", cursor: "pointer",
+                                fontSize: "12px", color: "#4EA771", fontWeight: 600,
+                                padding: "4px 8px", fontFamily: "inherit",
+                            }}
+                        >
+                            {expanded
+                                ? "Tampilkan lebih sedikit"
+                                : `Tampilkan ${sorted.length - PREVIEW_COUNT} lainnya`}
+                        </button>
+                    )}
                 </div>
             )}
         </div>

@@ -7,6 +7,8 @@ type PaginationProps = {
     onPageChange: (page: number) => void;
     /** Max page buttons shown before using ellipsis. Default: 5 */
     siblingCount?: number;
+    /** "compact" = smaller size, neutral gray palette */
+    variant?: "default" | "compact";
 };
 
 export default function Pagination({
@@ -14,6 +16,7 @@ export default function Pagination({
     totalPages,
     onPageChange,
     siblingCount = 1,
+    variant = "default",
 }: PaginationProps) {
     if (totalPages <= 1) return null;
 
@@ -32,8 +35,10 @@ export default function Pagination({
         return pages;
     };
 
+    const rootCls = variant === "compact" ? "pagination pagination--compact" : "pagination";
+
     return (
-        <div className="pagination">
+        <div className={rootCls}>
             {/* Prev */}
             <button
                 className="pagination__btn pagination__arrow"

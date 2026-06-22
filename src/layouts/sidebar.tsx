@@ -4,12 +4,15 @@ import {
     FaRecycle,
     FaUsers,
     FaBoxOpen,
+    FaBasketShopping,
+    FaLocationDot,
     FaCalendar,
     FaCircleInfo,
     FaBars,
     FaXmark,
     FaClockRotateLeft,
     FaGear,
+    FaWallet,
 } from "react-icons/fa6";
 import "../styles/sidebar.css";
 import photo from "../assets/logo-enviroo-new.png";
@@ -25,49 +28,96 @@ export type MenuItemData = {
     id: string;
 };
 
+export type MenuGroupData = {
+    groupLabel: string;
+    items: MenuItemData[];
+};
+
+export type SidebarEntry = MenuItemData | MenuGroupData;
+
+export function isGroup(entry: SidebarEntry): entry is MenuGroupData {
+    return "groupLabel" in entry;
+}
+
 /* ── Menu Definitions ── */
-export const SUPERADMIN_MENU: MenuItemData[] = [
-    { icon: FaChartLine, menu: "Dashboard", id: "superadmin" },
-    { icon: FaRecycle, menu: "Bank Sampah", id: "superadmin/bank-sampah" },
-    { icon: FaUsers, menu: "Pengguna", id: "superadmin/nasabah" },
-    { icon: FaBoxOpen, menu: "Katalog", id: "superadmin/katalog" },
-    { icon: FaCalendar, menu: "Jadwal", id: "superadmin/jadwal" },
-    { icon: FaGear, menu: "Konfigurasi", id: "superadmin/reward" },
-    { icon: FaCircleInfo, menu: "Informasi", id: "superadmin/informasi" },
+export const SUPERADMIN_MENU: SidebarEntry[] = [
+    { groupLabel: "Insight", items: [
+        { icon: FaChartLine, menu: "Dashboard", id: "superadmin" },
+    ]},
+    { groupLabel: "Data", items: [
+        { icon: FaRecycle,         menu: "Bank Sampah", id: "superadmin/bank-sampah" },
+        { icon: FaUsers,           menu: "Pengguna",    id: "superadmin/nasabah"     },
+        { icon: FaBoxOpen,         menu: "Sampah",      id: "superadmin/katalog"     },
+        { icon: FaBasketShopping,  menu: "Sembako",     id: "superadmin/sembako"     },
+    ]},
+    { groupLabel: "Konfigurasi", items: [
+        { icon: FaGear,        menu: "Operasional", id: "superadmin/reward"  },
+        { icon: FaLocationDot, menu: "Lokasi",      id: "superadmin/lokasi"  },
+    ]},
+    { groupLabel: "Media", items: [
+        { icon: FaCircleInfo, menu: "Informasi", id: "superadmin/informasi" },
+    ]},
 ];
 
-export const ADMIN_BSI_MENU: MenuItemData[] = [
-    { icon: FaChartLine, menu: "Dashboard", id: "bsi" },
-    { icon: FaRecycle, menu: "BSU", id: "bsi/bsu" },
-    { icon: FaUsers, menu: "Nasabah", id: "bsi/nasabah" },
-    { icon: FaBoxOpen, menu: "Katalog", id: "bsi/katalog" },
-    { icon: FaCalendar, menu: "Jadwal", id: "bsi/jadwal" },
-    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsi/riwayat" },
-    { icon: FaGear, menu: "Konfigurasi", id: "bsi/penjualan" },
-    { icon: FaCircleInfo, menu: "Konten", id: "bsi/konten" },
+export const ADMIN_BSI_MENU: SidebarEntry[] = [
+    { groupLabel: "Insight", items: [
+        { icon: FaChartLine, menu: "Dashboard", id: "bsi" },
+    ]},
+    { groupLabel: "Data", items: [
+        { icon: FaRecycle, menu: "BSU",     id: "bsi/bsu"     },
+        { icon: FaUsers,   menu: "Nasabah", id: "bsi/nasabah" },
+        { icon: FaWallet,  menu: "Saldo",   id: "bsi/saldo"   },
+    ]},
+    { groupLabel: "Konfigurasi", items: [
+        { icon: FaBoxOpen,  menu: "Katalog", id: "bsi/katalog"   },
+        { icon: FaCalendar, menu: "Jadwal",  id: "bsi/jadwal"    },
+        { icon: FaGear,     menu: "Reward",  id: "bsi/penjualan" },
+    ]},
+    { groupLabel: "Pencatatan", items: [
+        { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsi/riwayat" },
+        { icon: FaCircleInfo,      menu: "Konten",  id: "bsi/konten"  },
+    ]},
 ];
 
-export const ADMIN_BSU_MENU: MenuItemData[] = [
-    { icon: FaChartLine, menu: "Dashboard", id: "bsu" },
-    { icon: FaUsers, menu: "Nasabah", id: "bsu/nasabah" },
-    { icon: FaBoxOpen, menu: "Katalog", id: "bsu/katalog" },
-    { icon: FaCalendar, menu: "Jadwal", id: "bsu/jadwal" },
-    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsu/riwayat" },
-    { icon: FaGear, menu: "Konfigurasi", id: "bsu/penjualan" },
-    { icon: FaCircleInfo, menu: "Konten", id: "bsu/konten" },
+export const ADMIN_BSU_MENU: SidebarEntry[] = [
+    { groupLabel: "Insight", items: [
+        { icon: FaChartLine, menu: "Dashboard", id: "bsu" },
+    ]},
+    { groupLabel: "Data", items: [
+        { icon: FaUsers,  menu: "Nasabah", id: "bsu/nasabah" },
+        { icon: FaWallet, menu: "Saldo",   id: "bsu/saldo"   },
+    ]},
+    { groupLabel: "Konfigurasi", items: [
+        { icon: FaBoxOpen,  menu: "Katalog", id: "bsu/katalog"   },
+        { icon: FaCalendar, menu: "Jadwal",  id: "bsu/jadwal"    },
+        { icon: FaGear,     menu: "Reward",  id: "bsu/penjualan" },
+    ]},
+    { groupLabel: "Pencatatan", items: [
+        { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsu/riwayat" },
+        { icon: FaCircleInfo,      menu: "Konten",  id: "bsu/konten"  },
+    ]},
 ];
 
-export const ADMIN_BSM_MENU: MenuItemData[] = [
-    { icon: FaChartLine, menu: "Dashboard", id: "bsm" },
-    { icon: FaUsers, menu: "Nasabah", id: "bsm/nasabah" },
-    { icon: FaBoxOpen, menu: "Katalog", id: "bsm/katalog" },
-    { icon: FaCalendar, menu: "Jadwal", id: "bsm/jadwal" },
-    { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },
-    { icon: FaGear, menu: "Konfigurasi", id: "bsm/penjualan" },
-    { icon: FaCircleInfo, menu: "Konten", id: "bsm/konten" },
+export const ADMIN_BSM_MENU: SidebarEntry[] = [
+    { groupLabel: "Insight", items: [
+        { icon: FaChartLine, menu: "Dashboard", id: "bsm" },
+    ]},
+    { groupLabel: "Data", items: [
+        { icon: FaUsers,  menu: "Nasabah", id: "bsm/nasabah" },
+        { icon: FaWallet, menu: "Saldo",   id: "bsm/saldo"   },
+    ]},
+    { groupLabel: "Konfigurasi", items: [
+        { icon: FaBoxOpen,  menu: "Katalog", id: "bsm/katalog"    },
+        { icon: FaCalendar, menu: "Jadwal",  id: "bsm/jadwal"     },
+        { icon: FaGear,     menu: "Reward",  id: "bsm/penjualan"  },
+    ]},
+    { groupLabel: "Pencatatan", items: [
+        { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },
+        { icon: FaCircleInfo,      menu: "Konten",  id: "bsm/konten"  },
+    ]},
 ];
 
-const DEFAULT_MENU: MenuItemData[] = [
+const DEFAULT_MENU: SidebarEntry[] = [
     { icon: FaChartLine, menu: "Dashboard", id: "" },
 ];
 
@@ -92,21 +142,23 @@ export default function SidebarLayout() {
         return DEFAULT_MENU;
     }, [user?.role]);
 
+    /* ── Flatten all items (including those inside groups) ── */
+    const allItems = useMemo(() =>
+        currentMenuItems.flatMap(entry => isGroup(entry) ? entry.items : [entry]),
+        [currentMenuItems]
+    );
+
     /* ── Sync active state with URL ── */
     const activeId = useMemo(() => {
         const path = location.pathname.substring(1).replace(/\/$/, "") || "";
-
-        // Find all items that match the current path
-        const matches = currentMenuItems.filter(item =>
+        const matches = allItems.filter(item =>
             path === item.id || path.startsWith(item.id + "/")
         );
-
-        // Return the id of the most specific match (the longest one)
         if (matches.length === 0) return "";
         return matches.reduce((prev, curr) =>
             curr.id.length > prev.id.length ? curr : prev
         ).id;
-    }, [location.pathname, currentMenuItems]);
+    }, [location.pathname, allItems]);
 
     useEffect(() => {
         const check = () => {
@@ -176,23 +228,39 @@ export default function SidebarLayout() {
                     <img src={logo} alt="Enviroo" />
                 </div>
 
-                {/* Section label */}
-                <div className="menu-section-label">Menu</div>
-
                 {/* Menu */}
                 <div className="menu">
-                    {currentMenuItems.map((item) => (
-                        <MenuLayout
-                            key={item.id}
-                            icon={item.icon}
-                            menu={item.menu}
-                            isActive={activeId === item.id}
-                            onClick={() => {
-                                if (isMobile) setMobileOpen(false);
-                                navigate(`/${item.id}`);
-                            }}
-                        />
-                    ))}
+                    {currentMenuItems.map((entry) =>
+                        isGroup(entry) ? (
+                            <div key={entry.groupLabel} className="menu-group">
+                                <span className="menu-group-label">{entry.groupLabel}</span>
+                                {entry.items.map((item) => (
+                                    <MenuLayout
+                                        key={item.id}
+                                        icon={item.icon}
+                                        menu={item.menu}
+                                        isActive={activeId === item.id}
+                                        isSub
+                                        onClick={() => {
+                                            if (isMobile) setMobileOpen(false);
+                                            navigate(`/${item.id}`);
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <MenuLayout
+                                key={entry.id}
+                                icon={entry.icon}
+                                menu={entry.menu}
+                                isActive={activeId === entry.id}
+                                onClick={() => {
+                                    if (isMobile) setMobileOpen(false);
+                                    navigate(`/${entry.id}`);
+                                }}
+                            />
+                        )
+                    )}
                 </div>
 
                 {/* Bank brand — footer */}
@@ -229,13 +297,14 @@ type MenuLayoutProps = {
     icon: ElementType;
     menu: string;
     isActive: boolean;
+    isSub?: boolean;
     onClick: () => void;
 };
 
-function MenuLayout({ icon: Icon, menu, isActive, onClick }: MenuLayoutProps) {
+function MenuLayout({ icon: Icon, menu, isActive, isSub, onClick }: MenuLayoutProps) {
     return (
         <div
-            className={`item${isActive ? " active" : ""}`}
+            className={`item${isActive ? " active" : ""}${isSub ? " sub" : ""}`}
             onClick={onClick}
             role="button"
             tabIndex={0}

@@ -1,6 +1,9 @@
 import type { BankActivationRequest } from "../types/bank.type";
-import type { GetNasabahBSIResponse } from "../types/bsi.type";
+import type { GetNasabahBSIResponse, GetNasabahBSIPagedResponse } from "../types/bsi.type";
 import { api } from "./api";
+import { mockGetNasabahPaged, mockGetAllNasabah } from "../mocks/list-nasabah";
+
+const USE_MOCK = false;
 
 export interface BankSampahOption {
     bank_id: string;
@@ -22,7 +25,16 @@ export const BankService = {
     },
 
     async getNasabah(bankId: string): Promise<GetNasabahBSIResponse> {
+        if (USE_MOCK) return mockGetAllNasabah(bankId);
         const response = await api.get<GetNasabahBSIResponse>(`/bank/get-nasabah/${bankId}`);
+        return response.data;
+    },
+
+    async getNasabahPaged(bankId: string, page: number): Promise<GetNasabahBSIPagedResponse> {
+        if (USE_MOCK) return mockGetNasabahPaged(bankId, page);
+        const response = await api.get<GetNasabahBSIPagedResponse>(`/bank/get-nasabah/${bankId}`, {
+            params: { page },
+        });
         return response.data;
     },
 

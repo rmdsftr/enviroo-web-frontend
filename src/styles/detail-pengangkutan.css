@@ -281,6 +281,21 @@
     color: #7c3aed;
 }
 
+.dpg-status-approved {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dpg-status-rejected {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dpg-status-canceled {
+    background: rgba(107, 114, 128, 0.10);
+    color: #6b7280;
+}
+
 .dpg-timeline-time {
     font-family: 'Poppins', sans-serif;
     font-size: 11px;

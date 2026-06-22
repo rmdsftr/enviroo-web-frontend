@@ -47,13 +47,25 @@ function BankCard({ bank, satuan }: { bank: PenerimaSisa; satuan: string }) {
                 </div>
 
                 {bank.transportasi > 0 && (
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <span className="dpj-item-detail" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                            <FaTruck style={{ fontSize: "9px" }} />
-                            Biaya Transportasi
-                        </span>
-                        <span className="dpj-item-detail" style={{ fontWeight: 600 }}>{fmt(bank.transportasi)}</span>
-                    </div>
+                    <>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <span className="dpj-item-detail" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                <FaTruck style={{ fontSize: "9px" }} />
+                                Biaya Transportasi
+                            </span>
+                            <span className="dpj-item-detail" style={{ fontWeight: 600 }}>{fmt(bank.transportasi)}</span>
+                        </div>
+                        {bank.transport_detail && bank.transport_detail.length > 0 && (
+                            <div style={{ paddingLeft: "14px", display: "flex", flexDirection: "column", gap: "3px" }}>
+                                {bank.transport_detail.map((td) => (
+                                    <div key={td.bsu_id} style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <span className="dpj-item-detail" style={{ color: "#94a3b8" }}>{td.nama_bsu}</span>
+                                        <span className="dpj-item-detail" style={{ color: "#94a3b8" }}>{fmt(td.transport)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
                 )}
 
                 <div style={{

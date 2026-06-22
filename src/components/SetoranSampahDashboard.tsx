@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { FaRecycle } from "react-icons/fa6";
+import { FaRecycle, FaChevronDown } from "react-icons/fa6";
 import FilterPill, { type FilterOption } from "./filter-pill";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import { StatistikService, type StatistikSetoranItem } from "../services/statistik.service";
 import "../styles/setoran-dashboard.css";
 
+
 type GroupBy = "satuan" | "kategori" | "jenis_reward";
 type Orientation = "horizontal" | "vertical";
+
+const SATUAN_ORDER = ["kg", "pcs", "liter"];
 
 const MONTH_ID = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -20,18 +23,28 @@ const GROUP_OPTIONS: FilterOption[] = [
 ];
 
 const PALETTE = [
-    { fill: "#4EA771", soft: "rgba(78,167,113,0.12)" },
-    { fill: "#2D9CB8", soft: "rgba(45,156,184,0.12)" },
-    { fill: "#F59E0B", soft: "rgba(245,158,11,0.12)" },
-    { fill: "#7C5DFA", soft: "rgba(124,93,250,0.12)" },
-    { fill: "#FB7185", soft: "rgba(251,113,133,0.12)" },
-    { fill: "#06B6D4", soft: "rgba(6,182,212,0.12)" },
-    { fill: "#84CC16", soft: "rgba(132,204,22,0.12)" },
-    { fill: "#EC4899", soft: "rgba(236,72,153,0.12)" },
+    { fill: "#94DF0C", soft: "rgba(148,223,12,0.12)" },    // prioritas 1 — lime
+    { fill: "#013236", soft: "rgba(1,50,54,0.12)" },        // prioritas 2 — teal gelap
+    { fill: "#4EA771", soft: "rgba(78,167,113,0.12)" },     // midpoint — hijau natural
+    { fill: "#1B6E5A", soft: "rgba(27,110,90,0.12)" },
+    { fill: "#025C5B", soft: "rgba(2,92,91,0.12)" },
+    { fill: "#7DC468", soft: "rgba(125,196,104,0.12)" },
+    { fill: "#B8F04A", soft: "rgba(184,240,74,0.12)" },
+    { fill: "#CAEC8A", soft: "rgba(202,236,138,0.12)" },
 ];
 
 function colorAt(idx: number) {
     return PALETTE[idx % PALETTE.length];
+}
+
+// rank 0 (terbesar) = #013236, rank terakhir (terkecil) = #94DF0C
+// Berbasis rank bukan nilai → rentang warna selalu penuh meski itemnya dikit
+function colorForRank(rank: number, total: number): string {
+    const t = total > 1 ? 1 - rank / (total - 1) : 1;
+    const r = Math.round(148 + t * (1   - 148));
+    const g = Math.round(223 + t * (50  - 223));
+    const b = Math.round(12  + t * (54  - 12));
+    return `rgb(${r},${g},${b})`;
 }
 
 function formatQty(n: number) {
@@ -152,18 +165,18 @@ function ChartCard({
             {orientation === "horizontal" ? (
                 <div className="ssd-bar-list">
                     {sorted.map((item, idx) => {
-                        const c = colorAt(idx);
+                        const fill = colorForRank(idx, sorted.length);
                         return (
                             <div key={item.sampah_id} className="ssd-bar-row">
                                 <span className="ssd-bar-label" title={item.nama_sampah}>
                                     {item.nama_sampah}
                                 </span>
-                                <div className="ssd-bar-track" style={{ background: c.soft }}>
+                                <div className="ssd-bar-track">
                                     <div
                                         className="ssd-bar-fill"
                                         style={{
                                             width: `${(item.total_qty / maxQty) * 100}%`,
-                                            background: c.fill,
+                                            background: fill,
                                         }}
                                     />
                                 </div>
@@ -177,18 +190,18 @@ function ChartCard({
             ) : (
                 <div className="ssd-vbar-list">
                     {sorted.map((item, idx) => {
-                        const c = colorAt(idx);
-                        const pct = (item.total_qty / maxQty) * 100;
+                        const fill = colorForRank(idx, sorted.length);
+                        const pct  = (item.total_qty / maxQty) * 100;
                         return (
                             <div key={item.sampah_id} className="ssd-vbar-col">
                                 <span className="ssd-vbar-value">
                                     {formatQty(item.total_qty)}
                                     <small>{item.satuan}</small>
                                 </span>
-                                <div className="ssd-vbar-track" style={{ background: c.soft }}>
+                                <div className="ssd-vbar-track">
                                     <div
                                         className="ssd-vbar-fill"
-                                        style={{ height: `${pct}%`, background: c.fill }}
+                                        style={{ height: `${pct}%`, background: fill }}
                                     />
                                 </div>
                                 <span className="ssd-vbar-label" title={item.nama_sampah}>
@@ -216,6 +229,14 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
     const [data, setData] = useState<StatistikSetoranItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [expandedSatuans, setExpandedSatuans] = useState<Set<string>>(new Set());
+
+    const toggleSatuan = (s: string) =>
+        setExpandedSatuans(prev => {
+            const next = new Set(prev);
+            next.has(s) ? next.delete(s) : next.add(s);
+            return next;
+        });
 
     const [fromYear, fromMonth] = from.split("-").map(Number);
     const [toYear, toMonth] = to.split("-").map(Number);
@@ -327,8 +348,36 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
                             />
                         ))}
                     </div>
+                ) : groupBy === "satuan" ? (
+                    <div className="ssd-satuan-accordion">
+                        {[...grouped.entries()]
+                            .sort(([a], [b]) => {
+                                const ai = SATUAN_ORDER.indexOf(a);
+                                const bi = SATUAN_ORDER.indexOf(b);
+                                return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+                            })
+                            .map(([satuan, items]) => {
+                                const total = items.reduce((s, i) => s + i.total_qty, 0);
+                                const isOpen = expandedSatuans.has(satuan);
+                                return (
+                                    <div key={satuan} className="ssd-satuan-block">
+                                        <button className="ssd-satuan-row" onClick={() => toggleSatuan(satuan)}>
+                                            <span className="ssd-satuan-label">{satuan}</span>
+                                            <span className="ssd-satuan-total">{formatQty(total)} {satuan}</span>
+                                            <FaChevronDown className={`ssd-satuan-chevron${isOpen ? " ssd-satuan-chevron--open" : ""}`} />
+                                        </button>
+                                        {isOpen && (
+                                            <div className="ssd-satuan-content">
+                                                <ChartCard title="" items={items} orientation="horizontal" />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>
                 ) : (
-                    <div className="ssd-charts-grid">
+                    <div className={`ssd-charts-grid${groupBy === "jenis_reward" ? " ssd-charts-grid--single" : ""}`}>
                         {Array.from(grouped.entries()).map(([key, items]) => (
                             <ChartCard
                                 key={key}

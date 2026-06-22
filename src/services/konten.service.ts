@@ -32,7 +32,7 @@ export const KontenService = {
         const response = await api.post<AddKontenResponse>(
             `/konten/add-konten/${payload.adminId}`,
             formData,
-            { headers: { "Content-Type": "multipart/form-data" } }
+            { headers: { "Content-Type": "multipart/form-data" }, timeout: 60000 }
         );
 
         return response.data;
@@ -88,7 +88,7 @@ export const KontenService = {
         const response = await api.patch<AddKontenResponse>(
             `/konten/edit-konten/${kontenId}`,
             formData,
-            { headers: { "Content-Type": "multipart/form-data" } }
+            { headers: { "Content-Type": "multipart/form-data" }, timeout: 60000 }
         );
 
         return response.data;

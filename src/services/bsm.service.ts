@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { NewBSM, GetBSMResponse } from "../types/bsm.type";
+import type { NewBSM, GetBSMResponse, GetBSMPagedResponse } from "../types/bsm.type";
 
 export const BsmService = {
     async createBsm(data: NewBSM) {
@@ -36,5 +36,10 @@ export const BsmService = {
     async getBsm(): Promise<GetBSMResponse> {
         const response = await api.get<GetBSMResponse>("/bsm/get-bsm");
         return response.data;
-    }
+    },
+
+    async getBsmPaged(page: number): Promise<GetBSMPagedResponse> {
+        const response = await api.get<GetBSMPagedResponse>("/bsm/get-bsm", { params: { page } });
+        return response.data;
+    },
 };

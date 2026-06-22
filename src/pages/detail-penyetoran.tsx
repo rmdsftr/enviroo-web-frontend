@@ -9,6 +9,7 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
 import { SetoranService, type SetoranDetail } from "../services/setoran.service";
+import ViewPhoto from "../components/view-photo";
 import "../styles/detail-penyetoran.css";
 import { formatTanggalPanjang, formatJam } from "../utils/date.utils";
 
@@ -44,6 +45,7 @@ export default function DetailPenyetoranPage() {
     const [detail, setDetail] = useState<SetoranDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -159,6 +161,7 @@ export default function DetailPenyetoranPage() {
                                     <span className="dps-stat-chip-label">Jenis Sampah</span>
                                 </div>
                             </div>
+
                         </div>
 
                         {/* ── RIGHT: Item List ── */}
@@ -198,11 +201,34 @@ export default function DetailPenyetoranPage() {
                                     ))}
                                 </div>
                             )}
+
+                            {detail.header.bukti_via_manual && (
+                                <div className="dps-bukti-section">
+                                    <span className="dps-bukti-label">
+                                        Bukti Via Manual
+                                    </span>
+                                    <div
+                                        className="dps-bukti-thumb"
+                                        onClick={() => setLightboxOpen(true)}
+                                        title="Klik untuk memperbesar"
+                                    >
+                                        <img src={detail.header.bukti_via_manual} alt="Bukti setoran manual" />
+                                        <div className="dps-bukti-overlay">Lihat Gambar</div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                     </div>
                 )}
             </div>
+            {lightboxOpen && detail?.header.bukti_via_manual && (
+                <ViewPhoto
+                    src={detail.header.bukti_via_manual}
+                    alt="Bukti setoran manual"
+                    onClose={() => setLightboxOpen(false)}
+                />
+            )}
         </>
     );
 }

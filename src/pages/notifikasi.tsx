@@ -94,7 +94,7 @@ export default function NotifikasiPage() {
         if (!userId) return;
         if (pageNum === 1) setLoading(true); else setLoadingMore(true);
         try {
-            const res = await NotifikasiService.getList(userId, pageNum, LIMIT);
+            const res = await NotifikasiService.getList(pageNum, LIMIT);
             setNotifs(prev => append ? [...prev, ...res.data] : res.data);
             setHasMore(pageNum < res.meta.total_halaman);
         } finally {
@@ -133,7 +133,7 @@ export default function NotifikasiPage() {
         setMarkingAll(true);
         setNotifs(prev => prev.map(n => ({ ...n, is_read: true })));
         try {
-            await NotifikasiService.markAllAsRead(userId);
+            await NotifikasiService.markAllAsRead();
         } catch {
             setPage(1);
             fetchPage(1, false);

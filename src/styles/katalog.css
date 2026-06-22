@@ -185,15 +185,6 @@ input[type=number] {
     justify-content: center;
 }
 
-/* Subtle inner highlight on image zone */
-.katalog-card-img::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 55%, rgba(255,255,255,0.45));
-    pointer-events: none;
-}
-
 .katalog-card-emoji {
     font-size: 58px;
     line-height: 1;
@@ -237,7 +228,7 @@ input[type=number] {
     align-items: center;
     gap: 6px;
     padding: 5px 11px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 12.5px;
     font-weight: 600;
     width: fit-content;
@@ -761,4 +752,48 @@ input[type=number] {
     gap: 6px;
     font-size: 11px;
     color: var(--k-muted);
+}
+
+
+/* =========================================================
+   DISTRIBUSI SEMBAKO SECTION
+   ========================================================= */
+.katalog-distribusi-section {
+    margin-top: 8px;
+}
+
+.katalog-distribusi-header {
+    margin-bottom: 16px;
+}
+
+.katalog-distribusi-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--k-dark);
+    margin: 0 0 6px;
+}
+
+.katalog-distribusi-desc {
+    font-size: 12.5px;
+    color: var(--k-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.katalog-distribusi-filter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.katalog-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    font-size: 0.875rem;
+    color: #94a3b8;
 }

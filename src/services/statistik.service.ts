@@ -6,6 +6,7 @@ import type {
     RankingBankResponse,
     PenjualanSampahResponse,
     MasukSampahResponse,
+    VolumeSampahResponse,
 } from "../types/statistik.type";
 
 export interface KontribusiNasabahItem {
@@ -26,6 +27,9 @@ export interface KontribusiNasabahResponse {
         nama_bank: string;
         jenis_bank: string;
     };
+    sort_by: string;
+    totals: { total_kg: number; total_pcs: number; total_liter: number };
+    pagination: { page: number; limit: number; total: number; total_pages: number };
     data: KontribusiNasabahItem[];
 }
 
@@ -117,6 +121,14 @@ export const StatistikService = {
         return response.data;
     },
 
+    async getVolumeSampah(tahun?: number): Promise<VolumeSampahResponse> {
+        const response = await api.get<VolumeSampahResponse>(
+            "/statistik/superadmin/volume-sampah",
+            { params: tahun !== undefined ? { tahun } : undefined }
+        );
+        return response.data;
+    },
+
     async getSetoranSampah(
         bankId: string,
         bulanMulai?: number,
@@ -144,14 +156,20 @@ export const StatistikService = {
         tahunMulai?: number,
         bulanSelesai?: number,
         tahunSelesai?: number,
+        sortBy?: string,
+        page?: number,
+        limit?: number,
     ): Promise<KontribusiNasabahResponse> {
-        const params: Record<string, number> = {};
+        const params: Record<string, string | number> = {};
         if (bulanMulai !== undefined && tahunMulai !== undefined) {
             params.bulan_mulai = bulanMulai;
             params.tahun_mulai = tahunMulai;
             params.bulan_selesai = bulanSelesai ?? bulanMulai;
             params.tahun_selesai = tahunSelesai ?? tahunMulai;
         }
+        if (sortBy) params.sort_by = sortBy;
+        if (page !== undefined) params.page = page;
+        if (limit !== undefined) params.limit = limit;
         const res = await api.get<KontribusiNasabahResponse>(
             `/statistik/kontribusi-nasabah/${bankId}`,
             { params }

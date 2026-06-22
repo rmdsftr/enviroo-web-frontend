@@ -16,6 +16,7 @@ import {
     FaCalendarDays,
     FaCircleInfo,
     FaCamera,
+    FaTrash,
 } from "react-icons/fa6";
 import Button from "../components/button";
 import { formatTanggalPanjang } from "../utils/date.utils";
@@ -45,7 +46,7 @@ interface ProfilData {
 type SettingType = "password" | null;
 
 export default function ProfilPage() {
-    const { user } = useAuth();
+    const { refreshUser, user } = useAuth();
     const [profil, setProfil] = useState<ProfilData | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -56,6 +57,7 @@ export default function ProfilPage() {
     const [editWhatsapp, setEditWhatsapp] = useState("");
     const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState("");
+    const [deletePhoto, setDeletePhoto] = useState(false);
     const [editLoading, setEditLoading] = useState(false);
     const [editError, setEditError] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +100,7 @@ export default function ProfilPage() {
         setEditWhatsapp(profil.no_whatsapp || "");
         setEditPhotoFile(null);
         setEditPhotoPreview("");
+        setDeletePhoto(false);
         setEditError("");
         setShowEditModal(true);
     };
@@ -107,6 +110,7 @@ export default function ProfilPage() {
         if (!file) return;
         setEditPhotoFile(file);
         setEditPhotoPreview(URL.createObjectURL(file));
+        setDeletePhoto(false);
     };
 
     const handleEditSubmit = async (e: React.FormEvent) => {
@@ -118,9 +122,11 @@ export default function ProfilPage() {
             if (editNama !== profil?.nama) formData.append("nama", editNama);
             if (editWhatsapp !== profil?.no_whatsapp) formData.append("no_whatsapp", editWhatsapp);
             if (editPhotoFile) formData.append("photo_profile", editPhotoFile);
+            else if (deletePhoto) formData.append("delete_photo", "true");
 
             await ProfilService.updateProfil(user?.user_id!, formData);
             await fetchProfil();
+            await refreshUser();
             setShowEditModal(false);
         } catch (err: any) {
             setEditError(err.response?.data?.error || "Terjadi kesalahan, silakan coba lagi.");
@@ -413,18 +419,38 @@ export default function ProfilPage() {
                             <div className="profil-modal-body">
                                 {/* Avatar uploader */}
                                 <div className="profil-edit-avatar-section">
-                                    <div
-                                        className="profil-edit-avatar"
-                                        onClick={() => fileInputRef.current?.click()}
-                                    >
-                                        <img
-                                            src={editPhotoPreview || profil.photo_url || profileDefault}
-                                            alt="foto"
-                                        />
-                                        <div className="profil-edit-avatar-overlay">
-                                            <FaCamera />
-                                            <span>Ganti Foto</span>
+                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                                        <div
+                                            className="profil-edit-avatar"
+                                            onClick={() => fileInputRef.current?.click()}
+                                        >
+                                            <img
+                                                src={deletePhoto ? profileDefault : (editPhotoPreview || profil.photo_url || profileDefault)}
+                                                alt="foto"
+                                            />
+                                            <div className="profil-edit-avatar-overlay">
+                                                <FaCamera />
+                                                <span>Ganti Foto</span>
+                                            </div>
                                         </div>
+                                        {profil.photo_url && !editPhotoFile && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setDeletePhoto(prev => !prev)}
+                                                style={{
+                                                    display: "flex", alignItems: "center", gap: "4px",
+                                                    padding: "3px 9px", borderRadius: "99px", cursor: "pointer",
+                                                    fontFamily: "inherit", fontSize: "10.5px", fontWeight: 500,
+                                                    border: `1px solid ${deletePhoto ? "rgba(78,167,113,0.4)" : "rgba(192,57,43,0.3)"}`,
+                                                    background: deletePhoto ? "rgba(78,167,113,0.07)" : "rgba(192,57,43,0.05)",
+                                                    color: deletePhoto ? "#4EA771" : "#c0392b",
+                                                    transition: "all 0.15s ease",
+                                                }}
+                                            >
+                                                <FaTrash style={{ fontSize: "10px" }} />
+                                                {deletePhoto ? "Batalkan Hapus" : "Hapus Foto"}
+                                            </button>
+                                        )}
                                     </div>
                                     <input
                                         ref={fileInputRef}

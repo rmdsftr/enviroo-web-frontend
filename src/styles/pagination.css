@@ -31,7 +31,7 @@
 
 .pagination__btn:hover:not(:disabled) {
     background: var(--c-primary-50);
-    border-color: var(--c-primary);
+    border-color: var(--c-accent);
     color: var(--c-primary-700);
     transform: translateY(-1px);
 }
@@ -59,4 +59,42 @@
     font-size: 14px;
     padding: 0 4px;
     user-select: none;
+}
+
+/* ── Compact / neutral variant ──────────────────────────── */
+.pagination--compact {
+    padding: 12px 0 4px;
+    gap: 3px;
+}
+
+.pagination--compact .pagination__btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 7px;
+    font-size: 11px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+}
+
+.pagination--compact .pagination__btn:hover:not(:disabled) {
+    background: #f3f4f6;
+    color: #6b7280;
+    transform: none;
+}
+
+.pagination--compact .pagination__btn--active {
+    background: #f0f0f0;
+    color: #374151;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+.pagination--compact .pagination__arrow {
+    font-size: 10px;
+}
+
+.pagination--compact .pagination__ellipsis {
+    font-size: 12px;
 }

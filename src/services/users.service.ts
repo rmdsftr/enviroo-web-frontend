@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { NewUser, GetNonAdminUsersResponse, GetNonNasabahUsersResponse } from "../types/users.type";
+import type { NewUser, GetNonAdminUsersResponse, GetNonNasabahUsersResponse, ActiveUserResponse } from "../types/users.type";
 
 export interface AllUserItem {
     user_id: string;
@@ -73,6 +73,11 @@ export const UsersService = {
     async getActiveAdmin(identity_id: string): Promise<any> {
         const response = await api.get(`/users/active-admin/${identity_id}`);
         return response.data;
+    },
+
+    async getActiveUser(user_id:string): Promise<ActiveUserResponse>{
+        const response = await api.get(`/users/active-user/${user_id}`);
+        return response.data
     },
 
     async exportLaporanNasabah(bank_id: string): Promise<Blob> {

@@ -36,13 +36,13 @@ interface GetSetoranDetailResponse {
 
 export const SetoranService = {
     async getDetailSetoran(setoranId: string): Promise<SetoranDetail> {
-        const response = await api.get<GetSetoranDetailResponse>(`/setoran/detail-setoran-nasabah/${setoranId}`);
+        const response = await api.get<GetSetoranDetailResponse>(`/setoran/detail/${setoranId}`);
         return response.data.data;
     },
 
     async getListSetoranNasabah(nasabahId: string): Promise<RiwayatSetoranNasabahItem[]> {
         const response = await api.get<{ message: string; data: RiwayatSetoranNasabahItem[] }>(
-            `/setoran/list-setoran-nasabah/${nasabahId}`
+            `/setoran/riwayat/${nasabahId}`
         );
         return response.data.data;
     },

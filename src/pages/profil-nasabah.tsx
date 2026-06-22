@@ -1,342 +1,78 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { ProfilService } from "../services/profil.service";
+import { useState } from "react";
 import { AuthService } from "../services/auth.service";
-import type { ProfilNasabah, SaldoNasabah } from "../types/profil.type";
+import { NasabahService } from "../services/nasabah.service";
 import type { ReactivateNasabahResponse } from "../types/auth.type";
-import BreadcrumbLayout from "../layouts/breadcrumb";
-import {
-    FaUser,
-    FaIdCard,
-    FaEnvelope,
-    FaWhatsapp,
-    FaCreditCard,
-    FaBuilding,
-    FaGear,
-    FaEye,
-    FaEyeSlash,
-    FaStar,
-    FaCalendarDays,
-    FaToggleOff,
-    FaMoneyBillWave,
-    FaUserShield,
-} from "react-icons/fa6";
-import PopupAktivasiResult from "../layouts/popup-aktivasi-result";
-import ViewPhoto from "../components/view-photo";
-import Tabs from "../components/tabs";
-import Table, { type ColumnDef, TableActionBtn } from "../components/table";
-import FilterRange, { defaultMonthRange } from "../components/filter-range";
-import SearchBar from "../components/search";
+import { useAuth } from "../contexts/AuthContext";
+import { getApiError } from "../utils/error.utils";
+import { formatTanggalPanjang } from "../utils/date.utils";
 import "../styles/layout.css";
 import "../styles/profil-nasabah.css";
 import "../styles/riwayat.css";
 import "../styles/jadwal-bsu.css";
-import PopupMenu from "../components/popup-menu";
+
+import { useProfilNasabahData } from "../hooks/useProfilNasabahData";
+import {
+    STATUS_CONFIG, formatRole,
+    SETORAN_COLUMNS, BAGI_HASIL_COLUMNS, PENARIKAN_COLUMNS,
+    type StatusNasabah,
+} from "../constants/profil-nasabah.constants";
+
+import BreadcrumbLayout from "../layouts/breadcrumb";
+import PopupAktivasiResult from "../layouts/popup-aktivasi-result";
+import PopupConfirmation from "../layouts/popup-confirmation";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
-import { useAuth } from "../contexts/AuthContext";
-import { formatTanggal, formatTanggalPanjang } from "../utils/date.utils";
-import { getApiError } from "../utils/error.utils";
-import { SetoranService, type RiwayatSetoranNasabahItem } from "../services/setoran.service";
-import { BagiHasilService, type RiwayatBagiHasilNasabahItem } from "../services/bagi_hasil_penjualan.service";
-import { PenarikanService, type PenarikanItem } from "../services/penarikan.service";
+import PopupMenu from "../components/popup-menu";
+import ViewPhoto from "../components/view-photo";
+import Tabs from "../components/tabs";
+import Table from "../components/table";
+import FilterRange from "../components/filter-range";
+import SearchBar from "../components/search";
 
-/* ── Setoran tab ── */
-const STATUS_SETORAN: Record<string, { label: string; cls: string }> = {
-    berhasil: { label: "Berhasil", cls: "selesai"    },
-    pending:  { label: "Pending",  cls: "mendatang"  },
-    gagal:    { label: "Gagal",    cls: "dibatalkan" },
-};
-
-const SETORAN_COLUMNS: ColumnDef<RiwayatSetoranNasabahItem>[] = [
-    {
-        key: "setoran_id",
-        header: "ID Setoran",
-        render: (row) => <span className="table-id">{row.setoran_id}</span>,
-    },
-    {
-        key: "tanggal",
-        header: "Tanggal Setoran",
-        width: "160px",
-        render: (row) => formatTanggal(row.transaksi_timestamp),
-    },
-    {
-        key: "total_item",
-        header: "Total Setoran",
-        width: "130px",
-        render: (row) => `${row.total_item} item`,
-    },
-    {
-        key: "status_setoran",
-        header: "Status Setoran",
-        width: "140px",
-        render: (row) => {
-            const s = STATUS_SETORAN[row.status_setoran];
-            return (
-                <span className={`jbsu-status-pill ${s?.cls ?? row.status_setoran}`}>
-                    {s?.label ?? row.status_setoran}
-                </span>
-            );
-        },
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "70px",
-        align: "center" as const,
-        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
-    },
-];
-
-/* ── Bagi Hasil tab ── */
-function fmtBh(total: number, satuan: string): string {
-    const num = total.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
-
-const BAGI_HASIL_COLUMNS: ColumnDef<RiwayatBagiHasilNasabahItem>[] = [
-    {
-        key: "penerima_id",
-        header: "ID Bagi Hasil",
-        render: (row) => <span className="table-id">{row.penerima_id}</span>,
-    },
-    {
-        key: "tanggal",
-        header: "Tanggal",
-        width: "160px",
-        render: (row) => formatTanggal(row.tanggal),
-    },
-    {
-        key: "reward",
-        header: "Reward",
-        width: "120px",
-        render: (row) => row.reward,
-    },
-    {
-        key: "total_diterima",
-        header: "Total Diterima",
-        width: "160px",
-        render: (row) => fmtBh(row.total_diterima, row.satuan_diterima),
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "70px",
-        align: "center" as const,
-        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
-    },
-];
-
-/* ── Penarikan tab ── */
-const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
-    pending:    { label: "Pending",    cls: "mendatang"  },
-    berhasil:   { label: "Berhasil",   cls: "selesai"    },
-    kadaluarsa: { label: "Kadaluarsa", cls: "dibatalkan" },
-    dibatalkan: { label: "Dibatalkan", cls: "dibatalkan" },
-};
-
-const PENARIKAN_COLUMNS: ColumnDef<PenarikanItem>[] = [
-    {
-        key: "penarikan_id",
-        header: "ID Penarikan",
-        render: (row) => <span className="table-id">{row.penarikan_id}</span>,
-    },
-    {
-        key: "nama_reward",
-        header: "Nama Reward",
-        width: "140px",
-        render: (row) => row.nama_reward,
-    },
-    {
-        key: "diajukan_pada",
-        header: "Diajukan Pada",
-        width: "160px",
-        render: (row) => formatTanggal(row.created_at),
-    },
-    {
-        key: "status_penarikan",
-        header: "Status Penarikan",
-        width: "150px",
-        render: (row) => {
-            const s = STATUS_PENARIKAN[row.status_penarikan];
-            return (
-                <span className={`jbsu-status-pill ${s?.cls ?? row.status_penarikan}`}>
-                    {s?.label ?? row.status_penarikan}
-                </span>
-            );
-        },
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "70px",
-        align: "center" as const,
-        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
-    },
-];
-
-type StatusNasabah = "aktif" | "nonaktif" | "pending";
-
-const STATUS_CONFIG: Record<StatusNasabah, { label: string; color: string; bg: string; dot: string }> = {
-    aktif:    { label: "Aktif",    color: "#4EA771", bg: "#4ea77223", dot: "#4EA771" },
-    nonaktif: { label: "Nonaktif", color: "#b04040", bg: "rgba(220,80,80,0.10)",  dot: "#dc5050" },
-    pending:  { label: "Pending",  color: "#8a6200", bg: "rgba(215,160,30,0.12)", dot: "#d7a01e" },
-};
-
-function formatRole(role?: string): string {
-    if (!role) return "-";
-    return role.split("_").map(w =>
-        ["bsi", "bsu", "bsm"].includes(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)
-    ).join(" ");
-}
+import {
+    FaUser, FaIdCard, FaEnvelope, FaWhatsapp, FaCreditCard, FaBuilding,
+    FaGear, FaEye, FaEyeSlash, FaStar, FaCalendarDays,
+    FaToggleOff, FaMoneyBillWave, FaUserShield, FaTrashCan,
+} from "react-icons/fa6";
+import { type RiwayatSetoranNasabahItem } from "../services/setoran.service";
+import { type RiwayatBagiHasilNasabahItem } from "../services/bagi_hasil_penjualan.service";
+import { type PenarikanItem } from "../services/penarikan.service";
 
 export default function ProfilNasabahPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { user } = useAuth();
+
     const role = user?.role?.toLowerCase();
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : role === "admin_bsm" ? "/bsm" : "/superadmin";
 
-    const [nasabah, setNasabah] = useState<ProfilNasabah | null>(null);
-    const [saldo, setSaldo] = useState<SaldoNasabah | null>(null);
-    const [loading, setLoading] = useState(true);
+    const {
+        nasabah, setNasabah, saldo, loading,
+        setoranLoading, setoranSearch, setSetoranSearch,
+        setoranFrom, setSetoranFrom, setoranTo, setSetoranTo, filteredSetoran,
+        bagiHasilLoading, bagiHasilSearch, setBagiHasilSearch,
+        bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo, filteredBagiHasil,
+        penarikanLoading, penarikanSearch, setPenarikanSearch,
+        penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo, filteredPenarikan,
+    } = useProfilNasabahData(id);
+
+    // ── UI states ──
     const [showSaldo, setShowSaldo] = useState(false);
     const [showPhoto, setShowPhoto] = useState(false);
     const [activeTab, setActiveTab] = useState("setoran");
-
     const [isReactivateModalOpen, setIsReactivateModalOpen] = useState(false);
     const [reactivateData, setReactivateData] = useState<ReactivateNasabahResponse["data"] | null>(null);
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" | "warning" } | null>(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    /* ── Setoran tab state ── */
-    const [setoranList, setSetoranList] = useState<RiwayatSetoranNasabahItem[]>([]);
-    const [setoranLoading, setSetoranLoading] = useState(false);
-    const [setoranSearch, setSetoranSearch] = useState("");
-    const [setoranFrom, setSetoranFrom] = useState(() => defaultMonthRange().from);
-    const [setoranTo, setSetoranTo] = useState(() => defaultMonthRange().to);
-
-    /* ── Bagi Hasil tab state ── */
-    const [bagiHasilList, setBagiHasilList] = useState<RiwayatBagiHasilNasabahItem[]>([]);
-    const [bagiHasilLoading, setBagiHasilLoading] = useState(false);
-    const [bagiHasilSearch, setBagiHasilSearch] = useState("");
-    const [bagiHasilFrom, setBagiHasilFrom] = useState(() => defaultMonthRange().from);
-    const [bagiHasilTo, setBagiHasilTo] = useState(() => defaultMonthRange().to);
-
-    /* ── Penarikan tab state ── */
-    const [penarikanList, setPenarikanList] = useState<PenarikanItem[]>([]);
-    const [penarikanLoading, setPenarikanLoading] = useState(false);
-    const [penarikanSearch, setPenarikanSearch] = useState("");
-    const [penarikanFrom, setPenarikanFrom] = useState(() => defaultMonthRange().from);
-    const [penarikanTo, setPenarikanTo] = useState(() => defaultMonthRange().to);
-
-    useEffect(() => {
-        if (!id) return;
-        Promise.all([
-            ProfilService.getProfilNasabah(id),
-            ProfilService.getSaldoNasabah(id),
-        ])
-            .then(([profilRes, saldoRes]) => {
-                setNasabah(profilRes.data);
-                setSaldo(saldoRes.data);
-            })
-            .catch(err => console.error("Gagal menarik data nasabah", err))
-            .finally(() => setLoading(false));
-    }, [id]);
-
-    const fetchSetoran = useCallback(async () => {
-        if (!id) return;
-        try {
-            setSetoranLoading(true);
-            const data = await SetoranService.getListSetoranNasabah(id);
-            setSetoranList(data);
-        } catch {
-            console.error("Gagal memuat riwayat setoran");
-        } finally {
-            setSetoranLoading(false);
-        }
-    }, [id]);
-
-    useEffect(() => { fetchSetoran(); }, [fetchSetoran]);
-
-    const fetchBagiHasil = useCallback(async () => {
-        if (!id) return;
-        try {
-            setBagiHasilLoading(true);
-            const data = await BagiHasilService.getListBhNasabah(id);
-            setBagiHasilList(data);
-        } catch {
-            console.error("Gagal memuat riwayat bagi hasil");
-        } finally {
-            setBagiHasilLoading(false);
-        }
-    }, [id]);
-
-    useEffect(() => { fetchBagiHasil(); }, [fetchBagiHasil]);
-
-    const fetchPenarikan = useCallback(async () => {
-        if (!id) return;
-        try {
-            setPenarikanLoading(true);
-            const data = await PenarikanService.getListByNasabah(id);
-            setPenarikanList(data);
-        } catch {
-            console.error("Gagal memuat riwayat penarikan");
-        } finally {
-            setPenarikanLoading(false);
-        }
-    }, [id]);
-
-    useEffect(() => { fetchPenarikan(); }, [fetchPenarikan]);
-
-    const filteredSetoran = useMemo(() => {
-        const q = setoranSearch.toLowerCase();
-        return setoranList.filter(item => {
-            const month = item.transaksi_timestamp.substring(0, 7);
-            if (month < setoranFrom || month > setoranTo) return false;
-            if (q) {
-                return item.setoran_id.toLowerCase().includes(q) ||
-                       item.nama_petugas.toLowerCase().includes(q);
-            }
-            return true;
-        });
-    }, [setoranList, setoranFrom, setoranTo, setoranSearch]);
-
-    const filteredBagiHasil = useMemo(() => {
-        const q = bagiHasilSearch.toLowerCase();
-        return bagiHasilList.filter(item => {
-            const month = item.tanggal.substring(0, 7);
-            if (month < bagiHasilFrom || month > bagiHasilTo) return false;
-            if (q) {
-                return item.penerima_id.toLowerCase().includes(q) ||
-                       item.bagi_hasil_id.toLowerCase().includes(q) ||
-                       item.reward.toLowerCase().includes(q);
-            }
-            return true;
-        });
-    }, [bagiHasilList, bagiHasilFrom, bagiHasilTo, bagiHasilSearch]);
-
-    const filteredPenarikan = useMemo(() => {
-        const q = penarikanSearch.toLowerCase();
-        return penarikanList.filter(item => {
-            const month = item.created_at.substring(0, 7);
-            if (month < penarikanFrom || month > penarikanTo) return false;
-            if (q) {
-                return item.penarikan_id.toLowerCase().includes(q) ||
-                       item.nama_reward.toLowerCase().includes(q);
-            }
-            return true;
-        });
-    }, [penarikanList, penarikanFrom, penarikanTo, penarikanSearch]);
-
-    if (loading) return <div style={{ padding: "40px", textAlign: "center", color: "#5a7a68" }}>Memuat profil nasabah...</div>;
-    if (!nasabah) return <div style={{ padding: "40px", textAlign: "center", color: "#b04040" }}>Nasabah tidak ditemukan.</div>;
-
+    // ── Handlers ──
     const handleToggleAktivasi = async () => {
         if (!nasabah || !id) return;
         const isCurrentlyActive = nasabah.status_nasabah === "aktif";
         try {
             if (isCurrentlyActive) {
                 await AuthService.deactivateAkun(nasabah.user_id, "nasabah");
-                setNasabah(prev => prev ? { ...prev, status_nasabah: "nonaktif" } : null);
+                setNasabah((prev) => prev ? { ...prev, status_nasabah: "nonaktif" } : null);
                 setPopupNotif({ message: "Akun nasabah berhasil dinonaktifkan", type: "success" });
             } else {
                 if (!user?.identity_id) {
@@ -346,26 +82,37 @@ export default function ProfilNasabahPage() {
                 const res = await AuthService.generateReactivateAkun(nasabah.user_id, user.identity_id, "nasabah");
                 setReactivateData(res.data);
                 setIsReactivateModalOpen(true);
-                setNasabah(prev => prev ? { ...prev, status_nasabah: "pending" } : null);
+                setNasabah((prev) => prev ? { ...prev, status_nasabah: "pending" } : null);
             }
         } catch (error) {
-            console.error("Gagal mengubah status nasabah:", error);
             setPopupNotif({ message: getApiError(error, "Terjadi kesalahan saat memproses status nasabah"), type: "error" });
         }
     };
 
+    const handleDeleteNasabah = async () => {
+        if (!nasabah) return;
+        try {
+            await NasabahService.deleteNasabah(nasabah.nasabah_id);
+            setPopupNotif({ message: "Nasabah berhasil dihapus", type: "success" });
+            setTimeout(() => navigate(`${rolePrefix}/nasabah`), 1500);
+        } catch (error) {
+            setPopupNotif({ message: getApiError(error, "Gagal menghapus nasabah"), type: "error" });
+        }
+    };
+
+    if (loading) return <div style={{ padding: "40px", textAlign: "center", color: "#5a7a68" }}>Memuat profil nasabah...</div>;
+    if (!nasabah) return <div style={{ padding: "40px", textAlign: "center", color: "#b04040" }}>Nasabah tidak ditemukan.</div>;
+
     const statusConf = STATUS_CONFIG[(nasabah.status_nasabah as StatusNasabah) || "aktif"];
     const initials = nasabah.nama.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 
-    // Left col: NIK, Email, WhatsApp — Right col: Rekening, Bank, Bergabung
-    // Interleaved order for 2-col grid: [NIK, Rekening, Email, Bank, WhatsApp, Bergabung]
     const INFO_ITEMS = [
-        { icon: <FaIdCard />,       label: "NIK",              value: nasabah.user_id },
-        { icon: <FaCreditCard />,   label: "No. Rekening",     value: nasabah.nomor_rekening },
-        { icon: <FaEnvelope />,     label: "Email",            value: nasabah.email || "-" },
-        { icon: <FaBuilding />,     label: "Bank Sampah",      value: nasabah.nama_bank || "-" },
-        { icon: <FaWhatsapp />,     label: "No. WhatsApp",     value: nasabah.no_whatsapp || "-" },
-        { icon: <FaCalendarDays />, label: "Bergabung Sejak",  value: nasabah.joined_at ? formatTanggalPanjang(nasabah.joined_at) : "-" },
+        { icon: <FaIdCard />,       label: "NIK",             value: nasabah.user_id },
+        { icon: <FaCreditCard />,   label: "No. Rekening",    value: nasabah.nomor_rekening },
+        { icon: <FaEnvelope />,     label: "Email",           value: nasabah.email || "-" },
+        { icon: <FaBuilding />,     label: "Bank Sampah",     value: nasabah.nama_bank || "-" },
+        { icon: <FaWhatsapp />,     label: "No. WhatsApp",    value: nasabah.no_whatsapp || "-" },
+        { icon: <FaCalendarDays />, label: "Bergabung Sejak", value: nasabah.joined_at ? formatTanggalPanjang(nasabah.joined_at) : "-" },
     ];
 
     return (
@@ -379,7 +126,7 @@ export default function ProfilNasabahPage() {
             <br />
 
             <div className="pn-card">
-                {/* Settings button */}
+                {/* ── Settings ── */}
                 <div style={{ position: "absolute", top: "24px", right: "28px", zIndex: 10 }}>
                     <PopupMenu
                         trigger={
@@ -393,6 +140,10 @@ export default function ProfilNasabahPage() {
                                 icon: <FaToggleOff />,
                                 onClick: handleToggleAktivasi,
                             },
+                            ...(nasabah.status_nasabah === "pending" || nasabah.status_nasabah === "nonaktif"
+                                ? [{ label: "Hapus Nasabah", icon: <FaTrashCan />, variant: "danger" as const, onClick: () => setShowDeleteConfirm(true) }]
+                                : []
+                            ),
                         ]}
                     />
                 </div>
@@ -441,26 +192,23 @@ export default function ProfilNasabahPage() {
                     </div>
                 </div>
 
-                {/* ── Admin Banner (kondisional) ── */}
+                {/* ── Admin Banner ── */}
                 {nasabah.is_admin && (
                     <div className="pn-admin-banner">
-                        <div className="pn-admin-banner-icon">
-                            <FaUserShield />
-                        </div>
+                        <div className="pn-admin-banner-icon"><FaUserShield /></div>
                         <p className="pn-admin-banner-text">
-                            Akun ini juga terdaftar sebagai{" "}
-                            <strong>{formatRole(nasabah.role_admin)}</strong>{" "}
+                            Akun ini juga terdaftar sebagai <strong>{formatRole(nasabah.role_admin)}</strong>{" "}
                             di <strong>{nasabah.nama_bank_admin}</strong>{" "}
                             dengan ID <strong>{nasabah.admin_id}</strong>
                         </p>
                     </div>
                 )}
 
-                {/* ── Ringkasan Saldo Rekening ── */}
+                {/* ── Saldo ── */}
                 <div className="pn-saldo-section">
                     <div className="pn-saldo-header">
                         <span className="pn-saldo-title">Ringkasan Saldo Rekening</span>
-                        <button className="pn-saldo-toggle" onClick={() => setShowSaldo(v => !v)}>
+                        <button className="pn-saldo-toggle" onClick={() => setShowSaldo((v) => !v)}>
                             {showSaldo ? <FaEyeSlash /> : <FaEye />}
                             {showSaldo ? "Sembunyikan" : "Tampilkan"}
                         </button>
@@ -470,9 +218,7 @@ export default function ProfilNasabahPage() {
                             <div className="pn-saldo-icon"><FaMoneyBillWave /></div>
                             <div className="pn-saldo-body">
                                 <span className="pn-saldo-number">
-                                    {showSaldo
-                                        ? `Rp ${(saldo?.uang.total_uang ?? 0).toLocaleString("id-ID")}`
-                                        : "••••••••"}
+                                    {showSaldo ? `Rp ${(saldo?.uang.total_uang ?? 0).toLocaleString("id-ID")}` : "••••••••"}
                                 </span>
                                 <span className="pn-saldo-status">Total Uang</span>
                             </div>
@@ -481,9 +227,7 @@ export default function ProfilNasabahPage() {
                             <div className="pn-saldo-icon"><FaStar /></div>
                             <div className="pn-saldo-body">
                                 <span className="pn-saldo-number">
-                                    {showSaldo
-                                        ? (saldo?.poin.total_poin ?? 0).toLocaleString("id-ID")
-                                        : "••••••••"}
+                                    {showSaldo ? (saldo?.poin.total_poin ?? 0).toLocaleString("id-ID") : "••••••••"}
                                 </span>
                                 <span className="pn-saldo-status">Total Poin</span>
                             </div>
@@ -507,17 +251,8 @@ export default function ProfilNasabahPage() {
             {activeTab === "setoran" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
-                        <SearchBar
-                            placeholder="Cari ID atau nama petugas..."
-                            value={setoranSearch}
-                            onChange={setSetoranSearch}
-                            width="300px"
-                        />
-                        <FilterRange
-                            from={setoranFrom}
-                            to={setoranTo}
-                            onChange={(f, t) => { setSetoranFrom(f); setSetoranTo(t); }}
-                        />
+                        <SearchBar placeholder="Cari ID atau nama petugas..." value={setoranSearch} onChange={setSetoranSearch} width="300px" />
+                        <FilterRange from={setoranFrom} to={setoranTo} onChange={(f, t) => { setSetoranFrom(f); setSetoranTo(t); }} />
                     </div>
                     {setoranLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -536,17 +271,8 @@ export default function ProfilNasabahPage() {
             {activeTab === "bagi-hasil" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
-                        <SearchBar
-                            placeholder="Cari ID atau nama reward..."
-                            value={bagiHasilSearch}
-                            onChange={setBagiHasilSearch}
-                            width="300px"
-                        />
-                        <FilterRange
-                            from={bagiHasilFrom}
-                            to={bagiHasilTo}
-                            onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
-                        />
+                        <SearchBar placeholder="Cari ID atau nama reward..." value={bagiHasilSearch} onChange={setBagiHasilSearch} width="300px" />
+                        <FilterRange from={bagiHasilFrom} to={bagiHasilTo} onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }} />
                     </div>
                     {bagiHasilLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -555,10 +281,7 @@ export default function ProfilNasabahPage() {
                             data={filteredBagiHasil}
                             rowKey={(row) => row.penerima_id}
                             emptyMessage="Belum ada riwayat bagi hasil."
-                            onRowClick={(row) => navigate(
-                                `${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`,
-                                { state: { bagiHasilId: row.bagi_hasil_id } }
-                            )}
+                            onRowClick={(row) => navigate(`${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`, { state: { bagiHasilId: row.bagi_hasil_id } })}
                           />
                     }
                 </div>
@@ -568,17 +291,8 @@ export default function ProfilNasabahPage() {
             {activeTab === "penarikan" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
-                        <SearchBar
-                            placeholder="Cari ID atau nama reward..."
-                            value={penarikanSearch}
-                            onChange={setPenarikanSearch}
-                            width="300px"
-                        />
-                        <FilterRange
-                            from={penarikanFrom}
-                            to={penarikanTo}
-                            onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }}
-                        />
+                        <SearchBar placeholder="Cari ID atau nama reward..." value={penarikanSearch} onChange={setPenarikanSearch} width="300px" />
+                        <FilterRange from={penarikanFrom} to={penarikanTo} onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }} />
                     </div>
                     {penarikanLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -594,11 +308,7 @@ export default function ProfilNasabahPage() {
             )}
 
             {showPhoto && nasabah.photo_url && (
-                <ViewPhoto
-                    src={nasabah.photo_url}
-                    alt={nasabah.nama}
-                    onClose={() => setShowPhoto(false)}
-                />
+                <ViewPhoto src={nasabah.photo_url} alt={nasabah.nama} onClose={() => setShowPhoto(false)} />
             )}
 
             <PopupAktivasiResult
@@ -606,6 +316,17 @@ export default function ProfilNasabahPage() {
                 onClose={() => setIsReactivateModalOpen(false)}
                 data={reactivateData}
                 description="Berikan informasi berikut kepada nasabah untuk proses aktivasi akun mereka."
+            />
+
+            <PopupConfirmation
+                isOpen={showDeleteConfirm}
+                type="danger"
+                title="Hapus Nasabah"
+                message={`Apakah kamu yakin ingin menghapus nasabah "${nasabah.nama}"? Tindakan ini tidak dapat dibatalkan.`}
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                onConfirm={() => { setShowDeleteConfirm(false); handleDeleteNasabah(); }}
+                onCancel={() => setShowDeleteConfirm(false)}
             />
 
             {popupNotif && (

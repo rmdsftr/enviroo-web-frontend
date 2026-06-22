@@ -57,32 +57,67 @@ const isStaff   = (u: AllUserItem) => u.roles.some(r => r !== "Nasabah" && r !==
 
 export default function SuperadminPenggunaPage() {
     const navigate = useNavigate();
-    const [allUsers, setAllUsers] = useState<AllUserItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [roleFilter, setRoleFilter] = useState("");
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Server-mode state
+    const [pageUsers, setPageUsers] = useState<AllUserItem[]>([]);
+    const [serverTotalPages, setServerTotalPages] = useState(1);
+    const [serverTotalItems, setServerTotalItems] = useState(0);
+
+    // Local-mode state: semua data, di-cache setelah pertama kali dimuat
+    const [allUsers, setAllUsers] = useState<AllUserItem[]>([]);
+    const [allUsersLoaded, setAllUsersLoaded] = useState(false);
+
+    const isLocalMode = search.trim() !== "" || roleFilter !== "";
+
+    // Server mode: fetch halaman saat ini
     useEffect(() => {
+        if (isLocalMode) return;
         setLoading(true);
         setError(null);
-        UsersService.getAllUsers({ page: 1, limit: 10000 })
-            .then(res => setAllUsers(Array.isArray(res.data) ? res.data : []))
+        UsersService.getAllUsers({ page: currentPage, limit: ITEMS_PER_PAGE })
+            .then(res => {
+                setPageUsers(Array.isArray(res.data) ? res.data : []);
+                setServerTotalPages(res.pagination?.total_pages ?? 1);
+                setServerTotalItems(res.pagination?.total_items ?? 0);
+            })
             .catch(() => setError("Gagal mengambil data pengguna. Pastikan server backend aktif."))
             .finally(() => setLoading(false));
-    }, []);
+    }, [currentPage, isLocalMode]);
 
-    /* ── Stats (from full dataset) ───────────────────────── */
-    const stats = useMemo(() => ({
-        total:   allUsers.length,
-        nasabah: allUsers.filter(isNasabah).length,
-        staff:   allUsers.filter(isStaff).length,
-        kosong:  allUsers.filter(isKosong).length,
-    }), [allUsers]);
+    // Local mode: fetch semua (tanpa page/limit), di-cache
+    useEffect(() => {
+        if (!isLocalMode || allUsersLoaded) return;
+        setLoading(true);
+        setError(null);
+        UsersService.getAllUsers()
+            .then(res => {
+                const data = Array.isArray(res.data) ? res.data : [];
+                setAllUsers(data);
+                setAllUsersLoaded(true);
+            })
+            .catch(() => setError("Gagal mengambil data pengguna. Pastikan server backend aktif."))
+            .finally(() => setLoading(false));
+    }, [isLocalMode, allUsersLoaded]);
 
-    /* ── Filtered list ───────────────────────────────────── */
+    /* ── Stats ───────────────────────────────────────────── */
+    const stats = useMemo(() => {
+        const src = allUsersLoaded ? allUsers : [];
+        return {
+            total:   allUsersLoaded ? allUsers.length : serverTotalItems,
+            nasabah: src.filter(isNasabah).length,
+            staff:   src.filter(isStaff).length,
+            kosong:  src.filter(isKosong).length,
+        };
+    }, [allUsers, allUsersLoaded, serverTotalItems]);
+
+    /* ── Filtered list (local mode) ──────────────────────── */
     const filtered = useMemo(() => {
+        if (!isLocalMode) return allUsers;
         let list = allUsers;
         if (roleFilter === "nasabah") list = list.filter(isNasabah);
         else if (roleFilter === "staff") list = list.filter(isStaff);
@@ -96,16 +131,22 @@ export default function SuperadminPenggunaPage() {
             );
         }
         return list;
-    }, [allUsers, roleFilter, search]);
+    }, [allUsers, roleFilter, search, isLocalMode]);
 
-    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-    const paginated  = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+    const totalPages = isLocalMode
+        ? Math.ceil(filtered.length / ITEMS_PER_PAGE)
+        : serverTotalPages;
+
+    const paginated = isLocalMode
+        ? filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+        : pageUsers;
+
+    
 
     const handleFilterChange = (val: string) => { setRoleFilter(val); setCurrentPage(1); };
     const handleSearch       = (val: string) => { setSearch(val);     setCurrentPage(1); };
 
     const startRow = (currentPage - 1) * ITEMS_PER_PAGE + 1;
-    const endRow   = Math.min(currentPage * ITEMS_PER_PAGE, filtered.length);
 
     return (
         <>
@@ -215,10 +256,7 @@ export default function SuperadminPenggunaPage() {
 
                 {/* ── Pagination ───────────────────────────── */}
                 {totalPages > 1 && (
-                    <div className="nasabah-pagination-row" style={{ paddingTop: "12px" }}>
-                        <span className="nasabah-pagination-info">
-                            Menampilkan {startRow}–{endRow} dari {filtered.length} pengguna
-                        </span>
+                    <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}

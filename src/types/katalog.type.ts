@@ -12,6 +12,107 @@ export interface GetKategoriResponse {
     message: string;
 }
 
+export interface MasterSampah{
+    SarokID : number;
+    NamaSampah : string;
+    Satuan : SatuanEnum;
+}
+
+export interface MasterSampahResponse{
+    data : MasterSampah[];
+    message : string;
+}
+
+export interface MasterSampahPaginatedResponse {
+    data: MasterSampah[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+export interface SampahPerKategoriItem {
+    sarok_id: number;
+    nama_sampah: string;
+    satuan: string;
+}
+
+export interface KategoriSampahGroup {
+    kategori_id: number;
+    kategori: string;
+    sampah: SampahPerKategoriItem[];
+}
+
+export interface SampahPerKategoriResponse {
+    data: KategoriSampahGroup[];
+}
+
+export interface SampahFavoritItem {
+    sarok_id: number;
+    nama_sampah: string;
+    satuan: string;
+    total_qty: number;
+    jumlah_nasabah: number;
+    jumlah_setoran: number;
+}
+
+export interface SampahFavoritResponse {
+    message: string;
+    data: SampahFavoritItem[];
+}
+
+export interface StatistikSampahItem {
+    sarok_id: number;
+    nama_sampah: string;
+    satuan: string;
+    jenis_reward: "Uang" | "Sembako";
+    satuan_reward: "Rp" | "poin";
+    rata_rata_harga: number;
+    jumlah_katalog: number;
+}
+
+export interface StatistikSampahResponse {
+    message: string;
+    data: StatistikSampahItem[];
+}
+
+export interface SembakoFavoritItem {
+    barang_id: number;
+    nama_barang: string;
+    total_qty: number;
+    total_poin: number;
+    jumlah_nasabah: number;
+    jumlah_tukar: number;
+}
+
+export interface SembakoFavoritResponse {
+    message: string;
+    data: SembakoFavoritItem[];
+}
+
+export interface StatistikSembakoItem {
+    barang_id: number;
+    nama_barang: string;
+    rata_rata_poin: number;
+    jumlah_katalog: number;
+}
+
+export interface StatistikSembakoResponse {
+    message: string;
+    data: StatistikSembakoItem[];
+}
+
+export interface MasterSembako {
+    BarangID: number;
+    NamaBarang: string;
+}
+
+export interface MasterSembakoPaginatedResponse {
+    data: MasterSembako[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 export type SatuanEnum = "kg" | "pcs" | "liter";
 export type LevelUser = "nasabah" | "eksternal";
 export type SatuanReward = "Rp" | "poin";
@@ -67,6 +168,19 @@ export interface GetKatalogResponse {
     message: string;
 }
 
+export interface KatalogSampahMeta {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+}
+
+export interface GetKatalogPaginatedResponse {
+    data: KatalogSampah[];
+    message: string;
+    pagination: KatalogSampahMeta;
+}
+
 export interface GetKatalogDetailResponse {
     data: KatalogDetail;
     message: string;
@@ -76,6 +190,7 @@ export interface GetKatalogDetailResponse {
 
 export interface AddKatalogRequest {
     nama_sampah: string;
+    sarok_id? : number;
     satuan: SatuanEnum;
     kategori_id: number;
     reward_id: number;
@@ -84,10 +199,6 @@ export interface AddKatalogRequest {
 }
 
 export interface EditKatalogRequest {
-    nama_sampah: string;
-    satuan: SatuanEnum;
-    kategori_id: number;
-    reward_id: number;
     syarat_pemilahan?: string;
     foto?: File;
 }

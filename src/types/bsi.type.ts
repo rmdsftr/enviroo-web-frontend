@@ -27,17 +27,40 @@ export interface GetBSIResponse {
     message: string;
 }
 
+export interface GetBSIPagedResponse {
+    message: string;
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        total_pages: number;
+    };
+    data: BSIData[];
+}
+
 export interface UnitBSI {
     BankID: string;
     NamaBank: string;
     PhotoURL: string;
     jumlah_nasabah: number;
+    jumlah_staff: number;
     IsActive: boolean;
 }
 
 export interface GetUnitBSIResponse {
     data: UnitBSI[];
     message: string;
+}
+
+export interface GetUnitBSIPagedResponse {
+    data: UnitBSI[];
+    message: string;
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        total_pages: number;
+    };
 }
 
 export interface AddUnitRequest {
@@ -74,4 +97,15 @@ export interface BsiNasabahItem {
 export interface GetNasabahBSIResponse {
     message: string;
     data: BsiNasabahItem[];
+}
+
+export interface GetNasabahBSIPagedResponse {
+    message: string;
+    data: BsiNasabahItem[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        total_pages: number;
+    };
 }

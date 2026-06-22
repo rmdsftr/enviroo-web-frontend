@@ -7,6 +7,7 @@ import {
     FaPencil
 } from "react-icons/fa6";
 import Button from "../components/button";
+import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
 import { KontenService } from "../services/konten.service";
 import type { BodyBlock } from "../types/konten.type";
@@ -53,6 +54,7 @@ export default function UnggahKontenPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(isEditMode);
     const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
+    const [viewPhotoSrc, setViewPhotoSrc] = useState<string | null>(null);
 
     // Block image file refs
     const blockFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -236,6 +238,9 @@ export default function UnggahKontenPage() {
 
     return (
         <div className="uc-page">
+            {viewPhotoSrc && (
+                <ViewPhoto src={viewPhotoSrc} alt="Block image" onClose={() => setViewPhotoSrc(null)} />
+            )}
             {notif && (
                 <PopupNotifikasi
                     message={notif.message}
@@ -254,7 +259,7 @@ export default function UnggahKontenPage() {
                         {isEditMode ? "Edit Mode" : "Draft"}
                     </span>
                     <Button
-                        color="primary"
+                        color="secondary"
                         variant="outline"
                         isRounded
                         onClick={() => handlePublish(false)}
@@ -263,7 +268,7 @@ export default function UnggahKontenPage() {
                         {isSubmitting ? "Menyimpan..." : isEditMode ? "Simpan Perubahan" : "Simpan Draft"}
                     </Button>
                     <Button
-                        color="neon"
+                        color="secondary"
                         isRounded
                         icon={isEditMode ? <FaPencil /> : <FaCloudArrowUp />}
                         onClick={() => handlePublish(true)}
@@ -364,7 +369,11 @@ export default function UnggahKontenPage() {
                                 {block.type === "image" && (
                                     <div className="uc-block-image">
                                         {block.content ? (
-                                            <div className="uc-block-image-wrap">
+                                            <div
+                                                className="uc-block-image-wrap"
+                                                onClick={(e) => { e.stopPropagation(); setViewPhotoSrc(block.content); }}
+                                                style={{ cursor: "zoom-in" }}
+                                            >
                                                 <img src={block.content} alt="Block image" />
                                             </div>
                                         ) : (

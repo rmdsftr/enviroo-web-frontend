@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     FaCalendarDays,
@@ -10,10 +9,10 @@ import {
     FaImage,
     FaBoxOpen,
     FaLeaf,
-    FaXmark,
     FaFileExport,
     FaChartPie,
 } from "react-icons/fa6";
+import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
@@ -66,10 +65,6 @@ export default function DetailPenjualanPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    useEffect(() => {
-        document.body.style.overflow = fotoOpen ? "hidden" : "";
-        return () => { document.body.style.overflow = ""; };
-    }, [fotoOpen]);
 
     const handleExport = async () => {
         if (!id) return;
@@ -298,24 +293,12 @@ export default function DetailPenjualanPage() {
                 />
             )}
 
-            {/* ── Bukti Foto Popup ── */}
-            {fotoOpen && detail && createPortal(
-                <div className="dpj-foto-overlay" onClick={() => setFotoOpen(false)}>
-                    <div className="dpj-foto-popup" onClick={(e) => e.stopPropagation()}>
-                        <div className="dpj-foto-header">
-                            <p className="dpj-foto-title">Bukti Foto Penjualan</p>
-                            <button className="dpj-foto-close" onClick={() => setFotoOpen(false)}>
-                                <FaXmark />
-                            </button>
-                        </div>
-                        <img
-                            src={detail.bukti_foto}
-                            alt="Bukti foto penjualan"
-                            className="dpj-foto-img"
-                        />
-                    </div>
-                </div>,
-                document.body
+            {fotoOpen && detail?.bukti_foto && (
+                <ViewPhoto
+                    src={detail.bukti_foto}
+                    alt="Bukti foto penjualan"
+                    onClose={() => setFotoOpen(false)}
+                />
             )}
         </>
     );

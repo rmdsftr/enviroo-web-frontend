@@ -16,6 +16,7 @@ export type NotifRefType =
 export interface NotifikasiItem {
     notifikasi_id: string;
     user_id: string;
+    role_target: string;
     judul: string;
     pesan: string;
     ref_id: string | null;
@@ -43,12 +44,11 @@ interface UnreadCountResponse {
 
 export const NotifikasiService = {
     async getList(
-        userId: string,
         page = 1,
         limit = 20,
     ): Promise<{ data: NotifikasiItem[]; meta: NotifikasiMeta }> {
-        const res = await api.get<GetNotifikasiResponse>(`/notifikasi/list/${userId}`, {
-            params: { page, limit },
+        const res = await api.get<GetNotifikasiResponse>("/notifikasi/list", {
+            params: { page, limit, role_target: "admin" },
         });
         return { data: res.data.data, meta: res.data.meta };
     },
@@ -57,12 +57,12 @@ export const NotifikasiService = {
         await api.patch(`/notifikasi/read/${notifikasiId}`);
     },
 
-    async markAllAsRead(userId: string): Promise<void> {
-        await api.patch(`/notifikasi/read-all/${userId}`);
+    async markAllAsRead(): Promise<void> {
+        await api.patch("/notifikasi/read-all");
     },
 
-    async getUnreadCount(userId: string): Promise<number> {
-        const res = await api.get<UnreadCountResponse>(`/notifikasi/unread-count/${userId}`);
+    async getUnreadCount(): Promise<number> {
+        const res = await api.get<UnreadCountResponse>("/notifikasi/unread-count");
         return res.data.data.unread_count;
     },
 };

@@ -1,9 +1,8 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import {
-    FaPlus, FaClockRotateLeft,
-    FaCalendarCheck, FaCalendarPlus, FaEye,
+    FaPlus,
+    FaCalendarCheck, FaCalendarPlus,
 } from "react-icons/fa6";
 import JadwalPenimbanganCalendar from "../../layouts/jadwal-penimbangan-calendar";
 import JadwalPengangkutanCalendar from "../../layouts/jadwal-pengangkutan-calendar";
@@ -15,14 +14,9 @@ import CloseButton from "../../components/close-button";
 import Tabs from "../../components/tabs";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import PopupConfirmation from "../../layouts/popup-confirmation";
-import Table, { type ColumnDef, TableActionBtn } from "../../components/table";
-import FilterRange, { defaultMonthRange } from "../../components/filter-range";
 import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
 import { BsiService } from "../../services/bsi.service";
-import { PenimbanganService, type PenimbanganItem } from "../../services/penimbangan.service";
-import { PengangkutanService, type PengangkutanItem } from "../../services/pengangkutan.service";
 import "../../styles/jadwal-bsu.css";
-import { formatTanggal, formatJam } from "../../utils/date.utils";
 
 type ActiveTab = "penimbangan" | "pengangkutan";
 
@@ -57,118 +51,11 @@ const getLocalISODate = (d: Date) => {
     return `${y}-${mo}-${dy}`;
 };
 
-/* ── Dummy riwayat ── */
-const STATUS_PENIMBANGAN: Record<string, { label: string; cls: string }> = {
-    aktif: { label: "Berlangsung", cls: "berlangsung" },
-    selesai: { label: "Selesai", cls: "selesai" },
-    dibatalkan: { label: "Dibatalkan", cls: "dibatalkan" },
-};
-
-const RIWAYAT_COLUMNS: ColumnDef<PenimbanganItem>[] = [
-    {
-        key: "penimbangan_id",
-        header: "ID Penimbangan",
-        render: (row) => row.penimbangan_id,
-    },
-    {
-        key: "tanggal",
-        header: "Tanggal",
-        width: "120px",
-        render: (row) => row.started_at
-            ? formatTanggal(row.started_at)
-            : "—",
-    },
-    {
-        key: "jam_mulai",
-        header: "Jam Mulai",
-        width: "100px",
-        render: (row) => row.started_at
-            ? formatJam(row.started_at)
-            : "—",
-    },
-    {
-        key: "jam_selesai",
-        header: "Jam Selesai",
-        width: "100px",
-        render: (row) => row.ended_at
-            ? formatJam(row.ended_at)
-            : "—",
-    },
-    {
-        key: "status",
-        header: "Status Penimbangan",
-        width: "160px",
-        render: (row) => {
-            const s = STATUS_PENIMBANGAN[row.status_penimbangan];
-            return (
-                <span className={`jbsu-status-pill ${s?.cls ?? row.status_penimbangan}`}>
-                    {s?.label ?? row.status_penimbangan}
-                </span>
-            );
-        },
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "70px",
-        align: "center" as const,
-        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
-    },
-];
-
-const STATUS_PENGANGKUTAN: Record<string, { label: string; cls: string }> = {
-    completed: { label: "Selesai", cls: "selesai" },
-    otw: { label: "Dalam Perjalanan", cls: "berlangsung" },
-    requested: { label: "Diminta", cls: "mendatang" },
-};
-
-const RIWAYAT_ANGKUT_COLUMNS: ColumnDef<PengangkutanItem>[] = [
-    {
-        key: "pengangkutan_id",
-        header: "ID Pengangkutan",
-        render: (row) => row.pengangkutan_id,
-    },
-    {
-        key: "tanggal",
-        header: "Tanggal Pengangkutan",
-        width: "160px",
-        render: (row) => row.changed_at
-            ? formatTanggal(row.changed_at)
-            : "—",
-    },
-    {
-        key: "angkut_ke",
-        header: "Angkut Ke",
-        render: (row) => row.nama_bsu,
-    },
-    {
-        key: "status",
-        header: "Status Pengangkutan",
-        width: "180px",
-        render: (row) => {
-            const s = STATUS_PENGANGKUTAN[row.status_pengangkutan];
-            return (
-                <span className={`jbsu-status-pill ${s?.cls ?? row.status_pengangkutan}`}>
-                    {s?.label ?? row.status_pengangkutan}
-                </span>
-            );
-        },
-    },
-    {
-        key: "aksi",
-        header: "Aksi",
-        width: "70px",
-        align: "center" as const,
-        render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
-    },
-];
-
 /* ============================================================
    COMPONENT
    ============================================================ */
 export default function JadwalBsiPage() {
     const { user } = useAuth();
-    const navigate = useNavigate();
 
     /* Tab */
     const [activeTab, setActiveTab] = useState<ActiveTab>("penimbangan");
@@ -178,8 +65,7 @@ export default function JadwalBsiPage() {
     const [pengangkutanList, setPengangkutanList] = useState<JadwalItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [bsuOptions, setBsuOptions] = useState<{ label: string; value: string }[]>([]);
-
-    /* Calendar state moved into JadwalPenimbanganCalendar */
+    const [calMonth, setCalMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
 
     /* Modal */
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -200,24 +86,12 @@ export default function JadwalBsiPage() {
     const [formTargetBankId, setFormTargetBankId] = useState("");
     const [formError, setFormError] = useState("");
 
-    /* Riwayat penimbangan */
-    const [riwayatList, setRiwayatList] = useState<PenimbanganItem[]>([]);
-    const [riwayatLoading, setRiwayatLoading] = useState(false);
-    const [riwayatFrom, setRiwayatFrom] = useState(() => defaultMonthRange().from);
-    const [riwayatTo, setRiwayatTo] = useState(() => defaultMonthRange().to);
-
-    /* Riwayat pengangkutan */
-    const [angkutList, setAngkutList] = useState<PengangkutanItem[]>([]);
-    const [angkutLoading, setAngkutLoading] = useState(false);
-    const [riwayatAngkutFrom, setRiwayatAngkutFrom] = useState(() => defaultMonthRange().from);
-    const [riwayatAngkutTo, setRiwayatAngkutTo] = useState(() => defaultMonthRange().to);
-
     /* ── Fetch ── */
-    const fetchJadwal = useCallback(async () => {
+    const fetchJadwal = useCallback(async (month: number, year: number) => {
         if (!user?.bank_id) return;
         try {
             setLoading(true);
-            const res = await JadwalService.getJadwalBank(user.bank_id);
+            const res = await JadwalService.getJadwalBank(user.bank_id, month, year);
             setPenimbanganList(res.data.penimbangan ?? []);
             setPengangkutanList(res.data.pengangkutan ?? []);
         } catch {
@@ -227,7 +101,7 @@ export default function JadwalBsiPage() {
         }
     }, [user?.bank_id]);
 
-    useEffect(() => { fetchJadwal(); }, [fetchJadwal]);
+    useEffect(() => { fetchJadwal(calMonth.month, calMonth.year); }, [calMonth, fetchJadwal]);
 
     useEffect(() => {
         const fetchBsus = async () => {
@@ -241,57 +115,6 @@ export default function JadwalBsiPage() {
         };
         fetchBsus();
     }, [user?.bank_id]);
-
-    const fetchRiwayat = useCallback(async () => {
-        if (!user?.bank_id) return;
-        try {
-            setRiwayatLoading(true);
-            const data = await PenimbanganService.getPenimbanganByBank(user.bank_id);
-            setRiwayatList(data);
-        } catch {
-            console.error("Gagal memuat riwayat penimbangan");
-        } finally {
-            setRiwayatLoading(false);
-        }
-    }, [user?.bank_id]);
-
-    useEffect(() => { fetchRiwayat(); }, [fetchRiwayat]);
-
-    const fetchRiwayatAngkut = useCallback(async () => {
-        if (!user?.bank_id) return;
-        try {
-            setAngkutLoading(true);
-            const data = await PengangkutanService.getPengangkutanByBank(user.bank_id);
-            setAngkutList(data);
-        } catch {
-            console.error("Gagal memuat riwayat pengangkutan");
-        } finally {
-            setAngkutLoading(false);
-        }
-    }, [user?.bank_id]);
-
-    useEffect(() => { fetchRiwayatAngkut(); }, [fetchRiwayatAngkut]);
-
-    const filteredRiwayatPenimbangan = useMemo(() =>
-        riwayatList.filter(item => {
-            if (!item.started_at) return false;
-            const month = item.started_at.substring(0, 7);
-            return month >= riwayatFrom && month <= riwayatTo;
-        }),
-        [riwayatList, riwayatFrom, riwayatTo]
-    );
-
-    /* Calendar helpers moved into JadwalPenimbanganCalendar */
-
-
-    const filteredRiwayatAngkut = useMemo(() =>
-        angkutList.filter(item => {
-            if (!item.changed_at) return false;
-            const month = item.changed_at.substring(0, 7);
-            return month >= riwayatAngkutFrom && month <= riwayatAngkutTo;
-        }),
-        [angkutList, riwayatAngkutFrom, riwayatAngkutTo]
-    );
 
     /* ── Modal handlers ── */
     const handleOpenModal = (jenis: "penimbangan" | "pengangkutan", item?: JadwalItem) => {
@@ -341,7 +164,7 @@ export default function JadwalBsiPage() {
                 await JadwalService.addJadwal(user!.bank_id, data);
                 setNotif({ show: true, message: "Jadwal berhasil ditambahkan!", type: "success" });
             }
-            handleCloseModal(); fetchJadwal();
+            handleCloseModal(); fetchJadwal(calMonth.month, calMonth.year);
         } catch {
             setNotif({ show: true, message: "Gagal menyimpan jadwal", type: "error" });
         } finally {
@@ -354,7 +177,7 @@ export default function JadwalBsiPage() {
         try {
             await JadwalService.deleteJadwal(deleteJadwalId);
             setNotif({ show: true, message: "Jadwal berhasil dihapus!", type: "success" });
-            fetchJadwal();
+            fetchJadwal(calMonth.month, calMonth.year);
         } catch {
             setNotif({ show: true, message: "Gagal menghapus jadwal", type: "error" });
         } finally {
@@ -412,93 +235,28 @@ export default function JadwalBsiPage() {
                TAB: JADWAL PENIMBANGAN
                ══════════════════════════════════════════ */}
             {activeTab === "penimbangan" && (
-                <>
-                    <JadwalPenimbanganCalendar
-                        jadwalList={penimbanganList}
-                        loading={loading}
-                        onEdit={(item) => handleOpenModal("penimbangan", item)}
-                        onDelete={setDeleteJadwalId}
-                    />
-
-                    {/* Riwayat Penimbangan */}
-                    <div className="jbsu-card">
-                        <div className="jbsu-section-header">
-                            <span className="jbsu-card-title-icon" style={{ background: "#013236" }}>
-                                <FaClockRotateLeft />
-                            </span>
-                            <div>
-                                <h2 className="jbsu-card-title">Riwayat Penimbangan</h2>
-                                <p className="jbsu-card-sub">Riwayat pelaksanaan penimbangan</p>
-                            </div>
-                            <div className="jbsu-section-header-right">
-                                <FilterRange
-                                    from={riwayatFrom}
-                                    to={riwayatTo}
-                                    onChange={(f, t) => { setRiwayatFrom(f); setRiwayatTo(t); }}
-                                />
-                            </div>
-                        </div>
-                        {riwayatLoading ? (
-                            <div className="jbsu-empty"><span>Memuat riwayat...</span></div>
-                        ) : (
-                            <Table<PenimbanganItem>
-                                columns={RIWAYAT_COLUMNS}
-                                data={filteredRiwayatPenimbangan}
-                                rowKey={(row) => row.penimbangan_id}
-                                emptyMessage="Belum ada riwayat penimbangan."
-                                onRowClick={(row) => navigate(`/bsi/riwayat/penimbangan/${row.penimbangan_id}`)}
-                            />
-                        )}
-                    </div>
-                </>
+                <JadwalPenimbanganCalendar
+                    jadwalList={penimbanganList}
+                    loading={loading}
+                    onEdit={(item) => handleOpenModal("penimbangan", item)}
+                    onDelete={setDeleteJadwalId}
+                    onMonthChange={(m, y) => setCalMonth({ month: m, year: y })}
+                />
             )}
 
             {/* ══════════════════════════════════════════
                TAB: JADWAL PENGANGKUTAN
                ══════════════════════════════════════════ */}
             {activeTab === "pengangkutan" && (
-                <>
-                    <JadwalPengangkutanCalendar
-                        jadwalList={pengangkutanList}
-                        loading={loading}
-                        onEdit={(item) => handleOpenModal("pengangkutan", item)}
-                        onDelete={setDeleteJadwalId}
-                        getBankLabel={(item) => item.target_bank_name || undefined}
-                    />
-
-                    {/* Riwayat Pengangkutan */}
-                    <div className="jbsu-card">
-                        <div className="jbsu-section-header">
-                            <span className="jbsu-card-title-icon" style={{ background: "#013236" }}>
-                                <FaClockRotateLeft />
-                            </span>
-                            <div>
-                                <h2 className="jbsu-card-title">Riwayat Pengangkutan</h2>
-                                <p className="jbsu-card-sub">Riwayat pelaksanaan pengangkutan sampah</p>
-                            </div>
-                            <div className="jbsu-section-header-right">
-                                <FilterRange
-                                    from={riwayatAngkutFrom}
-                                    to={riwayatAngkutTo}
-                                    onChange={(f, t) => { setRiwayatAngkutFrom(f); setRiwayatAngkutTo(t); }}
-                                />
-                            </div>
-                        </div>
-                        {angkutLoading ? (
-                            <div className="jbsu-empty"><span>Memuat riwayat...</span></div>
-                        ) : (
-                            <Table<PengangkutanItem>
-                                columns={RIWAYAT_ANGKUT_COLUMNS}
-                                data={filteredRiwayatAngkut}
-                                rowKey={(row) => row.pengangkutan_id}
-                                emptyMessage="Belum ada riwayat pengangkutan."
-                                onRowClick={(row) => navigate(`/bsi/riwayat/pengangkutan/${row.pengangkutan_id}`)}
-                            />
-                        )}
-                    </div>
-                </>
+                <JadwalPengangkutanCalendar
+                    jadwalList={pengangkutanList}
+                    loading={loading}
+                    onEdit={(item) => handleOpenModal("pengangkutan", item)}
+                    onDelete={setDeleteJadwalId}
+                    getBankLabel={(item) => item.target_bank_name || undefined}
+                    onMonthChange={(m, y) => setCalMonth({ month: m, year: y })}
+                />
             )}
-
 
             {/* ── Modal ── */}
             {isModalOpen && createPortal(

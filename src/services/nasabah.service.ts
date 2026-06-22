@@ -26,4 +26,9 @@ export const NasabahService = {
         const response = await api.get<NasabahBankSampahResponse>(`/nasabah/${bank_id}`);
         return response.data;
     },
+
+    async deleteNasabah(nasabah_id:string): Promise<any>{
+        const response = await api.delete(`/nasabah/${nasabah_id}`);
+        return response.data;
+    }
 };

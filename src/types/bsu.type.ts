@@ -29,6 +29,17 @@ export interface GetBSUResponse {
     data: BSUData[];
 }
 
+export interface GetBSUPagedResponse {
+    message: string;
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        total_pages: number;
+    };
+    data: BSUData[];
+}
+
 export interface BSUByBankId {
     bank_id: string;
     nama_bsu: string;

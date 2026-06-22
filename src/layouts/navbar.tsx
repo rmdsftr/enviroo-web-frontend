@@ -8,6 +8,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { NotifikasiService } from "../services/notifikasi.service";
 import {
     SUPERADMIN_MENU, ADMIN_BSI_MENU, ADMIN_BSU_MENU, ADMIN_BSM_MENU,
+    isGroup,
     type MenuItemData,
 } from "./sidebar";
 
@@ -19,20 +20,22 @@ export default function NavbarLayout() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchOpen, setSearchOpen] = useState(false);
     const [focusedIndex, setFocusedIndex] = useState(-1);
+
     const searchRef = useRef<HTMLDivElement>(null);
 
-    const { user, logout } = useAuth();
+    const { activeUser, user, logout } = useAuth();
     const navigate = useNavigate();
 
     const role = user?.role?.toLowerCase() ?? "";
     const isAdmin = ADMIN_ROLES.includes(role);
 
     const menuItems: MenuItemData[] = useMemo(() => {
-        if (role === "superadmin") return SUPERADMIN_MENU;
-        if (role === "admin_bsi") return ADMIN_BSI_MENU;
-        if (role === "admin_bsu") return ADMIN_BSU_MENU;
-        if (role === "admin_bsm") return ADMIN_BSM_MENU;
-        return [];
+        const entries =
+            role === "superadmin" ? SUPERADMIN_MENU :
+            role === "admin_bsi"  ? ADMIN_BSI_MENU  :
+            role === "admin_bsu"  ? ADMIN_BSU_MENU  :
+            role === "admin_bsm"  ? ADMIN_BSM_MENU  : [];
+        return entries.flatMap(entry => isGroup(entry) ? entry.items : [entry]);
     }, [role]);
 
     const searchResults = useMemo(() => {
@@ -60,7 +63,7 @@ export default function NavbarLayout() {
 
     useEffect(() => {
         if (!isAdmin || !user?.user_id) return;
-        NotifikasiService.getUnreadCount(user.user_id)
+        NotifikasiService.getUnreadCount()
             .then(setUnreadCount)
             .catch(() => {});
     }, [isAdmin, user?.user_id]);
@@ -159,10 +162,10 @@ export default function NavbarLayout() {
                     aria-haspopup="menu"
                 >
                     <div className="nav-avatar">
-                        <img src={ava} alt="Profile" />
+                        <img src={activeUser?.photo_url || ava} alt="Profile" />
                     </div>
                     <div className="nav-profile-info">
-                        <span className="nav-profile-name">{user?.nama || "User"}</span>
+                        <span className="nav-profile-name">{activeUser?.nama || user?.nama}</span>
                         <span className="nav-profile-role" style={{ textTransform: "uppercase" }}>
                             {user?.role ? user.role.replace("_", " ") : "Role"}
                         </span>

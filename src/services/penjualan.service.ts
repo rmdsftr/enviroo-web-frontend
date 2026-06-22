@@ -43,8 +43,10 @@ interface GetPenjualanExternalResponse {
 }
 
 export const PenjualanService = {
-    async getRiwayatEksternal(bankId: string): Promise<PenjualanExternalItem[]> {
-        const response = await api.get<GetPenjualanExternalResponse>(`/penjualan/riwayat-eksternal/${bankId}`);
+    async getRiwayatEksternal(bankId: string, startDate?: string, endDate?: string): Promise<PenjualanExternalItem[]> {
+        const response = await api.get<GetPenjualanExternalResponse>(`/penjualan/riwayat-eksternal/${bankId}`, {
+            params: { start_date: startDate, end_date: endDate },
+        });
         return response.data.data;
     },
 

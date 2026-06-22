@@ -213,7 +213,8 @@
 /* ── Search ── */
 .nav-search-wrapper {
     position: relative;
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     max-width: 360px;
 }
 
@@ -303,8 +304,13 @@
         top: 0;
         height: 64px;
         padding-left: 64px;
-        padding-right: 20px;
+        padding-right: 16px;
         width: 100%;
+        gap: 12px;
+    }
+
+    .nav-search-wrapper {
+        max-width: 220px;
     }
 
     .nav-profile-info {
@@ -314,16 +320,31 @@
     .nav-profile {
         padding: 4px;
     }
+
+    .nav-chevron {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
     .nav {
         padding-left: 56px;
         padding-right: 12px;
-        gap: 10px;
+        gap: 8px;
     }
 
-    .nav-logo img {
-        height: 22px;
+    .nav-search-wrapper {
+        max-width: 160px;
+    }
+
+    .nav-icon-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    .nav-avatar {
+        width: 28px;
+        height: 28px;
     }
 }

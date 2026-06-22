@@ -1,5 +1,9 @@
 import { api } from "./api";
-import type { NewBSI, GetBSIResponse, GetUnitBSIResponse, AddUnitRequest } from "../types/bsi.type";
+import type { NewBSI, GetBSIResponse, GetBSIPagedResponse, GetUnitBSIResponse, GetUnitBSIPagedResponse, AddUnitRequest } from "../types/bsi.type";
+import { mockGetUnitPaged } from "../mocks/list-bank";
+import { mockGetBsiPaged, mockGetBsiAll } from "../mocks/bsi-list";
+
+const USE_MOCK = false;
 
 export const BsiService = {
     // ... existing methods ...
@@ -33,12 +37,27 @@ export const BsiService = {
     },
 
     async getBsi(): Promise<GetBSIResponse> {
+        if (USE_MOCK) return mockGetBsiAll();
         const response = await api.get<GetBSIResponse>("/bsi/get-bsi");
+        return response.data;
+    },
+
+    async getBsiPaged(page: number): Promise<GetBSIPagedResponse> {
+        if (USE_MOCK) return mockGetBsiPaged(page);
+        const response = await api.get<GetBSIPagedResponse>("/bsi/get-bsi", { params: { page } });
         return response.data;
     },
 
     async getUnit(bankId: string): Promise<GetUnitBSIResponse> {
         const response = await api.get<GetUnitBSIResponse>(`/bsi/get-unit/${bankId}`);
+        return response.data;
+    },
+
+    async getUnitPaged(bankId: string, page: number): Promise<GetUnitBSIPagedResponse> {
+        if (USE_MOCK) return mockGetUnitPaged(bankId, page);
+        const response = await api.get<GetUnitBSIPagedResponse>(`/bsi/get-unit/${bankId}`, {
+            params: { page },
+        });
         return response.data;
     },
 

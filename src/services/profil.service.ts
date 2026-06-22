@@ -32,11 +32,6 @@ export const ProfilService = {
         return response.data;
     },
 
-    async hapusNasabah(nasabah_id: string): Promise<any> {
-        const response = await api.delete(`/profil/nasabah/${nasabah_id}`);
-        return response.data;
-    },
-
     async getHistoryAkunBank(bank_id: string): Promise<GetHistoryAkunBankResponse> {
         const response = await api.get<GetHistoryAkunBankResponse>(`/profil/bank-sampah/${bank_id}/history`);
         return response.data;

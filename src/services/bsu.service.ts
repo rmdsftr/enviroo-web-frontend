@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { NewBSU, GetBSUResponse, BSUByBankIdResponse } from "../types/bsu.type";
+import type { NewBSU, GetBSUResponse, GetBSUPagedResponse, BSUByBankIdResponse } from "../types/bsu.type";
 
 export const BsuService = {
     async createBsu(data: NewBSU) {
@@ -36,6 +36,11 @@ export const BsuService = {
 
     async getBsu(): Promise<GetBSUResponse> {
         const response = await api.get<GetBSUResponse>("/bsu/get-bsu");
+        return response.data;
+    },
+
+    async getBsuPaged(page: number): Promise<GetBSUPagedResponse> {
+        const response = await api.get<GetBSUPagedResponse>("/bsu/get-bsu", { params: { page } });
         return response.data;
     },
 

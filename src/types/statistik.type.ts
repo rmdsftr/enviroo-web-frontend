@@ -89,3 +89,14 @@ export interface RankingBankResponse {
     periode: string;
     data: RankingBankItem[];
 }
+
+export interface VolumeSampahItem {
+    bulan: number;
+    tahun: number;
+    satuan: string;
+    total_qty: number;
+}
+
+export interface VolumeSampahResponse {
+    data: VolumeSampahItem[];
+}

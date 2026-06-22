@@ -544,6 +544,25 @@
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.profil-status-badge.status-pending {
+    background: rgba(215, 160, 30, 0.12);
+    color: #8a6200;
+    border: 1px solid rgba(215, 160, 30, 0.25);
+}
+
+.profil-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: currentColor;
+}
+
+.profil-status-badge.status-aktif .profil-status-dot    { background: #2e8b57; }
+.profil-status-badge.status-nonaktif .profil-status-dot,
+.profil-status-badge.status-non-aktif .profil-status-dot { background: #dc2626; }
+.profil-status-badge.status-pending .profil-status-dot  { background: #d7a01e; }
+
 .profil-admin-id-badge {
     display: inline-flex;
     align-items: center;

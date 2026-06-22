@@ -18,31 +18,38 @@ export function useNasabahData() {
     const isAdminBsi = user?.role === "admin_bsi";
     const isAdminBsu = user?.role === "admin_bsu";
     const isAdminBsm = user?.role === "admin_bsm";
+    const isAdmin = isAdminBsi || isAdminBsu || isAdminBsm;
 
     const [nasabahList, setNasabahList] = useState<NasabahRow[]>([]);
+    const [allNasabahList, setAllNasabahList] = useState<NasabahRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState("");
-
-    // ── Search ───────────────────────────────────────────
     const [searchQuery, setSearchQuery] = useState("");
-
-    // ── Sort ─────────────────────────────────────────────
     const [sortKey, setSortKey] = useState<SortKey>("");
     const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
-    // ── Pagination ───────────────────────────────────────
     const [currentPage, setCurrentPage] = useState(1);
-
-    // ── Afiliasi options (for modal dropdown) ────────────
+    const [serverTotalPages, setServerTotalPages] = useState(1);
     const [afiliasiOptions, setAfiliasiOptions] = useState<{ label: string; value: string }[]>([]);
 
+    // ── Fetch ALL data once for admin (untuk keperluan search & filter) ──
+    useEffect(() => {
+        if (!isAdmin || !user?.bank_id) return;
+        BankService.getNasabah(user.bank_id)
+            .then((res) => setAllNasabahList(mapBsiNasabah(res.data)))
+            .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.bank_id, isAdmin]);
+
+    // ── Fetch data utama (paged untuk admin, semua untuk superadmin) ──
     const fetchNasabahs = async () => {
         setLoading(true);
+        setError(null);
         try {
-            if ((isAdminBsi || isAdminBsu || isAdminBsm) && user?.bank_id) {
-                const res = await BankService.getNasabah(user.bank_id);
+            if (isAdmin && user?.bank_id) {
+                const res = await BankService.getNasabahPaged(user.bank_id, currentPage);
                 setNasabahList(mapBsiNasabah(res.data));
+                setServerTotalPages(res.pagination.total_pages);
             } else {
                 const res = await NasabahService.getNasabahs();
                 setNasabahList(mapSuperadminNasabah(res.data));
@@ -57,38 +64,36 @@ export function useNasabahData() {
 
     useEffect(() => {
         fetchNasabahs();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.bank_id, isAdminBsi, isAdminBsu, isAdminBsm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.bank_id, isAdmin, isSuperadmin, currentPage]);
 
+    // ── Afiliasi options (for modal dropdown) ────────────
     useEffect(() => {
-        // BSU dan BSM: bank_id sudah fixed dari sesi, tidak perlu fetch afiliasi options
         if (isAdminBsu || isAdminBsm) return;
 
         if (isAdminBsi && user?.bank_id) {
             BsiService.getUnit(user.bank_id)
                 .then((res) => {
-                    const mapped = (res.data || []).map((b) => ({
+                    setAfiliasiOptions((res.data || []).map((b) => ({
                         label: b.NamaBank,
                         value: b.BankID,
-                    }));
-                    setAfiliasiOptions(mapped);
+                    })));
                 })
                 .catch((err) => console.error("Gagal mendapatkan unit BSI:", err));
         } else {
             NasabahService.getAfiliasi()
                 .then((res) => {
-                    const mapped = (res.data || []).map((item) => ({
+                    setAfiliasiOptions((res.data || []).map((item) => ({
                         label: item.NamaBank,
                         value: item.BankID,
-                    }));
-                    setAfiliasiOptions(mapped);
+                    })));
                 })
                 .catch((err) => console.error("Gagal mendapatkan opsi afiliasi nasabah", err));
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdminBsi, isAdminBsu, isAdminBsm, user?.bank_id]);
 
-    // ── Reset page when filters change ───────────────────
+    // ── Reset page saat filter/search berubah ────────────
     const handleStatusFilter = (val: string) => {
         setStatusFilter(val);
         setCurrentPage(1);
@@ -105,16 +110,18 @@ export function useNasabahData() {
         setCurrentPage(1);
     };
 
-    // ── Computed: filter → search → sort → paginate ─────
-    const filteredAndSorted = useMemo(() => {
-        let result = [...nasabahList];
+    // ── Admin: aktif search/filter → pakai allNasabahList ──
+    const isFiltering = isAdmin && (!!searchQuery || !!statusFilter);
 
-        // Status filter
+    // ── filter → search → sort ───────────────────────────
+    const filteredAndSorted = useMemo(() => {
+        const source = isFiltering ? allNasabahList : nasabahList;
+        let result = [...source];
+
         if (statusFilter) {
             result = result.filter((n) => n.status === statusFilter);
         }
 
-        // Search filter (by name or ID)
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase().trim();
             result = result.filter(
@@ -125,7 +132,6 @@ export function useNasabahData() {
             );
         }
 
-        // Sort
         if (sortKey) {
             result.sort((a, b) => {
                 const valA = (a[sortKey] || "").toLowerCase();
@@ -136,16 +142,32 @@ export function useNasabahData() {
         }
 
         return result;
-    }, [nasabahList, statusFilter, searchQuery, sortKey, sortDirection]);
+    }, [nasabahList, allNasabahList, isFiltering, statusFilter, searchQuery, sortKey, sortDirection]);
 
-    const totalPages = Math.ceil(filteredAndSorted.length / ITEMS_PER_PAGE);
+    // ── Pagination ────────────────────────────────────────
+    // Admin + tidak filtering → server pagination (nasabahList sudah 1 page)
+    // Admin + filtering → tampilkan semua hasil, sembunyikan pagination
+    // Superadmin → client-side pagination
+    const totalPages = isAdmin
+        ? isFiltering ? 1 : serverTotalPages
+        : Math.ceil(filteredAndSorted.length / ITEMS_PER_PAGE);
 
     const paginatedNasabah = useMemo(() => {
+        if (isAdmin) return filteredAndSorted;
         const start = (currentPage - 1) * ITEMS_PER_PAGE;
         return filteredAndSorted.slice(start, start + ITEMS_PER_PAGE);
-    }, [filteredAndSorted, currentPage]);
+    }, [filteredAndSorted, isAdmin, currentPage]);
 
-    const stats = useMemo(() => computeNasabahStats(nasabahList), [nasabahList]);
+    // Stats dari allNasabahList kalau sudah ada, fallback ke nasabahList
+    const stats = useMemo(
+        () => computeNasabahStats(allNasabahList.length > 0 ? allNasabahList : nasabahList),
+        [allNasabahList, nasabahList]
+    );
+
+    // Total keseluruhan untuk teks info pagination
+    const totalNasabahCount = isAdmin
+        ? isFiltering ? filteredAndSorted.length : allNasabahList.length
+        : filteredAndSorted.length;
 
     return {
         user,
@@ -159,21 +181,18 @@ export function useNasabahData() {
         loading,
         error,
         stats,
-        // Filters
         statusFilter,
         setStatusFilter: handleStatusFilter,
         searchQuery,
         setSearchQuery: handleSearch,
-        // Sort
         sortKey,
         sortDirection,
         handleSort,
-        // Pagination
         currentPage,
         setCurrentPage,
         totalPages,
+        totalNasabahCount,
         itemsPerPage: ITEMS_PER_PAGE,
-        // Other
         afiliasiOptions,
         fetchNasabahs,
     };

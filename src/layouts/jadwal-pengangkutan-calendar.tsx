@@ -75,15 +75,24 @@ interface Props {
     onDelete?: (jadwalId: string) => void;
     /** Provide to show a bank label (e.g. target BSU name) on each chip/item */
     getBankLabel?: (item: JadwalItem) => string | undefined;
+    onMonthChange?: (month: number, year: number) => void;
 }
 
 /* ── Component ── */
-export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit, onDelete, getBankLabel }: Props) {
+export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit, onDelete, getBankLabel, onMonthChange }: Props) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate]  = useState(new Date());
 
-    const prevM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-    const nextM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1));
+    const prevM = () => {
+        const newM = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+        setCurrentMonth(newM);
+        onMonthChange?.(newM.getMonth() + 1, newM.getFullYear());
+    };
+    const nextM = () => {
+        const newM = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+        setCurrentMonth(newM);
+        onMonthChange?.(newM.getMonth() + 1, newM.getFullYear());
+    };
 
     const calWeeks = useMemo(
         () => buildCalendarWeeks(currentMonth.getFullYear(), currentMonth.getMonth()),

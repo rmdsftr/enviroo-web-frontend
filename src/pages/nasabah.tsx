@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNasabahData } from "../hooks/useNasabahData";
 import { buildColumns, STATUS_FILTER_OPTIONS } from "../constants/nasabah.constants";
-import DaftarNasabahModal from "../modals/DaftarNasabahModal";
 import StatistikLayout from "../layouts/statistik";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
 import Table from "../components/table";
@@ -33,7 +32,6 @@ export default function NasabahPage() {
         isAdminBsu,
         isAdminBsm,
         paginatedNasabah,
-        filteredNasabah,
         loading,
         error,
         stats,
@@ -44,22 +42,18 @@ export default function NasabahPage() {
         currentPage,
         setCurrentPage,
         totalPages,
-        afiliasiOptions,
-        fetchNasabahs,
     } = useNasabahData();
 
     const columns = buildColumns(isAdminBsi, isAdminBsu, navigate, isAdminBsm);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
     // ── Popup notifikasi state ────────────────────────────
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-    // ── Modal success callback with popup ────────────────
-    const handleModalSuccess = () => {
-        fetchNasabahs();
-        setPopupNotif({ message: "Berhasil mendaftarkan nasabah baru!", type: "success" });
-    };
+    const nasabahNewPath = isAdminBsi ? "/bsi/nasabah/new"
+        : isAdminBsu ? "/bsu/nasabah/new"
+        : isAdminBsm ? "/bsm/nasabah/new"
+        : "/nasabah/new";
 
     // ── Export laporan nasabah ────────────────────────────
     const handleExportLaporan = async () => {
@@ -113,7 +107,7 @@ export default function NasabahPage() {
                         variant="solid"
                         size="default"
                         isRounded
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => navigate(nasabahNewPath)}
                     >
                         Daftarkan Nasabah
                     </Button>
@@ -177,10 +171,7 @@ export default function NasabahPage() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="nasabah-pagination-row">
-                        <span className="nasabah-pagination-info">
-                            Menampilkan {((currentPage - 1) * 10) + 1}–{Math.min(currentPage * 10, filteredNasabah.length)} dari {filteredNasabah.length} nasabah
-                        </span>
+                    <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
@@ -189,19 +180,6 @@ export default function NasabahPage() {
                     </div>
                 )}
             </div>
-
-            {/* Modal: Daftarkan Nasabah */}
-            <DaftarNasabahModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSuccess={handleModalSuccess}
-                isAdminBsi={isAdminBsi}
-                isAdminBsu={isAdminBsu}
-                isAdminBsm={isAdminBsm}
-                bankId={user?.bank_id || ""}
-                identityId={user?.identity_id || ""}
-                afiliasiOptions={afiliasiOptions}
-            />
 
             {/* Popup Notifikasi */}
             {popupNotif && (

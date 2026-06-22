@@ -73,15 +73,24 @@ interface Props {
     loading?: boolean;
     onEdit?: (item: JadwalItem) => void;
     onDelete?: (jadwalId: string) => void;
+    onMonthChange?: (month: number, year: number) => void;
 }
 
 /* ── Component ── */
-export default function JadwalPenimbanganCalendar({ jadwalList, loading, onEdit, onDelete }: Props) {
+export default function JadwalPenimbanganCalendar({ jadwalList, loading, onEdit, onDelete, onMonthChange }: Props) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate]  = useState(new Date());
 
-    const prevM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
-    const nextM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1));
+    const prevM = () => {
+        const newM = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+        setCurrentMonth(newM);
+        onMonthChange?.(newM.getMonth() + 1, newM.getFullYear());
+    };
+    const nextM = () => {
+        const newM = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+        setCurrentMonth(newM);
+        onMonthChange?.(newM.getMonth() + 1, newM.getFullYear());
+    };
 
     const calWeeks = useMemo(
         () => buildCalendarWeeks(currentMonth.getFullYear(), currentMonth.getMonth()),

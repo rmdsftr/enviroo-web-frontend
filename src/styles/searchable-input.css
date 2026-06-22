@@ -1,0 +1,190 @@
+/* =========================================================
+   Searchable Input
+   ========================================================= */
+.si-container {
+    font-family: var(--ff-sans);
+    position: relative;
+    width: auto;
+}
+
+.si-container.si--full {
+    width: 100%;
+}
+
+.si-container.si--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Input wrapper ── */
+.si-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.si-input {
+    width: 100%;
+    background-color: var(--c-surface);
+    border: 1.5px solid var(--c-border);
+    color: var(--c-text);
+    font-family: var(--ff-sans);
+    font-weight: 500;
+    transition: border-color var(--t-base), box-shadow var(--t-base),
+        background-color var(--t-base);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.si-input::placeholder {
+    color: var(--c-text-subtle);
+    font-weight: 400;
+}
+
+.si-input:hover:not(:disabled) {
+    border-color: var(--c-border-strong);
+}
+
+.si-input:focus {
+    border-color: var(--c-primary);
+    box-shadow: var(--sh-focus);
+}
+
+.si-input:disabled {
+    cursor: not-allowed;
+    background-color: var(--c-surface-muted);
+}
+
+/* Loading spinner di kanan input */
+.si-loading-indicator {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    pointer-events: none;
+    color: var(--c-text-muted);
+    font-size: 11.5px;
+}
+
+.si-spinner {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--c-border-strong);
+    border-top-color: var(--c-primary);
+    border-radius: 50%;
+    animation: si-spin 0.6s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes si-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Menu ── */
+.si-menu-wrapper {
+    position: fixed;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scaleY(0.98);
+    transform-origin: top;
+    transition: opacity var(--t-slow), transform var(--t-slow), visibility 0.2s;
+    pointer-events: none;
+}
+
+.si-menu-wrapper.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scaleY(1);
+    pointer-events: auto;
+}
+
+.si-menu {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.si-menu::-webkit-scrollbar { width: 6px; }
+.si-menu::-webkit-scrollbar-track { background: transparent; }
+.si-menu::-webkit-scrollbar-thumb {
+    background: var(--c-border-strong);
+    border-radius: var(--r-pill);
+}
+
+/* ── Items ── */
+.si-item {
+    padding: 9px 12px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    font-size: 12.5px;
+    color: var(--c-text-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color var(--t-fast), color var(--t-fast);
+    user-select: none;
+}
+
+.si-item:hover,
+.si-item.active {
+    background-color: var(--c-primary-50);
+    color: var(--c-text);
+}
+
+.si-item:active {
+    transform: scale(0.99);
+}
+
+.si-item-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.si-empty {
+    padding: 14px 12px;
+    font-size: 12.5px;
+    color: var(--c-text-subtle);
+    text-align: center;
+    font-style: italic;
+}
+
+/* ── Sizes ── */
+.si--small .si-input {
+    padding: 5px 12px;
+    font-size: 11.5px;
+    border-radius: var(--r-sm);
+}
+
+.si--default .si-input {
+    padding: 10px 16px;
+    font-size: 12.5px;
+    border-radius: var(--r-md);
+}
+
+.si--large .si-input {
+    padding: 13px 18px;
+    font-size: 13px;
+    border-radius: var(--r-lg);
+}
+
+.si--rounded .si-input {
+    border-radius: var(--r-pill) !important;
+}
+
+/* Padding kanan extra saat loading supaya teks tidak ketutupan spinner */
+.si--small .si-input.si-input--loading  { padding-right: 70px; }
+.si--default .si-input.si-input--loading { padding-right: 80px; }
+.si--large .si-input.si-input--loading  { padding-right: 88px; }

@@ -26,3 +26,14 @@ export interface GetBSMResponse {
     message: string;
     data: BSMData[];
 }
+
+export interface GetBSMPagedResponse {
+    message: string;
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        total_pages: number;
+    };
+    data: BSMData[];
+}

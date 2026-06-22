@@ -32,6 +32,12 @@ export interface BagiHasilBsuItem {
     tanggal_distribusi: string;
 }
 
+export interface TransportDetail {
+    bsu_id: string;
+    nama_bsu: string;
+    transport: number;
+}
+
 export interface PenerimaSisa {
     penerima_sisa_id: string;
     bank_id: string;
@@ -40,6 +46,7 @@ export interface PenerimaSisa {
     porsi: number;
     transportasi: number;
     satuan_nominal: string;
+    transport_detail?: TransportDetail[];
 }
 
 export interface DistribusiSisaDetail {

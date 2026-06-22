@@ -231,6 +231,42 @@
     color: #ef4444;
 }
 
+/* Pengangkutan status variants */
+.dp-status-pill.completed {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dp-status-pill.approved {
+    background: rgba(78, 167, 113, 0.12);
+    color: #2e7d50;
+}
+
+.dp-status-pill.otw {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.dp-status-pill.requested {
+    background: rgba(59, 130, 246, 0.10);
+    color: #2563eb;
+}
+
+.dp-status-pill.arrived {
+    background: rgba(139, 92, 246, 0.10);
+    color: #7c3aed;
+}
+
+.dp-status-pill.rejected {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
+.dp-status-pill.canceled {
+    background: rgba(107, 114, 128, 0.10);
+    color: #6b7280;
+}
+
 .dp-status-dot {
     width: 6px;
     height: 6px;

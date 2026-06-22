@@ -15,7 +15,7 @@
 }
 
 .popup-notifikasi-container {
-    background: var(--c-surface);
+    background: #ffffff;
     border: 1px solid var(--c-border);
     border-left: 4px solid var(--c-primary);
     border-radius: var(--r-lg);
@@ -73,7 +73,7 @@
 /* ── Variants ── */
 .popup-notifikasi-container.notif-success {
     border-left-color: var(--c-primary);
-    background: linear-gradient(90deg, var(--c-primary-50), var(--c-surface) 60%);
+    background: linear-gradient(90deg, #e6f4ea, #ffffff 60%);
 }
 .notif-success .notif-icon {
     color: var(--c-primary);
@@ -81,7 +81,7 @@
 
 .popup-notifikasi-container.notif-error {
     border-left-color: var(--c-danger);
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), var(--c-surface) 60%);
+    background: linear-gradient(90deg, #fef2f2, #ffffff 60%);
 }
 .notif-error .notif-icon {
     color: var(--c-danger);
@@ -89,7 +89,7 @@
 
 .popup-notifikasi-container.notif-warning {
     border-left-color: var(--c-warning);
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.10), var(--c-surface) 60%);
+    background: linear-gradient(90deg, #fffbeb, #ffffff 60%);
 }
 .notif-warning .notif-icon {
     color: var(--c-warning-600);
@@ -97,7 +97,7 @@
 
 .popup-notifikasi-container.notif-info {
     border-left-color: var(--c-info);
-    background: linear-gradient(90deg, rgba(14, 165, 233, 0.10), var(--c-surface) 60%);
+    background: linear-gradient(90deg, #f0f9ff, #ffffff 60%);
 }
 .notif-info .notif-icon {
     color: var(--c-info);

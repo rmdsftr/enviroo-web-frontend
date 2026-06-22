@@ -92,8 +92,10 @@ export interface GetAllJadwalPengangkutanResponse {
 }
 
 export const JadwalService = {
-    async getJadwalBank(bankId: string): Promise<GetJadwalResponse> {
-        const response = await api.get<GetJadwalResponse>(`/jadwal/get-jadwal/${bankId}`);
+    async getJadwalBank(bankId: string, month: number, year: number): Promise<GetJadwalResponse> {
+        const response = await api.get<GetJadwalResponse>(`/jadwal/get-jadwal/${bankId}`, {
+            params: { month, year },
+        });
         return response.data;
     },
 

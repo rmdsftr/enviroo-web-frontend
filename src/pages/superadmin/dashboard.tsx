@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { StatistikService } from "../../services/statistik.service";
-import type { GetSuperadminRingkasanResponse, TrenPenjualanBulan, RankingBankItem } from "../../types/statistik.type";
+import type { GetSuperadminRingkasanResponse, TrenPenjualanBulan, RankingBankItem, VolumeSampahItem } from "../../types/statistik.type";
 import FilterPill from "../../components/filter-pill";
 import Dropdown from "../../components/dropdown";
 import "../../styles/layout.css";
@@ -8,15 +8,15 @@ import "../../styles/setoran-dashboard.css";
 
 // ─── Warna ──────────────────────────────────────────────
 const BANK_COLORS = {
-    bsi: "#4EA771",
-    bsu: "#3B82F6",
-    bsm: "#F59E0B",
+    bsi: "#013236",
+    bsu: "#4EA771",
+    bsm: "#94DF0C",
 };
 
 const NASABAH_COLORS = {
-    aktif:    "#22C55E",
-    pending:  "#F59E0B",
-    nonaktif: "#F43F5E",
+    aktif:    "#94DF0C",
+    pending:  "#4EA771",
+    nonaktif: "#013236",
 };
 
 // ─── Donut Chart (bank by type) ──────────────────────────
@@ -186,6 +186,84 @@ function BarChart({ values, color, formatLabel }: {
     );
 }
 
+// ─── Line Chart (stock-style) ────────────────────────────
+function LineChart({ values, color, formatLabel }: {
+    values: number[];
+    color: string;
+    formatLabel: (n: number) => string;
+}) {
+    const max = Math.max(...values, 1);
+    const W = 600, H = 200;
+    const padL = 8, padR = 8, padTop = 28, padBottom = 32;
+    const chartW = W - padL - padR;
+    const chartH = H - padTop - padBottom;
+    const n = values.length;
+    const slotW = chartW / n;
+
+    const pts = values.map((val, i) => ({
+        x: padL + i * slotW + slotW / 2,
+        y: padTop + chartH * (1 - val / max),
+    }));
+
+    const maxIdx = values.reduce((best, v, i) => v > values[best] ? i : best, 0);
+    const gradId = `lg${color.replace(/[^a-z0-9]/gi, "")}`;
+
+    const buildPath = (close: boolean) => {
+        let d = `M ${pts[0].x},${pts[0].y}`;
+        for (let i = 0; i < n - 1; i++) {
+            const p0 = pts[Math.max(0, i - 1)];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[Math.min(n - 1, i + 2)];
+            const cp1x = p1.x + (p2.x - p0.x) / 6;
+            const cp1y = p1.y + (p2.y - p0.y) / 6;
+            const cp2x = p2.x - (p3.x - p1.x) / 6;
+            const cp2y = p2.y - (p3.y - p1.y) / 6;
+            d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x},${p2.y}`;
+        }
+        if (close) d += ` L ${pts[n-1].x},${padTop + chartH} L ${pts[0].x},${padTop + chartH} Z`;
+        return d;
+    };
+
+    return (
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
+            <defs>
+                <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stopColor={color} stopOpacity={0.22} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.01} />
+                </linearGradient>
+            </defs>
+
+            {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+                const y = padTop + chartH * (1 - t);
+                return <line key={t} x1={padL} x2={W - padR} y1={y} y2={y} stroke="#e8f0eb" strokeWidth={1} />;
+            })}
+
+            <path d={buildPath(true)} fill={`url(#${gradId})`} />
+            <path d={buildPath(false)} fill="none" stroke={color} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" />
+
+            {pts.map((p, i) => (
+                <g key={i}>
+                    {values[i] > 0 && (
+                        <circle cx={p.x} cy={p.y} r={i === maxIdx ? 4 : 2.5}
+                            fill={color} stroke="white" strokeWidth={1.5} />
+                    )}
+                    {i === maxIdx && values[i] > 0 && (
+                        <text x={p.x} y={p.y - 10} textAnchor="middle"
+                            fontSize={8} fill={color} fontWeight={700} fontFamily="Poppins, sans-serif">
+                            {formatLabel(values[i])}
+                        </text>
+                    )}
+                    <text x={p.x} y={H - 8} textAnchor="middle"
+                        fontSize={9.5} fill="#a0b5a8" fontFamily="Poppins, sans-serif">
+                        {MONTH_ABBR[i]}
+                    </text>
+                </g>
+            ))}
+        </svg>
+    );
+}
+
 // ─── Card Wrapper ────────────────────────────────────────
 function InsightCard({ children, title, subtitle }: {
     children: React.ReactNode; title: string; subtitle: string
@@ -224,6 +302,10 @@ export default function DashboardSuperadminPage() {
     const [rankingLimit, setRankingLimit] = useState(10);
     const [rankingMetric, setRankingMetric] = useState<"TotalUang" | "TotalSembako" | "JumlahPenjualan">("TotalUang");
 
+    const [volumeData, setVolumeData] = useState<VolumeSampahItem[]>([]);
+    const [volumeYear, setVolumeYear] = useState(currentYear);
+    const [volumeSatuan, setVolumeSatuan] = useState<"kg" | "pcs" | "liter">("kg");
+
     useEffect(() => {
         StatistikService.getSuperadminRingkasan()
             .then(res => setData(res))
@@ -241,6 +323,12 @@ export default function DashboardSuperadminPage() {
             .then(res => setTrenData(res.data ?? []))
             .catch(err => console.error("Failed to fetch tren penjualan", err));
     }, [trenYear]);
+
+    useEffect(() => {
+        StatistikService.getVolumeSampah(volumeYear)
+            .then(res => setVolumeData(res.data ?? []))
+            .catch(err => console.error("Failed to fetch volume sampah", err));
+    }, [volumeYear]);
 
     const bank = data?.bank;
     const nasabah = data?.nasabah;
@@ -270,14 +358,14 @@ export default function DashboardSuperadminPage() {
             </div>
 
             {/* ── 1 Row, 2 Kolom ── */}
-            <div style={{ display: "flex", gap: "20px", alignItems: "stretch" }}>
+            <div className="insight-row">
 
                 {/* ── Kolom Kiri: Bank Sampah (Donut) ── */}
                 <InsightCard
                     title="Sebaran Bank Sampah"
                     subtitle="Komposisi BSI, BSU, dan BSM berdasarkan total terdaftar"
                 >
-                    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                    <div className="insight-card-inner">
                         {/* Chart */}
                         <div style={{ position: "relative", flexShrink: 0 }}>
                             <DonutChart slices={bankSlices} size={160} />
@@ -287,7 +375,7 @@ export default function DashboardSuperadminPage() {
                                 alignItems: "center", justifyContent: "center",
                                 pointerEvents: "none",
                             }}>
-                                <span style={{ fontSize: "22px", fontWeight: 800, color: "#0f1f15", lineHeight: 1 }}>
+                                <span style={{ fontSize: "22px", fontWeight: 700, color: "#0f1f15", lineHeight: 1 }}>
                                     {totalBank}
                                 </span>
                                 <span style={{ fontSize: "10px", color: "#7a9e8a", fontWeight: 500, marginTop: "2px" }}>
@@ -357,7 +445,7 @@ export default function DashboardSuperadminPage() {
                     title="Status Nasabah"
                     subtitle="Distribusi nasabah berdasarkan status pendaftaran"
                 >
-                    <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                    <div className="insight-card-inner">
                         {/* Chart */}
                         <div style={{ flexShrink: 0 }}>
                             <PieChart slices={nasabahSlices} size={160} />
@@ -390,6 +478,110 @@ export default function DashboardSuperadminPage() {
                     </div>
                 </InsightCard>
 
+            </div>
+
+            {/* ── Volume Sampah ── */}
+            <div style={{
+                background: "#fff",
+                borderRadius: "16px",
+                border: "1px solid #e8f0eb",
+                padding: "24px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px",
+            }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                    <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f1f15" }}>
+                            Volume Sampah
+                        </p>
+                        <p style={{ margin: "2px 0 0", fontSize: "11.5px", color: "#7a9e8a" }}>
+                            Total volume sampah yang masuk tiap bulan di seluruh bank sampah
+                        </p>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <FilterPill
+                            options={[
+                                { label: "kg",    value: "kg"    },
+                                { label: "pcs",   value: "pcs"   },
+                                { label: "liter", value: "liter" },
+                            ]}
+                            activeValue={volumeSatuan}
+                            onChange={(v) => setVolumeSatuan(v as "kg" | "pcs" | "liter")}
+                        />
+                        <Dropdown
+                            options={[currentYear - 1, currentYear].map(y => ({ label: String(y), value: y }))}
+                            value={volumeYear}
+                            onChange={(e) => setVolumeYear(Number(e.target.value))}
+                            dropdownSize="small"
+                            isRounded
+                        />
+                    </div>
+                </div>
+
+                {(() => {
+                    const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
+                    const color = SATUAN_COLOR[volumeSatuan] ?? "#a0b5a8";
+                    const filtered = volumeData.filter(d => d.satuan === volumeSatuan);
+                    const filled: number[] = Array.from({ length: 12 }, (_, i) =>
+                        filtered.find(d => d.bulan === i + 1)?.total_qty ?? 0
+                    );
+                    const total = filled.reduce((a, b) => a + b, 0);
+                    const activeMths = filled.filter(v => v > 0).length;
+                    const avg = activeMths > 0 ? total / activeMths : 0;
+
+                    return (
+                        <>
+                            <div style={{ display: "flex", gap: "12px" }}>
+                                <div style={{
+                                    background: `${color}12`,
+                                    border: `1.5px solid ${color}38`,
+                                    borderRadius: "12px",
+                                    padding: "10px 14px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "2px",
+                                    minWidth: "140px",
+                                }}>
+                                    <span style={{ fontSize: "10px", fontWeight: 600, color: "#013236", textTransform: "uppercase", letterSpacing: "0.5px", opacity: 0.6 }}>
+                                        Total {volumeYear}
+                                    </span>
+                                    <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
+                                        {fmtCompact(total)}
+                                    </span>
+                                    <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
+                                        {total % 1 !== 0 ? total.toFixed(2) : total.toLocaleString("id-ID")} {volumeSatuan}
+                                    </span>
+                                </div>
+                                <div style={{
+                                    background: "rgba(1,50,54,0.05)",
+                                    border: "1.5px solid rgba(1,50,54,0.12)",
+                                    borderRadius: "12px",
+                                    padding: "10px 14px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "2px",
+                                    minWidth: "140px",
+                                }}>
+                                    <span style={{ fontSize: "10px", fontWeight: 600, color: "#013236", textTransform: "uppercase", letterSpacing: "0.5px", opacity: 0.6 }}>
+                                        Rata-rata / Bulan
+                                    </span>
+                                    <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
+                                        {fmtCompact(avg)}
+                                    </span>
+                                    <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
+                                        dari {activeMths} bulan aktif
+                                    </span>
+                                </div>
+                            </div>
+                            <BarChart
+                                values={filled}
+                                color={color}
+                                formatLabel={(n) => fmtCompact(n)}
+                            />
+                        </>
+                    );
+                })()}
             </div>
 
             {/* ── Tren Penjualan ── */}
@@ -496,7 +688,7 @@ export default function DashboardSuperadminPage() {
                                     );
                                 })()}
                             </div>
-                            <BarChart
+                            <LineChart
                                 values={filled}
                                 color={color}
                                 formatLabel={isUang ? fmtCompact : (n) => n.toLocaleString("id-ID")}
@@ -536,13 +728,16 @@ export default function DashboardSuperadminPage() {
                             activeValue={rankingMetric}
                             onChange={(v) => setRankingMetric(v as typeof rankingMetric)}
                         />
-                        <Dropdown
-                            options={[5, 10, 20].map(n => ({ label: `Top ${n}`, value: n }))}
-                            value={rankingLimit}
-                            onChange={(e) => setRankingLimit(Number(e.target.value))}
-                            dropdownSize="small"
-                            isRounded
-                        />
+                        <div style={{ minWidth: "90px" }}>
+                            <Dropdown
+                                options={[5, 10, 20].map(n => ({ label: `Top ${n}`, value: n }))}
+                                value={rankingLimit}
+                                onChange={(e) => setRankingLimit(Number(e.target.value))}
+                                dropdownSize="small"
+                                isRounded
+                                fullWidth
+                            />
+                        </div>
                         <Dropdown
                             options={[currentYear - 1, currentYear].map(y => ({ label: String(y), value: y }))}
                             value={rankingYear}
@@ -564,7 +759,7 @@ export default function DashboardSuperadminPage() {
                     const JENIS_COLOR: Record<string, string> = {
                         bsi: "#4EA771", bsu: "#3B82F6", bsm: "#F59E0B",
                     };
-                    const BAR_COLORS = ["#4EA771", "#6bbf8a", "#8dcca3", "#b0d9bc"];
+                    const BAR_COLORS = ["#94DF0C"];
 
                     const formatVal = (item: RankingBankItem) => {
                         if (rankingMetric === "TotalUang")
@@ -610,7 +805,7 @@ export default function DashboardSuperadminPage() {
                                                     {item.JenisBank}
                                                 </span>
                                             </div>
-                                            <div style={{ height: "5px", borderRadius: "99px",
+                                            <div style={{ height: "10px", borderRadius: "99px",
                                                 background: "#e8f0eb", overflow: "hidden" }}>
                                                 <div style={{ height: "100%", width: `${pct}%`,
                                                     borderRadius: "99px", background: barColor,

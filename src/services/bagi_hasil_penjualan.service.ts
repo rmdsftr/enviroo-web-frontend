@@ -106,9 +106,10 @@ export const BagiHasilService = {
         return response.data;
     },
 
-    async getRiwayatByBank(bankId: string): Promise<RiwayatBagiHasilItem[]> {
+    async getRiwayatByBank(bankId: string, startDate?: string, endDate?: string): Promise<RiwayatBagiHasilItem[]> {
         const response = await api.get<{ bank_id: string; nama_bank: string; jenis_bank: string; riwayat_bagi_hasil: RiwayatBagiHasilItem[] }>(
-            `/bagi-hasil/list-bh-bank/${bankId}`
+            `/bagi-hasil/list-bh-bank/${bankId}`,
+            { params: { start_date: startDate, end_date: endDate } }
         );
         return response.data.riwayat_bagi_hasil ?? [];
     },

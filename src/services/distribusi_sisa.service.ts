@@ -40,9 +40,13 @@ export const DistribusiSisaService = {
         return response.data;
     },
 
-    async getRiwayatBagiHasilBsu(bankId: string): Promise<BagiHasilBsuItem[]> {
+    async getRiwayatBagiHasilBsu(bankId: string, startDate?: string, endDate?: string): Promise<BagiHasilBsuItem[]> {
+        const params: Record<string, string> = {};
+        if (startDate) params.start_date = startDate;
+        if (endDate) params.end_date = endDate;
         const response = await api.get<{ bank_id: string; jenis_bank: string; nama_bank: string; riwayat: BagiHasilBsuItem[] }>(
-            `/distribusi-sisa/list-bh-bank/${bankId}`
+            `/distribusi-sisa/list-bh-bank/${bankId}`,
+            { params }
         );
         return response.data.riwayat ?? [];
     },

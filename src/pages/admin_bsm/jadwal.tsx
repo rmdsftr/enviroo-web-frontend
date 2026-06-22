@@ -1,9 +1,8 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import {
-    FaPlus, FaClockRotateLeft,
-    FaCalendarCheck, FaCalendarPlus, FaEye,
+    FaPlus,
+    FaCalendarCheck, FaCalendarPlus,
 } from "react-icons/fa6";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "../../components/button";
@@ -12,13 +11,9 @@ import Input from "../../components/input";
 import CloseButton from "../../components/close-button";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import PopupConfirmation from "../../layouts/popup-confirmation";
-import Table, { type ColumnDef, TableActionBtn } from "../../components/table";
-import FilterRange, { defaultMonthRange } from "../../components/filter-range";
 import JadwalPenimbanganCalendar from "../../layouts/jadwal-penimbangan-calendar";
 import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
-import { PenimbanganService, type PenimbanganItem } from "../../services/penimbangan.service";
 import "../../styles/jadwal-bsu.css";
-import { formatTanggal, formatJam } from "../../utils/date.utils";
 import { formatTime } from "../../layouts/jadwal-penimbangan-calendar";
 
 /* ── Constants ── */
@@ -34,36 +29,15 @@ const MINGGU_OPTIONS = [
     { label: "Minggu ke-5", value: "5" },
 ];
 
-const STATUS_PENIMBANGAN: Record<string, { label: string; cls: string }> = {
-    aktif:      { label: "Berlangsung", cls: "berlangsung" },
-    selesai:    { label: "Selesai",     cls: "selesai"     },
-    dibatalkan: { label: "Dibatalkan",  cls: "dibatalkan"  },
-};
-
-const RIWAYAT_COLUMNS: ColumnDef<PenimbanganItem>[] = [
-    { key: "penimbangan_id", header: "ID Penimbangan", render: (row) => row.penimbangan_id },
-    { key: "tanggal",  header: "Tanggal",     width: "120px", render: (row) => row.started_at ? formatTanggal(row.started_at) : "—" },
-    { key: "mulai",    header: "Jam Mulai",   width: "100px", render: (row) => row.started_at ? formatJam(row.started_at) : "—" },
-    { key: "selesai",  header: "Jam Selesai", width: "100px", render: (row) => row.ended_at   ? formatJam(row.ended_at)   : "—" },
-    {
-        key: "status", header: "Status Penimbangan", width: "160px",
-        render: (row) => {
-            const s = STATUS_PENIMBANGAN[row.status_penimbangan];
-            return <span className={`jbsu-status-pill ${s?.cls ?? row.status_penimbangan}`}>{s?.label ?? row.status_penimbangan}</span>;
-        },
-    },
-    { key: "aksi", header: "Aksi", width: "70px", align: "center" as const, render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" /> },
-];
-
 /* ============================================================
    COMPONENT
    ============================================================ */
 export default function JadwalBsmPage() {
-    const { user }   = useAuth();
-    const navigate   = useNavigate();
+    const { user } = useAuth();
 
     const [penimbanganList, setPenimbanganList] = useState<JadwalItem[]>([]);
     const [loading, setLoading]                = useState(true);
+    const [calMonth, setCalMonth]              = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
     const [isModalOpen, setIsModalOpen]        = useState(false);
     const [isSubmitting, setIsSubmitting]      = useState(false);
     const [editJadwalId, setEditJadwalId]      = useState<string | null>(null);
@@ -80,45 +54,18 @@ export default function JadwalBsmPage() {
     const [formJamSelesai,   setFormJamSelesai]   = useState("");
     const [formError,        setFormError]        = useState("");
 
-    /* Riwayat */
-    const [riwayatList,    setRiwayatList]    = useState<PenimbanganItem[]>([]);
-    const [riwayatLoading, setRiwayatLoading] = useState(false);
-    const [riwayatFrom,    setRiwayatFrom]    = useState(() => defaultMonthRange().from);
-    const [riwayatTo,      setRiwayatTo]      = useState(() => defaultMonthRange().to);
-
     /* ── Fetch ── */
-    const fetchJadwal = useCallback(async () => {
+    const fetchJadwal = useCallback(async (month: number, year: number) => {
         if (!user?.bank_id) return;
         try {
             setLoading(true);
-            const res = await JadwalService.getJadwalBank(user.bank_id);
+            const res = await JadwalService.getJadwalBank(user.bank_id, month, year);
             setPenimbanganList(res.data.penimbangan || []);
         } catch { console.error("Gagal memuat jadwal"); }
         finally { setLoading(false); }
     }, [user?.bank_id]);
 
-    useEffect(() => { fetchJadwal(); }, [fetchJadwal]);
-
-    const fetchRiwayat = useCallback(async () => {
-        if (!user?.bank_id) return;
-        try {
-            setRiwayatLoading(true);
-            const data = await PenimbanganService.getPenimbanganByBank(user.bank_id);
-            setRiwayatList(data);
-        } catch { console.error("Gagal memuat riwayat"); }
-        finally { setRiwayatLoading(false); }
-    }, [user?.bank_id]);
-
-    useEffect(() => { fetchRiwayat(); }, [fetchRiwayat]);
-
-    const filteredRiwayat = useMemo(() =>
-        riwayatList.filter(item => {
-            if (!item.started_at) return false;
-            const month = item.started_at.substring(0, 7);
-            return month >= riwayatFrom && month <= riwayatTo;
-        }),
-        [riwayatList, riwayatFrom, riwayatTo]
-    );
+    useEffect(() => { fetchJadwal(calMonth.month, calMonth.year); }, [calMonth, fetchJadwal]);
 
     /* ── Modal ── */
     const resetForm = () => {
@@ -168,7 +115,7 @@ export default function JadwalBsmPage() {
                 await JadwalService.addJadwal(user.bank_id, payload);
                 setNotif({ show: true, message: "Jadwal berhasil ditambahkan!", type: "success" });
             }
-            handleCloseModal(); fetchJadwal();
+            handleCloseModal(); fetchJadwal(calMonth.month, calMonth.year);
         } catch (err: any) {
             setFormError(err?.response?.data?.error || "Gagal menyimpan jadwal");
         } finally { setIsSubmitting(false); }
@@ -179,7 +126,7 @@ export default function JadwalBsmPage() {
         try {
             await JadwalService.deleteJadwal(deleteJadwalId);
             setNotif({ show: true, message: "Jadwal berhasil dihapus!", type: "success" });
-            fetchJadwal();
+            fetchJadwal(calMonth.month, calMonth.year);
         } catch { setNotif({ show: true, message: "Gagal menghapus jadwal", type: "error" }); }
         finally { setDeleteJadwalId(null); }
     };
@@ -207,31 +154,8 @@ export default function JadwalBsmPage() {
                 loading={loading}
                 onEdit={handleOpenModal}
                 onDelete={setDeleteJadwalId}
+                onMonthChange={(m, y) => setCalMonth({ month: m, year: y })}
             />
-
-            {/* ── Riwayat Penimbangan ── */}
-            <div className="jbsu-card">
-                <div className="jbsu-section-header">
-                    <span className="jbsu-card-title-icon" style={{ background: "#013236" }}><FaClockRotateLeft /></span>
-                    <div>
-                        <h2 className="jbsu-card-title">Riwayat Penimbangan</h2>
-                        <p className="jbsu-card-sub">Riwayat pelaksanaan penimbangan</p>
-                    </div>
-                    <div className="jbsu-section-header-right">
-                        <FilterRange from={riwayatFrom} to={riwayatTo} onChange={(f, t) => { setRiwayatFrom(f); setRiwayatTo(t); }} />
-                    </div>
-                </div>
-                {riwayatLoading
-                    ? <div className="jbsu-empty"><span>Memuat riwayat...</span></div>
-                    : <Table<PenimbanganItem>
-                        columns={RIWAYAT_COLUMNS}
-                        data={filteredRiwayat}
-                        rowKey={(row) => row.penimbangan_id}
-                        emptyMessage="Belum ada riwayat penimbangan."
-                        onRowClick={(row) => navigate(`/bsm/riwayat/penimbangan/${row.penimbangan_id}`)}
-                      />
-                }
-            </div>
 
             {/* ── Modal Tambah / Edit ── */}
             {isModalOpen && createPortal(

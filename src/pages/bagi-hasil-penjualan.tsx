@@ -10,6 +10,7 @@ import {
     FaBuilding,
     FaBoxOpen,
     FaRightLeft,
+    FaChevronDown,
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
@@ -18,6 +19,7 @@ import {
     BagiHasilService,
     type BagiHasilPenjualan,
     type NasabahPenerima,
+    type PenerimaBSU,
 } from "../services/bagi_hasil_penjualan.service";
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
@@ -49,6 +51,57 @@ function NasabahRow({ nasabah, onClick }: { nasabah: NasabahPenerima; onClick?: 
                     {fmtAmount(nasabah.total_diterima, nasabah.satuan_diterima)}
                 </span>
             </div>
+        </div>
+    );
+}
+
+/* ── BSU Accordion Card ── */
+function BsuAccordionCard({ bsu, onNasabahClick }: { bsu: PenerimaBSU; onNasabahClick: (penerimaId: string) => void }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <div style={{ border: "1px solid #e0ece6", borderRadius: 12, overflow: "hidden" }}>
+            <button
+                onClick={() => setOpen(o => !o)}
+                style={{
+                    width: "100%", display: "flex", alignItems: "center",
+                    justifyContent: "space-between", padding: "13px 16px",
+                    background: open ? "#f3faf6" : "#fff", border: "none",
+                    cursor: "pointer", gap: 8, textAlign: "left",
+                    fontFamily: "inherit",
+                }}
+            >
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <FaBuilding style={{ fontSize: 12, color: "#7a9e8a", flexShrink: 0 }} />
+                    <span style={{ fontWeight: 600, fontSize: 13, color: "#013236" }}>{bsu.nama_bank}</span>
+                    <span className="dp-setoran-count-badge">{bsu.nasabah_penerima.length} nasabah</span>
+                </div>
+                <FaChevronDown style={{
+                    fontSize: 11, color: "#7a9e8a", flexShrink: 0,
+                    transition: "transform 0.2s",
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                }} />
+            </button>
+            {open && (
+                <div style={{ borderTop: "1px solid #e0ece6", padding: "4px 0" }}>
+                    {bsu.nasabah_penerima.map(n => (
+                        <div
+                            key={n.penerima_id}
+                            className="dpj-item-row"
+                            onClick={() => onNasabahClick(n.penerima_id)}
+                            style={{ cursor: "pointer", background: "transparent", border: "none", borderRadius: 0, boxShadow: "none", borderBottom: "1px solid #f0f7f3" }}
+                        >
+                            <div className="dpj-item-icon"><FaUser /></div>
+                            <div className="dpj-item-body">
+                                <span className="dpj-item-name">{n.nama_nasabah}</span>
+                                <span className="dpj-item-detail">{n.nasabah_id}</span>
+                            </div>
+                            <div className="dpj-item-right">
+                                <span className="dpj-item-subtotal">{fmtAmount(n.total_diterima, n.satuan_diterima)}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
@@ -228,32 +281,29 @@ export default function BagiHasilPenjualanPage() {
                             )}
 
                             {/* BSU Sections — BSI only */}
-                            {hasPenerima && detail.penerima.map((bsu) => (
-                                <div key={bsu.bank_id}>
+                            {hasPenerima && (
+                                <>
                                     <div className="dp-divider" style={{ margin: "12px 0" }} />
-                                    <div className="dp-setoran-header">
-                                        <div>
-                                            <p className="dp-setoran-title" style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom:"10px"}}>
-                                                <FaBuilding style={{ fontSize: "11px", color: "#7a9e8a", flexShrink: 0 }} />
-                                                {bsu.nama_bank}
-                                            </p>
-                                        </div>
-                                        <span className="dp-setoran-count-badge">{bsu.nasabah_penerima.length} nasabah</span>
+                                    <div>
+                                    <div className="dp-setoran-header" style={{ marginBottom: 10 }}>
+                                        <p className="dp-setoran-title">Nasabah via Bank Unit</p>
+                                        <span className="dp-setoran-count-badge">{detail.penerima.length} BSU</span>
                                     </div>
-                                    <div className="dpj-items-list">
-                                        {bsu.nasabah_penerima.map((n) => (
-                                            <NasabahRow
-                                                key={n.penerima_id}
-                                                nasabah={n}
-                                                onClick={() => navigate(
-                                                    `${rolePrefix}/bagi-hasil/penerima/${n.penerima_id}`,
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                                        {detail.penerima.map((bsu) => (
+                                            <BsuAccordionCard
+                                                key={bsu.bank_id}
+                                                bsu={bsu}
+                                                onNasabahClick={(penerimaId) => navigate(
+                                                    `${rolePrefix}/bagi-hasil/penerima/${penerimaId}`,
                                                     { state: { bagiHasilId: detail.bagi_hasil_id } }
                                                 )}
                                             />
                                         ))}
                                     </div>
-                                </div>
-                            ))}
+                                    </div>
+                                </>
+                            )}
 
                         </div>
 
