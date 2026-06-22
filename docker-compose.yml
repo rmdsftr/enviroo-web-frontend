@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   frontend:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_API_URL: https://api.enviroo.tech
     ports:
       - "3000:80"
     restart: always
