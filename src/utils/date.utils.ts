@@ -2,7 +2,11 @@ const BULAN_PENDEK = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "S
 const BULAN_PANJANG = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 function parse(iso: string): Date {
-    return new Date(iso.replace(" ", "T"));
+    let s = iso.replace(" ", "T");
+    if (!s.endsWith("Z") && !/[+-]\d{2}:\d{2}$/.test(s)) {
+        s += "Z";
+    }
+    return new Date(s);
 }
 
 /** "31 Mei 2026" */

@@ -89,20 +89,17 @@ export default function SuperadminPenggunaPage() {
             .finally(() => setLoading(false));
     }, [currentPage, isLocalMode]);
 
-    // Local mode: fetch semua (tanpa page/limit), di-cache
+    // Fetch semua user untuk stats + local mode filter (di-cache, background)
     useEffect(() => {
-        if (!isLocalMode || allUsersLoaded) return;
-        setLoading(true);
-        setError(null);
+        if (allUsersLoaded) return;
         UsersService.getAllUsers()
             .then(res => {
                 const data = Array.isArray(res.data) ? res.data : [];
                 setAllUsers(data);
                 setAllUsersLoaded(true);
             })
-            .catch(() => setError("Gagal mengambil data pengguna. Pastikan server backend aktif."))
-            .finally(() => setLoading(false));
-    }, [isLocalMode, allUsersLoaded]);
+            .catch(() => {});
+    }, [allUsersLoaded]);
 
     /* ── Stats ───────────────────────────────────────────── */
     const stats = useMemo(() => {
