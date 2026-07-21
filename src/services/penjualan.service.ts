@@ -61,4 +61,12 @@ export const PenjualanService = {
         });
         return response.data as Blob;
     },
+
+    async exportRekapLaporan(bankId: string, startDate: string, endDate: string): Promise<Blob> {
+        const response = await api.get(`/laporan/penjualan/rekap/${bankId}`, {
+            params: { start: startDate, end: endDate },
+            responseType: "blob",
+        });
+        return response.data as Blob;
+    },
 };

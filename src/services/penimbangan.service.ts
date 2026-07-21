@@ -62,4 +62,12 @@ export const PenimbanganService = {
         });
         return response.data as Blob;
     },
+
+    async exportRekapLaporan(bankId: string, startDate: string, endDate: string): Promise<Blob> {
+        const response = await api.get(`/laporan/penimbangan/rekap/${bankId}`, {
+            params: { start: startDate, end: endDate },
+            responseType: "blob",
+        });
+        return response.data as Blob;
+    },
 };

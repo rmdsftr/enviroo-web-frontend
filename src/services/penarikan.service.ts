@@ -62,4 +62,12 @@ export const PenarikanService = {
         const response = await api.get<PenarikanListResponse>(`/penarikan/list/${nasabahId}`);
         return response.data.data;
     },
+
+    async exportRekapLaporan(bankId: string, startDate: string, endDate: string): Promise<Blob> {
+        const response = await api.get(`/laporan/penarikan/rekap/${bankId}`, {
+            params: { start: startDate, end: endDate },
+            responseType: "blob",
+        });
+        return response.data as Blob;
+    },
 };

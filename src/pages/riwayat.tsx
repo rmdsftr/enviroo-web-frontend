@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaFileExport } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import Tabs from "../components/tabs";
 import Table from "../components/table";
 import FilterRange from "../components/filter-range";
 import SearchBar from "../components/search";
+import Button from "../components/button";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
-import { type PenimbanganItem } from "../services/penimbangan.service";
+import PopupExportLaporan from "../layouts/popup-export-laporan";
+import { PenimbanganService, type PenimbanganItem } from "../services/penimbangan.service";
 import { type PengangkutanItem } from "../services/pengangkutan.service";
-import { type PenjualanExternalItem } from "../services/penjualan.service";
-import { type RiwayatBagiHasilItem } from "../services/bagi_hasil_penjualan.service";
+import { PenjualanService, type PenjualanExternalItem } from "../services/penjualan.service";
+import { BagiHasilService, type RiwayatBagiHasilItem } from "../services/bagi_hasil_penjualan.service";
 import type { BagiHasilBsuItem } from "../types/distribusi_sisa.type";
-import { type PenarikanItem } from "../services/penarikan.service";
+import { PenarikanService, type PenarikanItem } from "../services/penarikan.service";
 import { useRiwayatData } from "../hooks/useRiwayatData";
 import {
     PENIMBANGAN_COLUMNS, PENJUALAN_COLUMNS,
@@ -21,16 +24,47 @@ import {
 import "../styles/riwayat.css";
 import "../styles/jadwal-bsu.css";
 
+type ExportLaporanTab = "penimbangan" | "penjualan" | "bagi_hasil" | "penarikan";
+
+const EXPORT_LAPORAN_CONFIG: Record<ExportLaporanTab, {
+    title: string;
+    fileLabel: string;
+    download: (bankId: string, start: string, end: string) => Promise<Blob>;
+}> = {
+    penimbangan: {
+        title: "Ekspor Laporan Penimbangan",
+        fileLabel: "laporan-penimbangan",
+        download: PenimbanganService.exportRekapLaporan,
+    },
+    penjualan: {
+        title: "Ekspor Laporan Penjualan",
+        fileLabel: "laporan-penjualan",
+        download: PenjualanService.exportRekapLaporan,
+    },
+    bagi_hasil: {
+        title: "Ekspor Laporan Bagi Hasil",
+        fileLabel: "laporan-bagi-hasil",
+        download: BagiHasilService.exportRekapLaporan,
+    },
+    penarikan: {
+        title: "Ekspor Laporan Penarikan",
+        fileLabel: "laporan-penarikan",
+        download: PenarikanService.exportRekapLaporan,
+    },
+};
+
 export default function RiwayatPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const role = user?.role?.toLowerCase();
     const isBsi = role === "admin_bsi";
     const isBsu = role === "admin_bsu";
+    const isBsm = role === "admin_bsm";
 
     const tabs = isBsi ? BSI_TABS : isBsu ? BSU_TABS : BSM_TABS;
     const [activeTab, setActiveTab] = useState(tabs[0].id);
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
+    const [exportLaporanTab, setExportLaporanTab] = useState<ExportLaporanTab | null>(null);
 
     const {
         hasAngkut, hasPenjualan,
@@ -44,6 +78,31 @@ export default function RiwayatPage() {
     } = useRiwayatData({ bankId: user?.bank_id, isBsu, isBsi });
 
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : "/bsm";
+
+    const defaultExportEnd = new Date().toISOString().slice(0, 10);
+    const defaultExportStart = (() => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+    })();
+
+    const handleDownloadLaporan = async (start: string, end: string) => {
+        if (!user?.bank_id || !exportLaporanTab) return;
+        const config = EXPORT_LAPORAN_CONFIG[exportLaporanTab];
+        try {
+            const blob = await config.download(user.bank_id, start, end);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${config.fileLabel}-${user.bank_id}-${start}_${end}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setExportLaporanTab(null);
+        } catch {
+            setPopupNotif({ message: "Gagal mengekspor laporan. Silakan coba lagi.", type: "error" });
+        }
+    };
 
     return (
         <div className="riwayat-page">
@@ -74,11 +133,23 @@ export default function RiwayatPage() {
                             onChange={setSearchQuery}
                             width="300px"
                         />
-                        <FilterRange
-                            from={penimbanganFrom}
-                            to={penimbanganTo}
-                            onChange={(f, t) => { setPenimbanganFrom(f); setPenimbanganTo(t); }}
-                        />
+                        <div className="riwayat-filter-right">
+                            <FilterRange
+                                from={penimbanganFrom}
+                                to={penimbanganTo}
+                                onChange={(f, t) => { setPenimbanganFrom(f); setPenimbanganTo(t); }}
+                            />
+                            <Button
+                                icon={<FaFileExport />}
+                                color="secondary"
+                                variant="solid"
+                                size="default"
+                                isRounded
+                                onClick={() => setExportLaporanTab("penimbangan")}
+                            >
+                                Ekspor Laporan
+                            </Button>
+                        </div>
                     </div>
                     {penimbanganLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -132,11 +203,23 @@ export default function RiwayatPage() {
                             onChange={setSearchQuery}
                             width="300px"
                         />
-                        <FilterRange
-                            from={penjualanFrom}
-                            to={penjualanTo}
-                            onChange={(f, t) => { setPenjualanFrom(f); setPenjualanTo(t); }}
-                        />
+                        <div className="riwayat-filter-right">
+                            <FilterRange
+                                from={penjualanFrom}
+                                to={penjualanTo}
+                                onChange={(f, t) => { setPenjualanFrom(f); setPenjualanTo(t); }}
+                            />
+                            <Button
+                                icon={<FaFileExport />}
+                                color="secondary"
+                                variant="solid"
+                                size="default"
+                                isRounded
+                                onClick={() => setExportLaporanTab("penjualan")}
+                            >
+                                Ekspor Laporan
+                            </Button>
+                        </div>
                     </div>
                     {penjualanLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -161,11 +244,31 @@ export default function RiwayatPage() {
                             onChange={setSearchQuery}
                             width="300px"
                         />
-                        <FilterRange
-                            from={bagiHasilFrom}
-                            to={bagiHasilTo}
-                            onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
-                        />
+                        {isBsm ? (
+                            <div className="riwayat-filter-right">
+                                <FilterRange
+                                    from={bagiHasilFrom}
+                                    to={bagiHasilTo}
+                                    onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
+                                />
+                                <Button
+                                    icon={<FaFileExport />}
+                                    color="secondary"
+                                    variant="solid"
+                                    size="default"
+                                    isRounded
+                                    onClick={() => setExportLaporanTab("bagi_hasil")}
+                                >
+                                    Ekspor Laporan
+                                </Button>
+                            </div>
+                        ) : (
+                            <FilterRange
+                                from={bagiHasilFrom}
+                                to={bagiHasilTo}
+                                onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
+                            />
+                        )}
                     </div>
                     {bagiHasilLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -222,11 +325,23 @@ export default function RiwayatPage() {
                             onChange={setSearchQuery}
                             width="300px"
                         />
-                        <FilterRange
-                            from={penarikanFrom}
-                            to={penarikanTo}
-                            onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }}
-                        />
+                        <div className="riwayat-filter-right">
+                            <FilterRange
+                                from={penarikanFrom}
+                                to={penarikanTo}
+                                onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }}
+                            />
+                            <Button
+                                icon={<FaFileExport />}
+                                color="secondary"
+                                variant="solid"
+                                size="default"
+                                isRounded
+                                onClick={() => setExportLaporanTab("penarikan")}
+                            >
+                                Ekspor Laporan
+                            </Button>
+                        </div>
                     </div>
                     {penarikanLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
@@ -240,6 +355,15 @@ export default function RiwayatPage() {
                     }
                 </>
             )}
+
+            <PopupExportLaporan
+                isOpen={exportLaporanTab !== null}
+                title={exportLaporanTab ? EXPORT_LAPORAN_CONFIG[exportLaporanTab].title : undefined}
+                defaultStart={defaultExportStart}
+                defaultEnd={defaultExportEnd}
+                onDownload={handleDownloadLaporan}
+                onCancel={() => setExportLaporanTab(null)}
+            />
 
             {popupNotif && (
                 <PopupNotifikasi

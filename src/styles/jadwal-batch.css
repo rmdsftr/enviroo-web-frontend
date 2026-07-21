@@ -1,0 +1,99 @@
+/* Multi-select chips untuk tambah jadwal rutin (batch) */
+.jbatch-quickrow {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    /* margin-bottom: 3px; */
+}
+
+/* Preset "pilih" (Senin–Jumat, Pilih tiap hari) */
+.jbatch-quickbtn {
+    font-family: inherit;
+    font-size: 10px;
+    padding: 5px 10px;
+    line-height: 1.4;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.jbatch-quickbtn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+/* "Kosongkan" = aksi hapus pilihan → sengaja dibedakan (link merah, di kanan) */
+.jbatch-clearbtn {
+    font-family: inherit;
+    font-size: 10px;
+    padding: 4px 6px;
+    border: none;
+    background: transparent;
+    color: #ef4444;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: auto;
+    font-weight: 500;
+}
+.jbatch-clearbtn:hover {
+    color: #dc2626;
+}
+
+.jbatch-chips {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.jbatch-chip {
+    font-family: inherit;
+    padding: 6px 11px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #334155;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1.5;
+    user-select: none;
+    transition: all 0.15s;
+}
+.jbatch-chip:hover {
+    border-color: #4ea771;
+}
+.jbatch-chip.active {
+    background: #4ea771;
+    border-color: #4ea771;
+    color: #fff;
+}
+
+.jbatch-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #334155;
+    user-select: none;
+    font-family: inherit;
+}
+.jbatch-toggle input {
+    cursor: pointer;
+    accent-color: #4ea771;
+    width: 12px;
+    height: 12px;
+    margin: 0;
+}
+
+.jbatch-count {
+    font-family: inherit;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 8px;
+    font-weight: 500;
+}

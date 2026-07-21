@@ -17,6 +17,29 @@ export interface AddJadwalRequest {
 /** @deprecated Use AddJadwalRequest instead */
 export type AddJadwalPenimbanganRequest = AddJadwalRequest;
 
+/* ── Batch add (jadwal rutin: banyak kombinasi hari × minggu sekaligus) ── */
+export interface JadwalBatchItem {
+    hari: string;
+    minggu_ke: number;
+    jam_mulai: string;
+    jam_selesai: string;
+}
+
+export interface AddJadwalBatchRequest {
+    admin_id: string;
+    jenis_jadwal: "penimbangan";
+    is_rutin: boolean;
+    items: JadwalBatchItem[];
+}
+
+export interface AddJadwalBatchResponse {
+    message: string;
+    data: {
+        created: JadwalItem[];
+        skipped: Array<{ hari: string; minggu_ke: number; jam_mulai: string; jam_selesai: string; alasan: string }>;
+    };
+}
+
 export interface JadwalItem {
     jadwal_id: string;
     bank_id: string;
@@ -101,6 +124,11 @@ export const JadwalService = {
 
     async addJadwal(bankId: string, data: AddJadwalPenimbanganRequest) {
         const response = await api.post(`/jadwal/add-jadwal/${bankId}`, data);
+        return response.data;
+    },
+
+    async addJadwalBatch(bankId: string, data: AddJadwalBatchRequest): Promise<AddJadwalBatchResponse> {
+        const response = await api.post<AddJadwalBatchResponse>(`/jadwal/add-jadwal-batch/${bankId}`, data);
         return response.data;
     },
 

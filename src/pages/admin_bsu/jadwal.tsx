@@ -14,6 +14,7 @@ import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import PopupConfirmation from "../../layouts/popup-confirmation";
 import JadwalPenimbanganCalendar from "../../layouts/jadwal-penimbangan-calendar";
 import JadwalPengangkutanCalendar from "../../layouts/jadwal-pengangkutan-calendar";
+import JadwalBatchFields, { buildJadwalBatchItems } from "../../components/JadwalBatchFields";
 import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
 import "../../styles/jadwal-bsu.css";
 import { formatTime } from "../../layouts/jadwal-penimbangan-calendar";
@@ -49,7 +50,7 @@ export default function JadwalBsuPage() {
     const [deleteJadwalId, setDeleteJadwalId]    = useState<string | null>(null);
     const [notif, setNotif] = useState<{ show: boolean; message: string; type: "success" | "error" }>({ show: false, message: "", type: "success" });
 
-    /* Form */
+    /* Form (single: dipakai untuk edit & jadwal spesial) */
     const [formType,        setFormType]        = useState<"rutin" | "spesial">("rutin");
     const [formHari,        setFormHari]        = useState("");
     const [formMingguKe,    setFormMingguKe]    = useState("");
@@ -58,6 +59,10 @@ export default function JadwalBsuPage() {
     const [formJamMulai,    setFormJamMulai]    = useState("");
     const [formJamSelesai,  setFormJamSelesai]  = useState("");
     const [formError,       setFormError]       = useState("");
+
+    /* Form batch (tambah jadwal rutin banyak sekaligus) */
+    const [formHariList,   setFormHariList]   = useState<string[]>([]);
+    const [formMingguList, setFormMingguList] = useState<string[]>([]);
 
     /* ── Fetch ── */
     const fetchJadwal = useCallback(async (month: number, year: number) => {
@@ -77,6 +82,7 @@ export default function JadwalBsuPage() {
     const resetForm = () => {
         setFormType("rutin"); setFormHari(""); setFormMingguKe(""); setFormTanggal("");
         setFormNamaSpesial(""); setFormJamMulai(""); setFormJamSelesai(""); setFormError(""); setEditJadwalId(null);
+        setFormHariList([]); setFormMingguList([]);
     };
     const handleOpenModal = (jadwal?: JadwalItem) => {
         if (jadwal) {
@@ -95,35 +101,58 @@ export default function JadwalBsuPage() {
     const handleSubmit = async () => {
         if (!user?.bank_id) return;
         if (!formJamMulai || !formJamSelesai) { setFormError("Jam mulai dan jam selesai wajib diisi"); return; }
-        if (formType === "rutin") {
-            if (!formHari)    { setFormError("Hari wajib dipilih"); return; }
-            if (!formMingguKe){ setFormError("Minggu ke wajib dipilih"); return; }
-        } else {
-            if (!formTanggal)           { setFormError("Tanggal wajib diisi"); return; }
-            if (!formNamaSpesial.trim()){ setFormError("Nama jadwal spesial wajib diisi"); return; }
-        }
-        setFormError(""); setIsSubmitting(true);
-        try {
-            const payload = {
-                hari: formType === "rutin" ? formHari : "",
-                minggu_ke: formType === "rutin" ? parseInt(formMingguKe) : 0,
-                jam_mulai: formJamMulai, jam_selesai: formJamSelesai,
-                jenis_jadwal: "penimbangan" as const,
-                is_active: true, is_rutin: formType === "rutin",
-                tanggal: formType === "spesial" ? formTanggal : "",
-                nama_jadwal_spesial: formType === "spesial" ? formNamaSpesial.trim() : "",
-                admin_id: user.identity_id,
-            };
-            if (editJadwalId) {
-                await JadwalService.updateJadwal(editJadwalId, payload);
-                setNotif({ show: true, message: "Jadwal berhasil diperbarui!", type: "success" });
+
+        /* ── Edit (satu baris) atau Jadwal Spesial → jalur single lama ── */
+        if (editJadwalId || formType === "spesial") {
+            if (formType === "rutin") {
+                if (!formHari)     { setFormError("Hari wajib dipilih"); return; }
+                if (!formMingguKe) { setFormError("Minggu ke wajib dipilih"); return; }
             } else {
-                await JadwalService.addJadwal(user.bank_id, payload);
-                setNotif({ show: true, message: "Jadwal berhasil ditambahkan!", type: "success" });
+                if (!formTanggal)            { setFormError("Tanggal wajib diisi"); return; }
+                if (!formNamaSpesial.trim()) { setFormError("Nama jadwal spesial wajib diisi"); return; }
             }
+            setFormError(""); setIsSubmitting(true);
+            try {
+                const payload = {
+                    hari: formType === "rutin" ? formHari : "",
+                    minggu_ke: formType === "rutin" ? parseInt(formMingguKe) : 0,
+                    jam_mulai: formJamMulai, jam_selesai: formJamSelesai,
+                    jenis_jadwal: "penimbangan" as const,
+                    is_active: true, is_rutin: formType === "rutin",
+                    tanggal: formType === "spesial" ? formTanggal : "",
+                    nama_jadwal_spesial: formType === "spesial" ? formNamaSpesial.trim() : "",
+                    admin_id: user.identity_id,
+                };
+                if (editJadwalId) {
+                    await JadwalService.updateJadwal(editJadwalId, payload);
+                    setNotif({ show: true, message: "Jadwal berhasil diperbarui!", type: "success" });
+                } else {
+                    await JadwalService.addJadwal(user.bank_id, payload);
+                    setNotif({ show: true, message: "Jadwal berhasil ditambahkan!", type: "success" });
+                }
+                handleCloseModal(); fetchJadwal(calMonth.month, calMonth.year);
+            } catch (err: any) {
+                setNotif({ show: true, message: err?.response?.data?.error || "Gagal menyimpan jadwal", type: "error" });
+            } finally { setIsSubmitting(false); }
+            return;
+        }
+
+        /* ── Tambah Jadwal Rutin (batch: banyak hari × minggu sekaligus) ── */
+        if (formHariList.length === 0)   { setNotif({ show: true, message: "Pilih minimal satu hari", type: "error" }); return; }
+        if (formMingguList.length === 0) { setNotif({ show: true, message: "Pilih minggu, atau centang 'Setiap minggu'", type: "error" }); return; }
+        setIsSubmitting(true);
+        try {
+            const items = buildJadwalBatchItems(formHariList, formMingguList, formJamMulai, formJamSelesai);
+            const res = await JadwalService.addJadwalBatch(user.bank_id, {
+                admin_id: user.identity_id,
+                jenis_jadwal: "penimbangan",
+                is_rutin: true,
+                items,
+            });
+            setNotif({ show: true, message: res.message || "Jadwal berhasil ditambahkan!", type: "success" });
             handleCloseModal(); fetchJadwal(calMonth.month, calMonth.year);
         } catch (err: any) {
-            setFormError(err?.response?.data?.error || "Gagal menyimpan jadwal");
+            setNotif({ show: true, message: err?.response?.data?.error || "Gagal menyimpan jadwal", type: "error" });
         } finally { setIsSubmitting(false); }
     };
 
@@ -212,16 +241,26 @@ export default function JadwalBsuPage() {
                         </div>
                         <div className="jmodal-form">
                             {formType === "rutin" ? (
-                                <>
-                                    <div className="jmodal-field">
-                                        <label className="jmodal-label">Hari Penimbangan</label>
-                                        <Dropdown options={HARI_OPTIONS} placeholder="Pilih hari..." value={formHari} onChange={e => setFormHari(e.target.value)} fullWidth />
-                                    </div>
-                                    <div className="jmodal-field">
-                                        <label className="jmodal-label">Minggu ke</label>
-                                        <Dropdown options={MINGGU_OPTIONS} placeholder="Pilih minggu..." value={formMingguKe} onChange={e => setFormMingguKe(e.target.value)} fullWidth />
-                                    </div>
-                                </>
+                                editJadwalId ? (
+                                    /* Edit: satu baris → dropdown tunggal */
+                                    <>
+                                        <div className="jmodal-field">
+                                            <label className="jmodal-label">Hari Penimbangan</label>
+                                            <Dropdown options={HARI_OPTIONS} placeholder="Pilih hari..." value={formHari} onChange={e => setFormHari(e.target.value)} fullWidth />
+                                        </div>
+                                        <div className="jmodal-field">
+                                            <label className="jmodal-label">Minggu ke</label>
+                                            <Dropdown options={MINGGU_OPTIONS} placeholder="Pilih minggu..." value={formMingguKe} onChange={e => setFormMingguKe(e.target.value)} fullWidth />
+                                        </div>
+                                    </>
+                                ) : (
+                                    /* Tambah: multi-select (batch) */
+                                    <JadwalBatchFields
+                                        hariLabel="Hari Penimbangan"
+                                        hariList={formHariList} setHariList={setFormHariList}
+                                        mingguList={formMingguList} setMingguList={setFormMingguList}
+                                    />
+                                )
                             ) : (
                                 <>
                                     <div className="jmodal-field">

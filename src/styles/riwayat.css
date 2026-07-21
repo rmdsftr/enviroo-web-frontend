@@ -59,6 +59,13 @@
     flex-wrap: wrap;
 }
 
+.riwayat-filter-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 /* ── Loading / coming-soon states ──────────────────── */
 .riwayat-loading,
 .riwayat-coming-soon {
