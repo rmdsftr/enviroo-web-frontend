@@ -53,14 +53,32 @@ export default function SearchableInput<T>({
     const menuRef = useRef<HTMLDivElement>(null);
 
     // ── Posisi menu (sama seperti Dropdown pakai portal) ──────────────────────
+    // Set lewat React state untuk render awal, lalu tulis langsung ke DOM saat
+    // scroll/resize supaya posisi selalu sinkron tiap frame (tanpa nunggu re-render,
+    // yang bikin menu keliatan "gerak-gerak" ketika layar di-scroll cepat).
     const updateMenuPos = () => {
         if (!wrapperRef.current) return;
         const rect = wrapperRef.current.getBoundingClientRect();
         setMenuPos({ top: rect.bottom + 6, left: rect.left, width: rect.width });
     };
 
+    const syncMenuPos = () => {
+        if (!wrapperRef.current || !menuRef.current) return;
+        const rect = wrapperRef.current.getBoundingClientRect();
+        menuRef.current.style.top = `${rect.bottom + 6}px`;
+        menuRef.current.style.left = `${rect.left}px`;
+        menuRef.current.style.width = `${rect.width}px`;
+    };
+
     useEffect(() => {
-        if (isOpen) updateMenuPos();
+        if (!isOpen) return;
+        updateMenuPos();
+        window.addEventListener("scroll", syncMenuPos, true);
+        window.addEventListener("resize", syncMenuPos);
+        return () => {
+            window.removeEventListener("scroll", syncMenuPos, true);
+            window.removeEventListener("resize", syncMenuPos);
+        };
     }, [isOpen]);
 
     // ── Debounce search ───────────────────────────────────────────────────────

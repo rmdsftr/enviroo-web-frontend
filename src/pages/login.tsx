@@ -42,6 +42,16 @@ export default function LoginPage() {
     const { user, login, isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
+    // body pakai --c-bg (terang) secara default; ganti ke warna login supaya
+    // gap repaint saat resize window nunjukin teal, bukan putih.
+    useEffect(() => {
+        const prevBg = document.body.style.backgroundColor;
+        document.body.style.backgroundColor = "#013236";
+        return () => {
+            document.body.style.backgroundColor = prevBg;
+        };
+    }, []);
+
     useEffect(() => {
         if (isAuthenticated && user) {
             const role = user.role?.toLowerCase() || "";
