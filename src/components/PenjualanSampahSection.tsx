@@ -3,28 +3,16 @@ import { StatistikService } from "../services/statistik.service";
 import type { PenjualanSampahItem } from "../types/statistik.type";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import FilterPill from "./filter-pill";
+import { formatCompact, formatNominal } from "../utils/number.utils";
 import "../styles/setoran-dashboard.css";
 
 const PALETTE = [
-    // "#013236",
-    // "#025C5B",
-    // "#4EA771",
-    // "#7DC468",
     "#94DF0C",
-    // "#B8F04A",
-    // "#1B6E5A",
-    // "#CAEC8A",
 ];
 const colorAt = (i: number) => PALETTE[i % PALETTE.length];
 
 function fmtNilai(nilai: number, satuan: string): string {
-    const n = nilai ?? 0;
-    if (satuan === "Rp") {
-        if (n >= 1_000_000) return `Rp ${(n / 1_000_000).toFixed(1)}jt`;
-        if (n >= 1_000)     return `Rp ${(n / 1_000).toFixed(0)}rb`;
-        return `Rp ${n.toLocaleString("id-ID")}`;
-    }
-    return `${n.toLocaleString("id-ID")} poin`;
+    return satuan === "Rp" ? formatCompact(nilai, satuan) : formatNominal(nilai, satuan);
 }
 
 interface Props { bankId: string }
@@ -77,7 +65,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
 
     return (
         <div className="ssd-section">
-            {/* Header */}
             <div className="ssd-section-header">
                 <div className="ssd-section-header-left">
                     <div>
@@ -91,7 +78,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
             </div>
             <hr style={{ border: "none", borderTop: "1px solid #e8f0eb", margin: "0" }} />
 
-            {/* Summary chips + filter pill */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                 {!loading && items.length > 0 && (
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -122,7 +108,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                 />
             </div>
 
-            {/* Body */}
             {loading ? (
                 <div className="ssd-state">Memuat data...</div>
             ) : error ? (
@@ -145,7 +130,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                                 background: "transparent",
                                 border: "1px solid #e8f0eb",
                             }}>
-                                {/* Left: name + bar */}
                                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: 0 }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
                                         <span style={{ fontSize: "12.5px", fontWeight: 600, color: "#0f1f15",
@@ -166,7 +150,6 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                                     </div>
                                 </div>
 
-                                {/* Right: nilai */}
                                 <span style={{ fontSize: "13px", fontWeight: 700, color: "#013236",
                                     whiteSpace: "nowrap", textAlign: "right" }}>
                                     {fmtNilai(item.total_nilai ?? 0, item.satuan_nilai)}

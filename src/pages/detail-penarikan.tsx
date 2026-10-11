@@ -25,8 +25,8 @@ import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import "../styles/detail-pengangkutan.css";
 import { formatTanggalJam, formatTanggalJamBullet } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
-/* ── Status map (header pill) ── */
 const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
     pending:         { label: "Diajukan",              cls: "aktif"      },
     approved:        { label: "Menunggu Dijemput",      cls: "aktif"      },
@@ -37,7 +37,6 @@ const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
     pickup_expired:  { label: "Penjemputan Kadaluarsa", cls: "dibatalkan" },
 };
 
-/* ── Status map (riwayat timeline) ── */
 const RIWAYAT_STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
     pending:         { label: "Diajukan",              cls: "pending"  },
     approved:        { label: "Menunggu Dijemput",      cls: "approved" },
@@ -48,13 +47,7 @@ const RIWAYAT_STATUS_PENARIKAN: Record<string, { label: string; cls: string }> =
     pickup_expired:  { label: "Penjemputan Kadaluarsa", cls: "expired"  },
 };
 
-/* ── Helpers ── */
-function formatNominal(nominal: number, satuan: string): string {
-    const num = nominal.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} poin`;
-}
 
-/* ── Component ── */
 export default function DetailPenarikanPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -104,7 +97,6 @@ export default function DetailPenarikanPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Penarikan</h1>
@@ -123,7 +115,6 @@ export default function DetailPenarikanPage() {
                 {!loading && !error && detail && header && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
 
                             <div className="dp-overview-header">
@@ -154,7 +145,7 @@ export default function DetailPenarikanPage() {
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaGift /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Jenis Reward</span>
+                                        <span className="dp-info-label">Jenis Insentif</span>
                                         <span className="dp-info-value">{header.nama_reward}</span>
                                     </div>
                                 </div>
@@ -188,7 +179,6 @@ export default function DetailPenarikanPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Riwayat button */}
                             <button className="dpg-sesi-btn" onClick={() => setRiwayatOpen(true)}>
                                 <FaClockRotateLeft />
                                 Riwayat Penarikan
@@ -202,7 +192,6 @@ export default function DetailPenarikanPage() {
                             )}
                         </div>
 
-                        {/* ── RIGHT: Detail Reward ── */}
                         <div className="dp-setoran-col">
                             {isBarang ? (
                                 <>
@@ -231,12 +220,12 @@ export default function DetailPenarikanPage() {
                                                     <div className="dpj-item-body">
                                                         <span className="dpj-item-name">{item.nama_barang}</span>
                                                         <span className="dpj-item-detail">
-                                                            {item.qty} × {item.nilai_poin.toLocaleString("id-ID")} poin
+                                                            {formatDecimal(item.qty)} × {formatNominal(item.nilai_poin, "poin")}
                                                         </span>
                                                     </div>
                                                     <div className="dpj-item-right">
                                                         <span className="dpj-item-subtotal">
-                                                            {item.subtotal_poin.toLocaleString("id-ID")} poin
+                                                            {formatNominal(item.subtotal_poin, "poin")}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -255,7 +244,7 @@ export default function DetailPenarikanPage() {
                                         </div>
                                         <div className="dp-stat-chip">
                                             <span className="dp-stat-chip-value">
-                                                {header.nominal_penarikan.toLocaleString("id-ID")}
+                                                {formatDecimal(header.nominal_penarikan)}
                                             </span>
                                             <span className="dp-stat-chip-label">Total Poin</span>
                                         </div>
@@ -272,7 +261,7 @@ export default function DetailPenarikanPage() {
 
                                     <div className="dp-stat-chip" style={{ maxWidth: "240px" }}>
                                         <span className="dp-stat-chip-value">
-                                            Rp {header.nominal_penarikan.toLocaleString("id-ID")}
+                                            {formatNominal(header.nominal_penarikan, "Rp")}
                                         </span>
                                         <span className="dp-stat-chip-label">Nominal Dicairkan</span>
                                     </div>
@@ -295,7 +284,6 @@ export default function DetailPenarikanPage() {
                 )}
             </div>
 
-            {/* Popup Notifikasi */}
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}
@@ -312,12 +300,10 @@ export default function DetailPenarikanPage() {
                 />
             )}
 
-            {/* ── Riwayat Popup ── */}
             {riwayatOpen && createPortal(
                 <div className="dpg-overlay" onClick={() => setRiwayatOpen(false)}>
                     <div className="dpg-popup" onClick={(e) => e.stopPropagation()}>
 
-                        {/* Popup Header */}
                         <div className="dpg-popup-header">
                             <p className="dpg-popup-title">Riwayat Penarikan</p>
                             <button className="dpg-popup-close" onClick={() => setRiwayatOpen(false)}>

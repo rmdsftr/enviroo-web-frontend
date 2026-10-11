@@ -2,7 +2,6 @@ import { useState, useLayoutEffect, useEffect, useRef, type ReactNode } from "re
 import { createPortal } from "react-dom";
 import "../styles/popup-menu.css";
 
-// ── Types ──
 export type PopupMenuItem = {
     label: string;
     icon?: ReactNode;
@@ -15,7 +14,6 @@ type PopupMenuProps = {
     trigger: ReactNode;
 };
 
-// ── Component ──
 export default function PopupMenu({ items, trigger }: PopupMenuProps) {
     const [open, setOpen] = useState(false);
     const [positioned, setPositioned] = useState(false);
@@ -23,7 +21,6 @@ export default function PopupMenu({ items, trigger }: PopupMenuProps) {
     const triggerRef = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Setelah popup di-render (invisible), ukur dan tentukan posisi final
     useLayoutEffect(() => {
         if (!open || !triggerRef.current || !menuRef.current) return;
 
@@ -50,7 +47,6 @@ export default function PopupMenu({ items, trigger }: PopupMenuProps) {
         setPositioned(true);
     }, [open]);
 
-    // Close on outside click
     useEffect(() => {
         if (!open) return;
         const handler = (e: MouseEvent) => {
@@ -66,7 +62,6 @@ export default function PopupMenu({ items, trigger }: PopupMenuProps) {
         return () => document.removeEventListener("mousedown", handler);
     }, [open]);
 
-    // Close on Escape
     useEffect(() => {
         if (!open) return;
         const handler = (e: KeyboardEvent) => {
@@ -79,7 +74,6 @@ export default function PopupMenu({ items, trigger }: PopupMenuProps) {
     const handleTriggerClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!open) {
-            // Reset positioned agar popup di-render invisible dulu untuk diukur
             setPositioned(false);
         }
         setOpen((v) => !v);
@@ -102,7 +96,6 @@ export default function PopupMenu({ items, trigger }: PopupMenuProps) {
                             position: "fixed",
                             top: pos.top,
                             right: pos.right,
-                            // Invisible saat belum diukur agar tidak flicker
                             visibility: positioned ? "visible" : "hidden",
                         }}
                         onClick={(e) => e.stopPropagation()}

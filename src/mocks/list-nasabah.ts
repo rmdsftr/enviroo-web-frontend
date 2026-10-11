@@ -3,7 +3,7 @@ import type { GetNasabahBSIPagedResponse } from "../types/bsi.type";
 
 const LIMIT = 20;
 
-export const mockNasabahList: BsiNasabahItem[] = [
+const rawNasabahList: Omit<BsiNasabahItem, "nik" | "nomor_rekening">[] = [
     { nasabah_id: "nsb-001", nama: "Siti Rahayu",           email: "siti.rahayu@gmail.com",       foto: "", status: "aktif"    },
     { nasabah_id: "nsb-002", nama: "Budi Santoso",          email: "budi.santoso@gmail.com",      foto: "", status: "aktif"    },
     { nasabah_id: "nsb-003", nama: "Dewi Kurniawati",       email: "dewi.kurnia@yahoo.com",       foto: "", status: "pending"  },
@@ -55,6 +55,12 @@ export const mockNasabahList: BsiNasabahItem[] = [
     { nasabah_id: "nsb-049", nama: "Ahmad Fauzi",           email: "ahmad.fauzi@gmail.com",       foto: "", status: "aktif"    },
     { nasabah_id: "nsb-050", nama: "Badriyah Solihat",      email: "badriyah.solihat@gmail.com",  foto: "", status: "pending"  },
 ];
+
+export const mockNasabahList: BsiNasabahItem[] = rawNasabahList.map((item, i) => ({
+    ...item,
+    nik: `320101${(i + 1).toString().padStart(10, "0")}`,
+    nomor_rekening: `RK-${(i + 1).toString().padStart(4, "0")}`,
+}));
 
 export function mockGetNasabahPaged(_bankId: string, page: number): GetNasabahBSIPagedResponse {
     const total = mockNasabahList.length;

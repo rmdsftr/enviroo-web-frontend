@@ -5,7 +5,7 @@ import { BarangService } from "../services/barang.service";
 import type { KatalogSampah, KatalogDetail } from "../types/katalog.type";
 import type { KatalogBarangItem } from "../types/barang.type";
 import Pagination from "../components/pagination";
-import { FaBoxOpen, FaBasketShopping, FaPlus, FaFileExport } from "react-icons/fa6";
+import { FaBoxOpen, FaBasketShopping, FaPlus, FaFileExport, FaChevronDown } from "react-icons/fa6";
 import Button from "../components/button";
 import Tabs from "../components/tabs";
 import FilterPill from "../components/filter-pill";
@@ -26,15 +26,16 @@ import { getApiError } from "../utils/error.utils";
 import "../styles/katalog.css";
 import "../styles/jadwal-bsu.css";
 
+const KATEGORI_PREVIEW_COUNT = 8;
+
 export default function KatalogPage() {
     const navigate = useNavigate();
     const {
         user,
         isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
         categories, rewards,
-        katalogList, barangList,
-        sampahPage, setSampahPage, sampahMeta,
-        barangPage, setBarangPage, barangMeta,
+        sampahPage, setSampahPage, sampahTotalPages, pagedSampah,
+        barangPage, setBarangPage, barangTotalPages, pagedBarang,
         barangFilterBank, setBarangFilterBank,
         bsuList, bsuRiwayat, setBsuRiwayat,
         distribusiLoading, distribusiFrom, setDistribusiFrom, distribusiTo, setDistribusiTo,
@@ -42,7 +43,9 @@ export default function KatalogPage() {
         filterKategori, setFilterKategori,
         filterSatuan, setFilterSatuan,
         filterReward, setFilterReward,
-        filteredSampah, filteredDistribusi,
+        sampahSearch, setSampahSearch,
+        barangSearch, setBarangSearch,
+        filteredSampah, filteredBarang, filteredDistribusi,
         fetchKatalog, fetchBarang,
     } = useKatalogData();
 
@@ -59,6 +62,9 @@ export default function KatalogPage() {
     const [selectedBarang, setSelectedBarang] = useState<KatalogBarangItem | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+
+    const [filterOpen, setFilterOpen] = useState(false);
+    const filterAktifCount = [filterKategori, filterSatuan, filterReward].filter(v => v !== "all").length;
 
     const handleExport = async () => {
         if (!user?.bank_id) return;
@@ -105,6 +111,7 @@ export default function KatalogPage() {
             } else if (formMode === "edit-item" && selectedItem) {
                 await KatalogService.editKatalog(selectedItem.sampah_id, {
                     syarat_pemilahan: data.syarat_pemilahan,
+                    kategori_id: data.kategori_id,
                     foto: foto || undefined,
                 });
                 showNotif("Detail katalog berhasil diperbarui!");
@@ -112,7 +119,7 @@ export default function KatalogPage() {
                 setSelectedItemDetail(null);
             }
             setFormMode(null);
-            fetchKatalog(sampahPage);
+            fetchKatalog();
         } catch (error) {
             showNotif(getApiError(error, "Gagal menyimpan perubahan."), "error");
         } finally {
@@ -132,13 +139,7 @@ export default function KatalogPage() {
                     showNotif("Item berhasil dihapus!");
                     setSelectedItem(null);
                     setSelectedItemDetail(null);
-                    if (katalogList.length === 1 && sampahPage > 1) {
-                        const prevPage = sampahPage - 1;
-                        setSampahPage(prevPage);
-                        fetchKatalog(prevPage);
-                    } else {
-                        fetchKatalog(sampahPage);
-                    }
+                    fetchKatalog();
                 } catch (error) {
                     showNotif(getApiError(error, "Gagal menghapus item."), "error");
                 }
@@ -185,7 +186,7 @@ export default function KatalogPage() {
                 setSelectedBarang(null);
             }
             setFormMode(null);
-            fetchBarang(barangFilterBank, barangPage);
+            fetchBarang(barangFilterBank);
         } catch (error) {
             showNotif(getApiError(error, "Gagal menyimpan perubahan."), "error");
         } finally {
@@ -204,13 +205,7 @@ export default function KatalogPage() {
                     await BarangService.deleteBarang(selectedBarang.produk_id);
                     showNotif("Barang berhasil dihapus!");
                     setSelectedBarang(null);
-                    if (barangList.length === 1 && barangPage > 1) {
-                        const prevPage = barangPage - 1;
-                        setBarangPage(prevPage);
-                        fetchBarang(barangFilterBank, prevPage);
-                    } else {
-                        fetchBarang(barangFilterBank, barangPage);
-                    }
+                    fetchBarang(barangFilterBank);
                 } catch (error) {
                     showNotif(getApiError(error, "Gagal menghapus."), "error");
                 }
@@ -219,9 +214,6 @@ export default function KatalogPage() {
     };
 
     const distribusiColumns = useMemo(() => buildDistribusiColumns(isAdminBsi), [isAdminBsi]);
-    const count = activeTab === "sampah"
-        ? (sampahMeta?.total ?? filteredSampah.length)
-        : (barangMeta?.total ?? barangList.length);
 
     return (
         <div className="katalog-page">
@@ -259,17 +251,31 @@ export default function KatalogPage() {
                         </p>
 
                         <div className="katalog-action-row">
-                            <span className="katalog-count">{count} item</span>
+                            {activeTab === "sampah" ? (
+                                <SearchBar
+                                    placeholder="Cari ID atau nama sampah"
+                                    value={sampahSearch}
+                                    onChange={setSampahSearch}
+                                    width="280px"
+                                />
+                            ) : (
+                                <SearchBar
+                                    placeholder="Cari ID atau nama barang"
+                                    value={barangSearch}
+                                    onChange={setBarangSearch}
+                                    width="280px"
+                                />
+                            )}
                             <div style={{ display: "flex", gap: "8px" }}>
                                 {(isAdminBsi || isAdminBsu || isAdminBsm) && !(activeTab === "barang" && isViewingBSU) && (
                                     <Button icon={<FaFileExport />} color="secondary" variant="outline" size="small" isRounded disabled={isExporting} onClick={handleExport}>
-                                        {isExporting ? "Mengunduh..." : "Ekspor Laporan"}
+                                        {isExporting ? "Mengunduh..." : "Ekspor Data"}
                                     </Button>
                                 )}
                                 {(activeTab === "sampah" ? canEdit : canEditBarang) && (
                                     <Button icon={<FaPlus />} color="secondary" size="small" isRounded
                                         onClick={() => setFormMode(activeTab === "sampah" ? "add" : "add-barang")}>
-                                        {activeTab === "sampah" ? "Tambah Katalog Sampah" : "Tambah Katalog Barang"}
+                                        {activeTab === "sampah" ? "Tambah Sampah" : "Tambah Barang"}
                                     </Button>
                                 )}
                             </div>
@@ -282,71 +288,77 @@ export default function KatalogPage() {
                             ? <div className="katalog-empty"><FaBoxOpen /><span>Tidak ada item ditemukan</span></div>
                             : <>
                                 <div className="katalog-grid">
-                                    {filteredSampah.map(i => <SampahCard key={i.sampah_id} item={i} onClick={() => handleViewDetail(i)} />)}
+                                    {pagedSampah.map(i => <SampahCard key={i.sampah_id} item={i} onClick={() => handleViewDetail(i)} />)}
                                 </div>
-                                {sampahMeta && sampahMeta.total_pages > 1 && (
-                                    <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 0" }}>
-                                        <Pagination
-                                            currentPage={sampahPage}
-                                            totalPages={sampahMeta.total_pages}
-                                            onPageChange={(p) => { setSampahPage(p); fetchKatalog(p); }}
-                                        />
-                                    </div>
-                                )}
+                                <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 0" }}>
+                                    <Pagination
+                                        currentPage={sampahPage}
+                                        totalPages={sampahTotalPages}
+                                        onPageChange={setSampahPage}
+                                    />
+                                </div>
                             </>
                     ) : (
-                        barangList.length === 0
+                        filteredBarang.length === 0
                             ? <div className="katalog-empty"><FaBasketShopping /><span>Tidak ada item ditemukan</span></div>
                             : <>
                                 <div className="katalog-grid">
-                                    {barangList.map(i => <BarangCard key={i.produk_id} item={i} onClick={() => handleViewBarangDetail(i)} />)}
+                                    {pagedBarang.map(i => <BarangCard key={i.produk_id} item={i} onClick={() => handleViewBarangDetail(i)} />)}
                                 </div>
-                                {barangMeta && barangMeta.total_pages > 1 && (
-                                    <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 0" }}>
-                                        <Pagination
-                                            currentPage={barangPage}
-                                            totalPages={barangMeta.total_pages}
-                                            onPageChange={(p) => { setBarangPage(p); fetchBarang(barangFilterBank, p); }}
-                                        />
-                                    </div>
-                                )}
+                                <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 0" }}>
+                                    <Pagination
+                                        currentPage={barangPage}
+                                        totalPages={barangTotalPages}
+                                        onPageChange={setBarangPage}
+                                    />
+                                </div>
                             </>
                     )}
                 </div>
 
-                {/* Filter Sampah */}
                 {activeTab === "sampah" && (
                     <div className="katalog-side-col">
-                        <aside className="katalog-filter-sidebar">
-                            <div className="kf-group">
-                                <span className="kf-group-label">Kategori Sampah</span>
-                                <FilterPill
-                                    options={[{ label: "Semua", value: "all" }, ...categories.map(cat => ({ label: cat.Kategori, value: cat.KategoriID }))]}
-                                    activeValue={filterKategori}
-                                    onChange={(v) => setFilterKategori(v)}
-                                />
-                            </div>
-                            <div className="kf-group">
-                                <span className="kf-group-label">Jenis Satuan</span>
-                                <FilterPill
-                                    options={SATUAN_OPTIONS}
-                                    activeValue={filterSatuan}
-                                    onChange={(v) => setFilterSatuan(v as "all" | "kg" | "pcs" | "liter")}
-                                />
-                            </div>
-                            <div className="kf-group">
-                                <span className="kf-group-label">Nilai Jual</span>
-                                <FilterPill
-                                    options={[{ label: "Semua", value: "all" }, ...rewards.map(r => ({ label: r.NamaReward, value: r.RewardID }))]}
-                                    activeValue={filterReward}
-                                    onChange={(v) => setFilterReward(v)}
-                                />
+                        <aside className={`katalog-filter-sidebar kf-collapsible${filterOpen ? " is-open" : ""}`}>
+                            <button
+                                type="button"
+                                className="kf-mobile-toggle"
+                                onClick={() => setFilterOpen(prev => !prev)}
+                                aria-expanded={filterOpen}
+                            >
+                                <span>Filter{filterAktifCount > 0 ? ` · ${filterAktifCount} aktif` : ""}</span>
+                                <FaChevronDown className="kf-mobile-toggle-icon" />
+                            </button>
+                            <div className="kf-body">
+                                <div className="kf-group">
+                                    <span className="kf-group-label">Kategori Sampah</span>
+                                    <FilterPill
+                                        options={[{ label: "Semua", value: "all" }, ...categories.map(cat => ({ label: cat.Kategori, value: cat.KategoriID }))]}
+                                        activeValue={filterKategori}
+                                        onChange={(v) => setFilterKategori(v)}
+                                        maxVisible={KATEGORI_PREVIEW_COUNT}
+                                    />
+                                </div>
+                                <div className="kf-group">
+                                    <span className="kf-group-label">Jenis Satuan</span>
+                                    <FilterPill
+                                        options={SATUAN_OPTIONS}
+                                        activeValue={filterSatuan}
+                                        onChange={(v) => setFilterSatuan(v as "all" | "kg" | "pcs" | "liter")}
+                                    />
+                                </div>
+                                <div className="kf-group">
+                                    <span className="kf-group-label">Nilai Jual</span>
+                                    <FilterPill
+                                        options={[{ label: "Semua", value: "all" }, ...rewards.map(r => ({ label: r.nama_reward, value: r.reward_id }))]}
+                                        activeValue={filterReward}
+                                        onChange={(v) => setFilterReward(v)}
+                                    />
+                                </div>
                             </div>
                         </aside>
                     </div>
                 )}
 
-                {/* Filter Barang BSI */}
                 {activeTab === "barang" && isAdminBsi && (
                     <div className="katalog-side-col">
                         <aside className="katalog-filter-sidebar">
@@ -358,9 +370,8 @@ export default function KatalogPage() {
                                     onChange={(v) => {
                                         const bankId = v as string;
                                         setBarangFilterBank(bankId);
-                                        setBarangPage(1);
                                         setSelectedBarang(null);
-                                        fetchBarang(bankId, 1);
+                                        fetchBarang(bankId);
                                     }}
                                 />
                             </div>
@@ -387,7 +398,6 @@ export default function KatalogPage() {
                 )}
             </div>
 
-            {/* Distribusi Section */}
             {activeTab === "barang" && (isAdminBsi || isAdminBsu) && (
                 <div className="katalog-distribusi-section">
                     <hr className="katalog-divider" style={{ marginTop: "24px", marginBottom: "24px" }} />
@@ -425,7 +435,6 @@ export default function KatalogPage() {
                 </div>
             )}
 
-            {/* Modals */}
             {(formMode === "add" || formMode === "edit-item") && (
                 <KatalogSampahFormModal
                     formMode={formMode}

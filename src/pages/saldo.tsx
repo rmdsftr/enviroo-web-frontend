@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatNominal } from "../utils/number.utils";
 import { FaMoneyBillWave, FaStar, FaEye, FaEyeSlash, FaWallet } from "react-icons/fa6";
 import Table, { TableBadge, TableActionBtn, type ColumnDef } from "../components/table";
 import SearchBar from "../components/search";
@@ -34,9 +35,6 @@ type SaldoMeta = {
     total_pages: number;
 };
 
-function formatRupiah(angka: number) {
-    return angka.toLocaleString("id-ID");
-}
 
 export default function SaldoPage() {
     const { user } = useAuth();
@@ -58,7 +56,6 @@ export default function SaldoPage() {
     const [allData, setAllData] = useState<NasabahSaldo[]>([]);
     const [allDataLoading, setAllDataLoading] = useState(false);
 
-    // ── Load daftar BSU untuk dropdown (admin_bsi only) ──
     useEffect(() => {
         if (!isAdminBsi || !bankId) return;
         BsiService.getUnit(bankId)
@@ -69,19 +66,16 @@ export default function SaldoPage() {
             .catch((err) => console.error("Gagal memuat daftar BSU:", err));
     }, [isAdminBsi, bankId]);
 
-    // ── Sync selectedBankId ketika bankId pertama kali tersedia ──
     useEffect(() => {
         if (bankId) setSelectedBankId(bankId);
     }, [bankId]);
 
-    // ── Reset halaman dan cache all-data saat bank dipilih ──
     useEffect(() => {
         setCurrentPage(1);
         setSearchQuery("");
         setAllData([]);
     }, [selectedBankId]);
 
-    // ── Fetch total saldo ──
     useEffect(() => {
         if (!selectedBankId) return;
         api.get(`/dashboard/total-saldo-all-nasabah/${selectedBankId}`)
@@ -89,7 +83,6 @@ export default function SaldoPage() {
             .catch((err) => console.error("Gagal memuat total saldo:", err));
     }, [selectedBankId]);
 
-    // ── Fetch daftar saldo (server-side pagination) ──
     useEffect(() => {
         if (!selectedBankId) return;
         setLoading(true);
@@ -103,7 +96,6 @@ export default function SaldoPage() {
             .finally(() => setLoading(false));
     }, [selectedBankId, currentPage]);
 
-    // ── Fetch semua data tanpa pagination saat search aktif ──
     useEffect(() => {
         if (!searchQuery || !selectedBankId || allData.length > 0) return;
         setAllDataLoading(true);
@@ -170,13 +162,13 @@ export default function SaldoPage() {
         },
         {
             key: "saldo_uang",
-            header: "Saldo Uang",
+            header: "Saldo Rupiah",
             width: "170px",
             render: (row) => {
                 const visible = visibleRows.has(row.nasabah_id);
                 return (
                     <span className={`saldo-value ${visible ? "saldo-value--visible" : "saldo-value--hidden"}`}>
-                        {visible ? `Rp ${formatRupiah(row.saldo_uang)}` : "•••••••"}
+                        {visible ? formatNominal(row.saldo_uang, "Rp") : "•••••••"}
                     </span>
                 );
             },
@@ -189,14 +181,14 @@ export default function SaldoPage() {
                 const visible = visibleRows.has(row.nasabah_id);
                 return (
                     <span className={`saldo-value ${visible ? "saldo-value--visible" : "saldo-value--hidden"}`}>
-                        {visible ? `${formatRupiah(row.saldo_poin)} poin` : "•••••••"}
+                        {visible ? formatNominal(row.saldo_poin, "poin") : "•••••••"}
                     </span>
                 );
             },
         },
         {
             key: "aksi",
-            header: "Aksi",
+            header: "Lihat",
             width: "70px",
             align: "center",
             render: (row) => {
@@ -214,10 +206,9 @@ export default function SaldoPage() {
 
     return (
         <>
-            {/* ── Page Header ── */}
             <div className="nasabah-hero">
                 <div className="nasabah-hero-left">
-                    <h1 className="nasabah-hero-title">Saldo Nasabah</h1>
+                    <h1 className="nasabah-hero-title">Monitoring Saldo Nasabah</h1>
                     <p className="nasabah-hero-desc">
                         Pantau saldo uang dan poin seluruh nasabah bank sampah Anda dalam satu tampilan.
                     </p>
@@ -238,29 +229,27 @@ export default function SaldoPage() {
                 )}
             </div>
 
-            {/* ── Overview Cards ── */}
             <div className="saldo-overview">
                 <div className="pn-saldo-card pn-saldo-card--green">
                     <div className="pn-saldo-icon"><FaMoneyBillWave /></div>
                     <div className="pn-saldo-body">
                         <span className="pn-saldo-number">
-                            Rp {formatRupiah(overview?.total_uang ?? 0)}
+                            {formatNominal(overview?.total_uang ?? 0, "Rp")}
                         </span>
-                        <span className="pn-saldo-status">Total Saldo Uang</span>
+                        <span className="pn-saldo-status">Total Saldo Rupiah</span>
                     </div>
                 </div>
                 <div className="pn-saldo-card pn-saldo-card--teal">
                     <div className="pn-saldo-icon"><FaStar /></div>
                     <div className="pn-saldo-body">
                         <span className="pn-saldo-number">
-                            {formatRupiah(overview?.total_poin ?? 0)} poin
+                            {formatNominal(overview?.total_poin ?? 0, "poin")}
                         </span>
                         <span className="pn-saldo-status">Total Saldo Poin</span>
                     </div>
                 </div>
             </div>
 
-            {/* ── Toolbar: Search LEFT, Export RIGHT ── */}
             <div className="nasabah-filter-bar">
                 <SearchBar
                     placeholder="Cari nama atau ID nasabah..."
@@ -270,25 +259,25 @@ export default function SaldoPage() {
                 />
             </div>
 
-            {/* ── Table ── */}
             <div className="bsu-table-section">
                 {effectiveLoading ? (
                     <SkeletonTable rows={6} columns={columns.length} />
-                ) : filtered.length === 0 ? (
-                    <EmptyState
-                        icon={<FaWallet />}
-                        title={searchQuery ? "Nasabah tidak ditemukan" : "Belum ada data saldo"}
-                        description={
-                            searchQuery
-                                ? `Tidak ada hasil untuk "${searchQuery}". Coba kata kunci lain.`
-                                : "Belum ada nasabah yang terdaftar di bank sampah ini."
-                        }
-                    />
                 ) : (
                     <Table
                         columns={columns}
                         data={filtered}
                         rowKey={(row) => row.nasabah_id}
+                        emptyMessage={
+                            <EmptyState
+                                icon={<FaWallet />}
+                                title={searchQuery ? "Nasabah tidak ditemukan" : "Belum ada data saldo"}
+                                description={
+                                    searchQuery
+                                        ? `Tidak ada hasil untuk "${searchQuery}". Coba kata kunci lain.`
+                                        : "Belum ada nasabah yang terdaftar di bank sampah ini."
+                                }
+                            />
+                        }
                     />
                 )}
 

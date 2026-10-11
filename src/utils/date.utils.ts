@@ -10,49 +10,52 @@ function parse(iso: string): Date {
     return new Date(s);
 }
 
-/** "31 Mei 2026" */
 export function formatTanggal(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PENDEK[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** "31 Januari 2026" */
 export function formatTanggalPanjang(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** "Selasa, 25 Agustus 2026" */
 export function formatTanggalDenganHari(iso: string): string {
     const d = parse(iso);
     return `${HARI_PANJANG[d.getDay()]}, ${d.getDate()} ${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** "31 Mei" (no year) */
 export function formatTanggalPendek(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PENDEK[d.getMonth()]}`;
 }
 
-/** "22.39" */
 export function formatJam(iso: string): string {
     const d = parse(iso);
     return `${String(d.getHours()).padStart(2, "0")}.${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-/** "31 Mei 2026, 22.39" */
+export function formatTime(timeStr: string): string {
+    if (!timeStr) return "";
+    const m = timeStr.match(/^(\d{2}:\d{2})(:\d{2})?(?:[+-]\d{2}:\d{2}|Z)?$/);
+    if (m) return m[1];
+    try {
+        const d = new Date(timeStr);
+        if (isNaN(d.getTime())) return timeStr;
+        return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", hour12: false });
+    } catch { return timeStr; }
+}
+
 export function formatTanggalJam(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PENDEK[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2, "0")}.${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-/** "31 Mei 2026 • 22.39" */
 export function formatTanggalJamBullet(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PENDEK[d.getMonth()]} ${d.getFullYear()} • ${String(d.getHours()).padStart(2, "0")}.${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-/** "Mei 2026" */
 export function formatBulanTahun(iso: string): string {
     const d = parse(iso);
     return `${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;

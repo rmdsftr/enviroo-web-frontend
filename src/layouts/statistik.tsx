@@ -1,4 +1,5 @@
 import type { ElementType } from "react";
+import { formatDecimal } from "../utils/number.utils";
 import "../styles/statistik.css";
 
 type Variant = "default" | "success" | "warning" | "danger" | "teal";
@@ -23,7 +24,7 @@ export default function StatistikLayout({
     onClick,
 }: Props) {
     const formattedAngka =
-        typeof angka === "number" ? angka.toLocaleString("id-ID") : angka;
+        typeof angka === "number" ? formatDecimal(angka) : angka;
 
     return (
         <div

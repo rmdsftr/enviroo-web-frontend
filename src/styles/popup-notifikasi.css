@@ -1,6 +1,3 @@
-/* =========================================================
-   Popup Notifikasi — Toast
-   ========================================================= */
 .popup-notifikasi-overlay {
     position: fixed;
     top: 1.5rem;
@@ -70,7 +67,6 @@
     line-height: 1.45;
 }
 
-/* ── Variants ── */
 .popup-notifikasi-container.notif-success {
     border-left-color: var(--c-primary);
     background: linear-gradient(90deg, #e6f4ea, #ffffff 60%);

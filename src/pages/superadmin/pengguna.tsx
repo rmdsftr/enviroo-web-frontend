@@ -15,7 +15,6 @@ import { UsersService, type AllUserItem } from "../../services/users.service";
 import "../../styles/nasabah.css";
 import "../../styles/table.css";
 
-/* ── Role badge styling ──────────────────────────────────── */
 function roleBadgeStyle(role: string): React.CSSProperties {
     if (role === "Belum Terdaftar")
         return { background: "rgba(245,166,35,0.12)", color: "#b07c10", border: "1px solid rgba(245,166,35,0.25)" };
@@ -63,18 +62,15 @@ export default function SuperadminPenggunaPage() {
     const [search, setSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    // Server-mode state
     const [pageUsers, setPageUsers] = useState<AllUserItem[]>([]);
     const [serverTotalPages, setServerTotalPages] = useState(1);
     const [serverTotalItems, setServerTotalItems] = useState(0);
 
-    // Local-mode state: semua data, di-cache setelah pertama kali dimuat
     const [allUsers, setAllUsers] = useState<AllUserItem[]>([]);
     const [allUsersLoaded, setAllUsersLoaded] = useState(false);
 
     const isLocalMode = search.trim() !== "" || roleFilter !== "";
 
-    // Server mode: fetch halaman saat ini
     useEffect(() => {
         if (isLocalMode) return;
         setLoading(true);
@@ -89,7 +85,6 @@ export default function SuperadminPenggunaPage() {
             .finally(() => setLoading(false));
     }, [currentPage, isLocalMode]);
 
-    // Fetch semua user untuk stats + local mode filter (di-cache, background)
     useEffect(() => {
         if (allUsersLoaded) return;
         UsersService.getAllUsers()
@@ -101,7 +96,6 @@ export default function SuperadminPenggunaPage() {
             .catch(() => {});
     }, [allUsersLoaded]);
 
-    /* ── Stats ───────────────────────────────────────────── */
     const stats = useMemo(() => {
         const src = allUsersLoaded ? allUsers : [];
         return {
@@ -112,7 +106,6 @@ export default function SuperadminPenggunaPage() {
         };
     }, [allUsers, allUsersLoaded, serverTotalItems]);
 
-    /* ── Filtered list (local mode) ──────────────────────── */
     const filtered = useMemo(() => {
         if (!isLocalMode) return allUsers;
         let list = allUsers;
@@ -147,7 +140,6 @@ export default function SuperadminPenggunaPage() {
 
     return (
         <>
-            {/* ── Hero ─────────────────────────────────────── */}
             <div className="nasabah-hero">
                 <div className="nasabah-hero-left">
                     <h1 className="nasabah-hero-title">Manajemen Pengguna</h1>
@@ -157,7 +149,6 @@ export default function SuperadminPenggunaPage() {
                 </div>
             </div>
 
-            {/* ── Stats ────────────────────────────────────── */}
             <div className="statistik">
                 <StatistikLayout icon={FaUsers}      angka={stats.total}   status="Total Pengguna" variant="default" />
                 <StatistikLayout icon={FaUserGroup}  angka={stats.nasabah} status="Nasabah"         variant="success" />
@@ -165,7 +156,6 @@ export default function SuperadminPenggunaPage() {
                 <StatistikLayout icon={FaUserXmark}  angka={stats.kosong}  status="Akun Kosong"     variant="warning" />
             </div>
 
-            {/* ── Filter + Search ───────────────────────────── */}
             <div className="nasabah-filter-bar">
                 <FilterPill
                     options={FILTER_OPTIONS}
@@ -180,7 +170,6 @@ export default function SuperadminPenggunaPage() {
                 />
             </div>
 
-            {/* ── Table ────────────────────────────────────── */}
             <div className="bsu-table-section">
                 {error && <div className="nasabah-error-banner">{error}</div>}
 
@@ -251,7 +240,6 @@ export default function SuperadminPenggunaPage() {
                     </table>
                 </div>
 
-                {/* ── Pagination ───────────────────────────── */}
                 {totalPages > 1 && (
                     <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                         <Pagination

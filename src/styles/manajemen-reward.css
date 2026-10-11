@@ -1,12 +1,7 @@
-/* ══════════════════════════════════════════
-   Manajemen Reward — Section on Penjualan (Create New)
-   ══════════════════════════════════════════ */
-
 .mr-section {
     padding: 0 24px 28px;
 }
 
-/* ── Header (mirrors nasabah-hero styling) ── */
 .mr-header {
     display: flex;
     align-items: flex-start;
@@ -74,7 +69,6 @@
     margin-bottom: 16px;
 }
 
-/* ── Cards Row ── */
 .mr-cards-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -112,22 +106,6 @@
     opacity: 0;
     transition: opacity var(--t-base, 0.16s);
 }
-
-/* .mr-card--uang::before {
-    background: linear-gradient(90deg, #4EA771, #94DF0C);
-}
-
-.mr-card--emas::before {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-
-.mr-card--default::before {
-    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-}
-
-.mr-card:hover::before {
-    opacity: 1;
-} */
 
 .mr-card:hover {
     transform: translateY(-2px);
@@ -172,6 +150,62 @@
 .mr-card-icon--default {
     background: rgba(14, 165, 233, 0.10);
     color: var(--c-info, #0ea5e9);
+}
+
+.mr-card-percent {
+    align-self: center;
+    min-width: 62px;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: #4EA771;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.mr-card-badges {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mr-card-state-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 2px 10px;
+    border-radius: var(--r-pill, 999px);
+    font-family: var(--ff-sans, 'Poppins', sans-serif);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.mr-card-state-badge--empty {
+    border: 1px dashed var(--c-border, #d6ded9);
+    background: var(--c-surface-muted, #f2f5f3);
+    color: var(--c-text-muted, #6a7c72);
+}
+
+.mr-card-state-badge--off {
+    border: 1px solid rgba(180, 83, 9, 0.22);
+    background: rgba(245, 158, 11, 0.10);
+    color: var(--c-warning-600, #b45309);
+}
+
+.mr-card--inactive {
+    background: var(--c-surface-muted, #f8faf9);
+}
+
+.mr-card--inactive .mr-card-name,
+.mr-card--inactive .mr-card-desc {
+    opacity: 0.55;
+}
+
+.mr-card--inactive .mr-card-satuan {
+    background: var(--c-surface-muted, #f2f5f3);
+    color: var(--c-text-muted, #6a7c72);
 }
 
 .mr-card-actions {
@@ -274,7 +308,6 @@
     color: var(--c-primary, #4EA771);
 }
 
-/* ── Plus Card (add) ── */
 .mr-card--add {
     background: #fafdf9;
     border: 2px dashed rgba(78, 167, 113, 0.35);
@@ -323,7 +356,6 @@
     max-width: 220px;
 }
 
-/* ── Skeleton & Empty ── */
 .mr-card-skeleton {
     background: var(--c-surface, #ffffff);
     border: 1.5px solid var(--c-border-soft, #e7edea);
@@ -393,9 +425,6 @@
     line-height: 1.55;
 }
 
-/* ══════════════════════════════════════════
-   Modals (Picker & Form)
-   ══════════════════════════════════════════ */
 .mr-modal-overlay {
     position: fixed;
     inset: 0;
@@ -483,7 +512,6 @@
     line-height: 1.5;
 }
 
-/* ── Picker search ── */
 .mr-picker-search {
     display: flex;
     align-items: center;
@@ -507,7 +535,6 @@
     color: var(--c-text-faint, #9aaaa2);
 }
 
-/* ── Picker body & list ── */
 .mr-picker-body {
     padding: 14px 14px 20px;
     overflow-y: auto;
@@ -675,7 +702,6 @@
     line-height: 1.55;
 }
 
-/* ── Form modal ── */
 .mr-modal-form {
     padding: 20px 22px 22px;
     display: flex;
@@ -792,7 +818,6 @@
     padding-top: 4px;
 }
 
-/* ── Input Override (white bg, muted border, green focus) ── */
 .mr-input-override.input-wrapper {
     background-color: #ffffff !important;
     border: 1px solid #d1d9d4 !important;
@@ -815,7 +840,6 @@
     color: var(--c-text-subtle, #8aab97) !important;
 }
 
-/* ── Modern toggle switch (aktif/nonaktif) ── */
 .mr-toggle {
     display: inline-flex;
     align-items: center;
@@ -873,7 +897,6 @@
     color: var(--c-secondary, #013236);
 }
 
-/* ── Animations ── */
 @keyframes mrFadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -884,9 +907,6 @@
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ══════════════════════════════════════════
-   Responsive
-   ══════════════════════════════════════════ */
 @media (max-width: 900px) {
     .mr-section {
         padding: 0 16px 24px;

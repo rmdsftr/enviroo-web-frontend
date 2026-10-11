@@ -36,25 +36,19 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* For Webkit browsers (Chrome, Safari, Opera) */
-
-/* The entire scrollbar */
 ::-webkit-scrollbar {
-  width: 6px; /* width of the vertical scrollbar */
-  height: 6px; /* height of the horizontal scrollbar */
+  width: 6px;
+  height: 6px;
 }
 
-/* The draggable handle */
 ::-webkit-scrollbar-thumb {
-  background: #4EA771; /* color of the scrollbar thumb */
-  border-radius: 10px; /* round the corners of the thumb */
-  /* Ensures border works with background-clip: padding-box for finer control */
+  background: #4EA771;
+  border-radius: 10px;
   border: 2px solid transparent; 
   background-clip: padding-box; 
 }
 
-/* The track (background) */
 ::-webkit-scrollbar-track {
-  background: #4ea7721c; /* color of the scrollbar track */
-  border-radius: 10px; /* round the corners of the track */
+  background: #4ea7721c;
+  border-radius: 10px;
 }

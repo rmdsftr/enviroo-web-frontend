@@ -1,24 +1,23 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { FaCalendarDay, FaCalendarWeek, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import Tabs from "../components/tabs";
-import {
-    JadwalService,
-    type SuperadminJadwalBank,
-    type SuperadminPengangkutanBsi,
-} from "../services/jadwal.service";
+import { JadwalService } from "../services/jadwal.service";
+import type {
+    SuperadminJadwalBank,
+    SuperadminPengangkutanBsi,
+} from "../types/jadwal.type";
 import "../styles/jadwal.css";
 
 type TabType   = "penimbangan" | "pengangkutan";
 type BankType  = "bsi" | "bsm" | "bsu";
 
-/* ── Normalised item used by this page ── */
 interface SuperadminJadwalItem {
     jadwal_id: string;
-    chip_label: string;        // shown in calendar cell chip
-    chip_class: string;        // CSS modifier: bt-bsi/bsm/bsu or bt-angkut
-    detail_primary: string;    // penimbangan: bank name | pengangkutan: BSI name
-    detail_secondary?: string; // pengangkutan only: BSU name
-    bank_type?: BankType;      // penimbangan only
+    chip_label: string;
+    chip_class: string;
+    detail_primary: string;
+    detail_secondary?: string;
+    bank_type?: BankType;
     is_rutin: boolean;
     hari: string;
     minggu_ke: number;
@@ -28,7 +27,6 @@ interface SuperadminJadwalItem {
     nama_jadwal_spesial: string;
 }
 
-/* ── Constants ── */
 const HARI_MAP: Record<string, string> = {
     Sunday: "minggu", Monday: "senin", Tuesday: "selasa",
     Wednesday: "rabu", Thursday: "kamis", Friday: "jumat", Saturday: "sabtu",
@@ -39,7 +37,6 @@ const HARI_DISPLAY: Record<string, string> = {
 };
 const CAL_HEADERS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
-/* ── Calendar helpers ── */
 function getMondayFirstCol(date: Date): number {
     const d = date.getDay();
     return d === 0 ? 6 : d - 1;
@@ -78,7 +75,6 @@ function getItemsForDate(date: Date, items: SuperadminJadwalItem[]): SuperadminJ
         .sort((a, b) => a.jam_mulai.localeCompare(b.jam_mulai));
 }
 
-/* ── Normalize penimbangan response ── */
 function normalizePenimbangan(
     data: { bsi: SuperadminJadwalBank[]; bsm: SuperadminJadwalBank[]; bsu: SuperadminJadwalBank[] }
 ): SuperadminJadwalItem[] {
@@ -123,7 +119,6 @@ function normalizePenimbangan(
     return result;
 }
 
-/* ── Normalize pengangkutan response (BSI → BSU routes) ── */
 function normalizeAngkutan(data: SuperadminPengangkutanBsi[]): SuperadminJadwalItem[] {
     const result: SuperadminJadwalItem[] = [];
     for (const bsi of data ?? []) {
@@ -165,9 +160,6 @@ function normalizeAngkutan(data: SuperadminPengangkutanBsi[]): SuperadminJadwalI
     return result;
 }
 
-/* ============================================================
-   PAGE
-   ============================================================ */
 export default function JadwalPage() {
     const [activeTab, setActiveTab] = useState<TabType>("penimbangan");
     const [penimbanganList, setPenimbanganList] = useState<SuperadminJadwalItem[]>([]);
@@ -180,7 +172,6 @@ export default function JadwalPage() {
     const prevM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
     const nextM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1));
 
-    /* ── Fetch ── */
     const fetchAll = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -200,7 +191,6 @@ export default function JadwalPage() {
 
     useEffect(() => { fetchAll(); }, [fetchAll]);
 
-    /* ── Derived ── */
     const activeList = activeTab === "penimbangan" ? penimbanganList : pengangkutanList;
 
     const calWeeks = useMemo(
@@ -220,11 +210,9 @@ export default function JadwalPage() {
     const isToday = (d: Date) => d.toDateString() === new Date().toDateString();
     const isSel   = (d: Date) => d.toDateString() === selectedDate.toDateString();
 
-    /* ── Render ── */
     return (
         <div className="jadwal-page">
 
-            {/* Tabs */}
             <div className="jadwal-page-header">
                 <Tabs
                     tabs={[
@@ -243,10 +231,8 @@ export default function JadwalPage() {
                 <div className="nasabah-error-banner">{error}</div>
             )}
 
-            {/* ── Calendar Matrix ── */}
             <div className="jadwal-cal-card">
 
-                {/* Header */}
                 <div className="jadwal-cal-header">
                     <div className="jadwal-cal-header-left">
                         <div className="jadwal-card-header-icon"
@@ -282,12 +268,10 @@ export default function JadwalPage() {
                     </div>
                 </div>
 
-                {/* Day-of-week headers */}
                 <div className="jadwal-cal-grid-header">
                     {CAL_HEADERS.map(d => <div key={d} className="jadwal-cal-dh">{d}</div>)}
                 </div>
 
-                {/* Body */}
                 {loading ? (
                     <div style={{ padding: "56px 0", textAlign: "center", color: "#7a9e8a", fontFamily: "var(--ff-sans)", fontSize: 13 }}>
                         Memuat data jadwal...
@@ -336,7 +320,6 @@ export default function JadwalPage() {
                     </div>
                 )}
 
-                {/* Selected-date detail strip */}
                 <div className="jadwal-cal-detail-panel">
                     <div className="jadwal-cal-detail-header">
                         <FaCalendarDay className="jadwal-cal-detail-icon" />

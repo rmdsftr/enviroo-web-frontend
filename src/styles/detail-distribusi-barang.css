@@ -1,16 +1,9 @@
-/* =========================================================
-   Detail Distribusi Barang — Additional Styles
-   (imports alongside detail-penimbangan.css for dp- base classes)
-   ========================================================= */
-
-/* ── Items List ── */
 .dpd-items-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-/* ── Item Row ── */
 .dpd-item-row {
     display: flex;
     align-items: flex-start;
@@ -27,7 +20,6 @@
     background: rgba(148, 223, 12, 0.02);
 }
 
-/* ── Thumbnail (square, with photo or icon fallback) ── */
 .dpd-item-img {
     width: 46px;
     height: 46px;
@@ -48,7 +40,6 @@
     object-fit: cover;
 }
 
-/* ── Body ── */
 .dpd-item-body {
     display: flex;
     flex-direction: column;
@@ -74,7 +65,6 @@
     font-weight: 500;
 }
 
-/* ── Stok Change Chips ── */
 .dpd-stok-grid {
     display: flex;
     gap: 6px;
@@ -120,7 +110,6 @@
     color: #22c55e;
 }
 
-/* ── Right: Subtotal ── */
 .dpd-item-right {
     display: flex;
     flex-direction: column;
@@ -144,7 +133,6 @@
     font-weight: 500;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .dpd-item-row {
         gap: 10px;

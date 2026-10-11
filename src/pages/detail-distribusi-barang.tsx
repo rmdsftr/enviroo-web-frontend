@@ -15,6 +15,7 @@ import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import "../styles/detail-distribusi-barang.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
 const STATUS_DISTRIBUSI: Record<string, { label: string; cls: string }> = {
     pending: { label: "Pending", cls: "aktif"      },
@@ -59,7 +60,6 @@ export default function DetailDistribusiBarangPage() {
 
             <div className="dp-page">
 
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Distribusi Barang</h1>
@@ -82,7 +82,6 @@ export default function DetailDistribusiBarangPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
 
                             <div className="dp-overview-header">
@@ -101,7 +100,6 @@ export default function DetailDistribusiBarangPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaCalendarDays /></div>
@@ -146,7 +144,6 @@ export default function DetailDistribusiBarangPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Stats */}
                             <div className="dp-stats-row">
                                 <div className="dp-stat-chip">
                                     <span className="dp-stat-chip-value">{detail.header.total_item}</span>
@@ -160,7 +157,6 @@ export default function DetailDistribusiBarangPage() {
 
                         </div>
 
-                        {/* ── RIGHT: Daftar Barang ── */}
                         <div className="dp-setoran-col">
                             <div className="dp-setoran-header">
                                 <div>
@@ -180,7 +176,6 @@ export default function DetailDistribusiBarangPage() {
                                     {detail.items.map((item) => (
                                         <div key={item.produk_id} className="dpd-item-row">
 
-                                            {/* Thumbnail */}
                                             <div className="dpd-item-img">
                                                 {item.photo_url
                                                     ? <img src={item.photo_url} alt={item.nama_barang} />
@@ -188,31 +183,28 @@ export default function DetailDistribusiBarangPage() {
                                                 }
                                             </div>
 
-                                            {/* Body */}
                                             <div className="dpd-item-body">
                                                 <span className="dpd-item-name">{item.nama_barang}</span>
                                                 <span className="dpd-item-detail">
-                                                    {item.item} item &times; {item.nilai_poin} poin
+                                                    {formatDecimal(item.item)} item &times; {formatNominal(item.nilai_poin, "poin")}
                                                 </span>
 
-                                                {/* Stok changes */}
                                                 <div className="dpd-stok-grid">
                                                     <div className="dpd-stok-chip">
                                                         <span className="dpd-stok-chip-label">BSI</span>
-                                                        <span className="dpd-stok-val-before">{item.stok_bsi_sebelum}</span>
+                                                        <span className="dpd-stok-val-before">{formatDecimal(item.stok_bsi_sebelum)}</span>
                                                         <span className="dpd-stok-arrow">→</span>
-                                                        <span className="dpd-stok-val-down">{item.stok_bsi_sesudah}</span>
+                                                        <span className="dpd-stok-val-down">{formatDecimal(item.stok_bsi_sesudah)}</span>
                                                     </div>
                                                     <div className="dpd-stok-chip">
                                                         <span className="dpd-stok-chip-label">BSU</span>
-                                                        <span className="dpd-stok-val-before">{item.stok_bsu_sebelum}</span>
+                                                        <span className="dpd-stok-val-before">{formatDecimal(item.stok_bsu_sebelum)}</span>
                                                         <span className="dpd-stok-arrow">→</span>
-                                                        <span className="dpd-stok-val-up">{item.stok_bsu_sesudah}</span>
+                                                        <span className="dpd-stok-val-up">{formatDecimal(item.stok_bsu_sesudah)}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Subtotal */}
                                             <div className="dpd-item-right">
                                                 <span className="dpd-item-subtotal">{item.subtotal_poin}</span>
                                                 <span className="dpd-item-subtotal-label">poin</span>

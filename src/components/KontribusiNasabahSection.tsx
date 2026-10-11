@@ -4,6 +4,7 @@ import FilterRange from "./filter-range";
 import Dropdown from "./dropdown";
 import Pagination from "./pagination";
 import { StatistikService, type KontribusiNasabahItem } from "../services/statistik.service";
+import { formatDecimal, formatQty } from "../utils/number.utils";
 import "../styles/setoran-dashboard.css";
 
 const MONTH_ID = [
@@ -42,11 +43,11 @@ function NasabahRow({ item, rank, sortBy }: { item: KontribusiNasabahItem; rank:
     const rankCls = rank <= 3 ? `kns-rank--${rank}` : "kns-rank--other";
 
     const statLabel = sortBy === "kg"
-        ? `${item.total_kg.toLocaleString("id-ID", { maximumFractionDigits: 2 })} kg`
+        ? formatQty(item.total_kg, "kg")
         : sortBy === "pcs"
-        ? `${item.total_pcs.toLocaleString("id-ID", { maximumFractionDigits: 2 })} pcs`
+        ? formatQty(item.total_pcs, "pcs")
         : sortBy === "liter"
-        ? `${item.total_liter.toLocaleString("id-ID", { maximumFractionDigits: 2 })} liter`
+        ? formatQty(item.total_liter, "liter")
         : null;
 
     return (
@@ -60,7 +61,7 @@ function NasabahRow({ item, rank, sortBy }: { item: KontribusiNasabahItem; rank:
             </div>
             <div className="kns-stats">
                 {sortBy === "setoran"
-                    ? <span className="kns-setoran-count">{item.jumlah_setoran}x setoran</span>
+                    ? <span className="kns-setoran-count">{formatDecimal(item.jumlah_setoran)}x setoran</span>
                     : statLabel && <span className="kns-unit-pill">{statLabel}</span>
                 }
             </div>

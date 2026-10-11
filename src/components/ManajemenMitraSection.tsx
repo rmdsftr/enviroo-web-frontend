@@ -30,17 +30,14 @@ export default function ManajemenMitraSection() {
     const [error, setError] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("aktif");
 
-    // Form state
     const [formOpen, setFormOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<MitraPengepul | null>(null);
 
-    // Delete state
     const [deleteTarget, setDeleteTarget] = useState<MitraPengepul | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const [popup, setPopup] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-    /* ── Fetcher ──────────────────────────────────────────── */
     const fetchMitra = useCallback(async () => {
         if (!bankId) {
             setError("Bank tidak teridentifikasi pada sesi Anda.");
@@ -67,7 +64,6 @@ export default function ManajemenMitraSection() {
         return mitraList.filter(m => (statusFilter === "aktif" ? m.is_active : !m.is_active));
     }, [mitraList, statusFilter]);
 
-    /* ── Handlers ─────────────────────────────────────────── */
     const openAdd = () => { setEditTarget(null); setFormOpen(true); };
     const openEdit = (mitra: MitraPengepul) => { setEditTarget(mitra); setFormOpen(true); };
     const closeForm = () => { setFormOpen(false); setEditTarget(null); };
@@ -103,7 +99,6 @@ export default function ManajemenMitraSection() {
         }
     };
 
-    /* ── Table columns ────────────────────────────────────── */
     const columns: ColumnDef<MitraPengepul>[] = [
         {
             key: "mitra_id",
@@ -151,13 +146,11 @@ export default function ManajemenMitraSection() {
         },
     ];
 
-    /* ── Render ───────────────────────────────────────────── */
     return (
         <section className="mr-section">
-            {/* Header */}
             <div className="mr-header">
                 <div className="mr-header-left">
-                    <h2 className="mr-header-title">Manajemen Mitra Pengepul</h2>
+                    <h2 className="mr-header-title">Kelola Mitra Pengepul</h2>
                     <p className="mr-header-desc">
                         Kelola pengepul yang bermitra dengan bank sampah. Petugas juga bisa menambah mitra saat melakukan penjualan.
                     </p>
@@ -169,7 +162,6 @@ export default function ManajemenMitraSection() {
 
             {error && <div className="mr-error-banner">{error}</div>}
 
-            {/* Card: Filter + Table */}
             <div className="mm-card">
                 <div className="mm-card-toolbar">
                     <FilterPill
@@ -195,7 +187,6 @@ export default function ManajemenMitraSection() {
                 )}
             </div>
 
-            {/* ── Form Modal ── */}
             <MitraFormModal
                 isOpen={formOpen}
                 onClose={closeForm}
@@ -203,7 +194,6 @@ export default function ManajemenMitraSection() {
                 initialData={editTarget}
             />
 
-            {/* ── Delete confirmation ── */}
             <PopupConfirmation
                 isOpen={!!deleteTarget}
                 type="danger"

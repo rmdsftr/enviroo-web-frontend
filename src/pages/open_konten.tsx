@@ -24,7 +24,6 @@ export default function OpenKontenPage() {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [viewPhotoSrc, setViewPhotoSrc] = useState<string | null>(null);
 
-    // Sidebar: other content from the same bank
     const [otherKonten, setOtherKonten] = useState<KontenListItem[]>([]);
 
     useEffect(() => {
@@ -42,11 +41,9 @@ export default function OpenKontenPage() {
                         console.error("Failed to parse konten body", e);
                     }
                 }
-                // Fetch other articles from same bank for sidebar
                 if (res.data.BankID) {
                     try {
                         const allRes = await KontenService.getAllKonten(res.data.BankID, true);
-                        // Exclude current article, take up to 5
                         setOtherKonten((allRes.data || []).filter(k => k.konten_id !== id).slice(0, 5));
                     } catch { /* ignore */ }
                 }
@@ -61,7 +58,6 @@ export default function OpenKontenPage() {
         fetchDetail();
     }, [id]);
 
-    /* ── Loading ── */
     if (isLoading) {
         return (
             <div className="ok-page">
@@ -73,7 +69,6 @@ export default function OpenKontenPage() {
         );
     }
 
-    /* ── Error ── */
     if (error || !konten) {
         return (
             <div className="ok-page">
@@ -92,7 +87,6 @@ export default function OpenKontenPage() {
 
     const tanggal = formatTanggalPanjang(konten.CreatedAt);
 
-    // Cek apakah user yang login adalah penulis konten ini
     const isOwner = user?.identity_id === konten.AdminID;
 
     const handleDelete = () => {
@@ -132,19 +126,15 @@ export default function OpenKontenPage() {
                 onConfirm={doDelete}
                 onCancel={() => setShowDeleteConfirm(false)}
             />
-            {/* ── Header Row ── */}
             <div className="ok-header-row">
                 <button className="ok-back-btn" onClick={() => navigate(-1)}>
                     <FaArrowLeft /> Kembali
                 </button>
             </div>
 
-            {/* ── Two-column Layout ── */}
             <div className="ok-layout">
-                {/* Left: Article Card */}
                 <div className="ok-main">
                     <div className="ok-card">
-                        {/* Banner — clean image only */}
                         <div className="ok-banner">
                             {konten.Thumbnail ? (
                                 <img
@@ -163,7 +153,6 @@ export default function OpenKontenPage() {
                             </span>
                         </div>
 
-                        {/* Content */}
                         <div className="ok-content">
                             <h1 className="ok-title">{konten.Judul}</h1>
                             {konten.Deskripsi && (
@@ -192,7 +181,6 @@ export default function OpenKontenPage() {
                             </div>
                         </div>
 
-                        {/* Footer: author + date + status + actions */}
                         <div className="ok-footer">
                             <div className="ok-footer-meta">
                                 <div className="ok-footer-meta-info">
@@ -231,7 +219,6 @@ export default function OpenKontenPage() {
                     </div>
                 </div>
 
-                {/* Right: Sidebar */}
                 <aside className="ok-sidebar">
                     <div className="ok-sidebar-card">
                         <h3 className="ok-sidebar-title">Konten Lainnya</h3>

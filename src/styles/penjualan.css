@@ -1,8 +1,3 @@
-/* ══════════════════════════════════════════
-   Penjualan Page
-   ══════════════════════════════════════════ */
-
-/* ── Hero Header ── */
 .penjualan-hero {
     display: flex;
     align-items: flex-start;
@@ -46,7 +41,6 @@
     flex-shrink: 0;
 }
 
-/* ── Error Banner ── */
 .penjualan-error-banner {
     margin: 0 24px 16px;
     padding: 12px 16px;
@@ -59,12 +53,10 @@
     font-weight: 500;
 }
 
-/* ── Content Section ── */
 .penjualan-section {
     padding: 0 24px 28px;
 }
 
-/* ── Placeholder / coming-soon card ── */
 .penjualan-placeholder {
     background: var(--c-surface, #ffffff);
     border: 1.5px dashed var(--c-border, #d6ded9);
@@ -107,15 +99,10 @@
     line-height: 1.6;
 }
 
-/* ══════════════════════════════════════════
-   Penjualan Create New Page
-   ══════════════════════════════════════════ */
-
 .penjualan-new-page {
     padding-bottom: 40px;
 }
 
-/* Hero section (same style as nasabah) */
 .penjualan-new-hero {
     display: flex;
     align-items: flex-start;
@@ -159,14 +146,12 @@
     flex-shrink: 0;
 }
 
-/* ── Divider between sections ── */
 .penjualan-section-divider {
     height: 1px;
     background: rgba(1, 50, 54, 0.06);
     margin: 4px 24px 0;
 }
 
-/* ── Other form section placeholder ── */
 .penjualan-form-section {
     margin: 0 24px 24px;
     background: var(--c-surface, #ffffff);
@@ -202,7 +187,6 @@
     font-size: 12.5px;
 }
 
-/* ── Action footer ── */
 .penjualan-action-footer {
     display: flex;
     align-items: center;
@@ -216,7 +200,6 @@
     z-index: 10;
 }
 
-/* ── Responsive ── */
 @media (max-width: 900px) {
     .penjualan-hero,
     .penjualan-new-hero {

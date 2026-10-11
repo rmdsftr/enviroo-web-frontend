@@ -1,10 +1,10 @@
 export interface Reward {
-    RewardID: number;
-    NamaReward: string;
-    Satuan: string;
-    Deskripsi?: string | null;
-    CreatedAt: string;
-    UpdatedAt: string;
+    reward_id: number;
+    nama_reward: string;
+    satuan: string;
+    deskripsi?: string | null;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface AddRewardRequest {
@@ -19,7 +19,6 @@ export interface UpdateRewardRequest {
     deskripsi?: string | null;
 }
 
-/* ── Nilai Reward (per-bank conversion) ─────────────────────────────── */
 export interface NilaiRewardBank {
     nilai_reward_id: string;
     bank_id: string;
@@ -51,9 +50,8 @@ export interface UpdateNilaiRewardRequest {
 }
 
 export interface HistoryNilaiReward {
-    history_reward_id: number;
+    history_reward_id: string;
     nilai_reward_id: string;
-    level_user: string;
     old_persen?: number | null;
     new_persen?: number | null;
     changed_by: string;

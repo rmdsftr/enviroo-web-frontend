@@ -14,21 +14,15 @@ import {
 } from "../services/bagi_hasil_penjualan.service";
 import "../styles/detail-penyetoran.css";
 import { formatTanggalPanjang, formatJam } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
-/* ── Helpers ── */
-function fmtAmount(amount: number, satuan: string): string {
-    const num = amount.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
 function getInitials(name: string): string {
     return name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
 }
 
-/* ── Column widths for item table ── */
 const ITEM_GRID = "32px 1fr 60px 120px 120px";
 
-/* ── Component ── */
 export default function PenerimaBagiHasilPage() {
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
@@ -67,7 +61,6 @@ export default function PenerimaBagiHasilPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dps-page">
-                {/* Hero */}
                 <div className="dps-hero">
                     <h1>Penerima Bagi Hasil</h1>
                     <p>Rincian pembagian hasil penjualan sampah untuk nasabah</p>
@@ -79,7 +72,6 @@ export default function PenerimaBagiHasilPage() {
                 {!loading && !error && detail && (
                     <div className="dps-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dps-overview">
                             <div className="dps-overview-header">
                                 <div>
@@ -91,7 +83,6 @@ export default function PenerimaBagiHasilPage() {
                             <div className="dps-divider" />
 
                             <div className="dps-info-list">
-                                {/* Nasabah row with avatar */}
                                 <div className="dps-nasabah-row">
                                     <div className="dps-nasabah-avatar">
                                         {getInitials(detail.nama_nasabah)}
@@ -124,7 +115,7 @@ export default function PenerimaBagiHasilPage() {
                                 <div className="dps-info-row">
                                     <div className="dps-info-icon-wrap"><FaGift /></div>
                                     <div className="dps-info-text">
-                                        <span className="dps-info-label">Jenis Reward</span>
+                                        <span className="dps-info-label">Jenis Insentif</span>
                                         <span className="dps-info-value">{detail.reward}</span>
                                     </div>
                                 </div>
@@ -135,14 +126,13 @@ export default function PenerimaBagiHasilPage() {
                             <div className="dps-stats-row">
                                 <div className="dps-stat-chip">
                                     <span className="dps-stat-chip-value" style={{ fontSize: "16px" }}>
-                                        {fmtAmount(detail.total_diterima, detail.satuan_diterima)}
+                                        {formatNominal(detail.total_diterima, detail.satuan_diterima)}
                                     </span>
                                     <span className="dps-stat-chip-label">Total Diterima</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* ── RIGHT: Detail Items ── */}
                         <div className="dps-items-col">
                             <div className="dps-items-header">
                                 <div>
@@ -159,7 +149,6 @@ export default function PenerimaBagiHasilPage() {
                                 </div>
                             ) : (
                                 <div className="dps-items-list">
-                                    {/* Table header */}
                                     <div className="dps-item-thead" style={{ gridTemplateColumns: ITEM_GRID }}>
                                         <span className="dps-item-th dps-item-col-no">#</span>
                                         <span className="dps-item-th">Nama Sampah</span>
@@ -178,12 +167,12 @@ export default function PenerimaBagiHasilPage() {
                                             <div className="dps-item-name-wrap">
                                                 <span className="dps-item-name">{item.nama_sampah}</span>
                                             </div>
-                                            <span className="dps-item-qty">{item.qty}</span>
+                                            <span className="dps-item-qty">{formatDecimal(item.qty)}</span>
                                             <span className="dps-item-qty">
-                                                {fmtAmount(item.harga_item, detail.satuan_diterima)}
+                                                {formatNominal(item.harga_item, detail.satuan_diterima)}
                                             </span>
                                             <span className="dps-item-qty">
-                                                {fmtAmount(item.subtotal_harga, detail.satuan_diterima)}
+                                                {formatNominal(item.subtotal_harga, detail.satuan_diterima)}
                                             </span>
                                         </div>
                                     ))}

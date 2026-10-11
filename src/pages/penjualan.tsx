@@ -9,7 +9,6 @@ export default function PenjualanPage() {
     const { user } = useAuth();
     const role = (user?.role || "").toLowerCase();
     const isAdminBSI = role === "admin_bsi";
-    // Mitra pengepul hanya berlaku untuk bank tujuan BSI/BSM (BSU tidak diizinkan di backend).
     const canManageMitra = role === "admin_bsi" || role === "admin_bsm";
 
     return (

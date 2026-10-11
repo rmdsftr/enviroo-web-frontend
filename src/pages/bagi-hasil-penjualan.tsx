@@ -24,14 +24,9 @@ import {
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatNominal } from "../utils/number.utils";
 
-/* ── Helpers ── */
-function fmtAmount(amount: number, satuan: string): string {
-    const num = amount.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
-/* ── Nasabah Row ── */
 function NasabahRow({ nasabah, onClick }: { nasabah: NasabahPenerima; onClick?: () => void }) {
     return (
         <div
@@ -48,14 +43,13 @@ function NasabahRow({ nasabah, onClick }: { nasabah: NasabahPenerima; onClick?: 
             </div>
             <div className="dpj-item-right">
                 <span className="dpj-item-subtotal">
-                    {fmtAmount(nasabah.total_diterima, nasabah.satuan_diterima)}
+                    {formatNominal(nasabah.total_diterima, nasabah.satuan_diterima)}
                 </span>
             </div>
         </div>
     );
 }
 
-/* ── BSU Accordion Card ── */
 function BsuAccordionCard({ bsu, onNasabahClick }: { bsu: PenerimaBSU; onNasabahClick: (penerimaId: string) => void }) {
     const [open, setOpen] = useState(false);
     return (
@@ -96,7 +90,7 @@ function BsuAccordionCard({ bsu, onNasabahClick }: { bsu: PenerimaBSU; onNasabah
                                 <span className="dpj-item-detail">{n.nasabah_id}</span>
                             </div>
                             <div className="dpj-item-right">
-                                <span className="dpj-item-subtotal">{fmtAmount(n.total_diterima, n.satuan_diterima)}</span>
+                                <span className="dpj-item-subtotal">{formatNominal(n.total_diterima, n.satuan_diterima)}</span>
                             </div>
                         </div>
                     ))}
@@ -106,7 +100,6 @@ function BsuAccordionCard({ bsu, onNasabahClick }: { bsu: PenerimaBSU; onNasabah
     );
 }
 
-/* ── Component ── */
 export default function BagiHasilPenjualanPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -137,7 +130,7 @@ export default function BagiHasilPenjualanPage() {
         { label: "Detail Bagi Hasil" },
     ];
 
-    const fmt = (amount: number) => detail ? fmtAmount(amount, detail.satuan) : "";
+    const fmt = (amount: number) => detail ? formatNominal(amount, detail.satuan) : "";
     const hasPenerima = (detail?.penerima?.length ?? 0) > 0;
 
     return (
@@ -145,7 +138,6 @@ export default function BagiHasilPenjualanPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Bagi Hasil</h1>
@@ -164,7 +156,6 @@ export default function BagiHasilPenjualanPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
                             <div className="dp-overview-header">
                                 <div>
@@ -195,7 +186,7 @@ export default function BagiHasilPenjualanPage() {
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaGift /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Jenis Reward</span>
+                                        <span className="dp-info-label">Jenis Insentif</span>
                                         <span className="dp-info-value">{detail.reward}</span>
                                     </div>
                                 </div>
@@ -242,10 +233,8 @@ export default function BagiHasilPenjualanPage() {
                             )}
                         </div>
 
-                        {/* ── RIGHT: Nasabah Penerima ── */}
                         <div className="dp-setoran-col">
 
-                            {/* Nasabah Langsung */}
                             <div className="dp-setoran-header">
                                 <div>
                                     <p className="dp-setoran-title">
@@ -280,7 +269,6 @@ export default function BagiHasilPenjualanPage() {
                                 </div>
                             )}
 
-                            {/* BSU Sections — BSI only */}
                             {hasPenerima && (
                                 <>
                                     <div className="dp-divider" style={{ margin: "12px 0" }} />

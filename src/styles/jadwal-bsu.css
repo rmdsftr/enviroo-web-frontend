@@ -1,7 +1,3 @@
-/* =========================================================
-   Jadwal BSU — Dedicated Schedule Dashboard
-   ========================================================= */
-
 .jbsu {
     padding: 0 24px 40px;
     margin-top: 25px;
@@ -16,7 +12,6 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Header ── */
 .jbsu-header {
     display: flex;
     align-items: center;
@@ -41,7 +36,6 @@
 }
 
 
-/* ── Main Grid: Calendar Left + Schedule Right ── */
 .jbsu-main-grid {
     display: grid;
     grid-template-columns: 340px 1fr;
@@ -53,7 +47,6 @@
     .jbsu-main-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Shared Card ── */
 .jbsu-card {
     background: #ffffff;
     border-radius: 18px;
@@ -92,9 +85,6 @@
     margin: 0;
 }
 
-/* =========================================================
-   CALENDAR
-   ========================================================= */
 .jbsu-calendar {
     background: #ffffff;
     border-radius: 18px;
@@ -207,7 +197,6 @@
 .jbsu-cal-day.selected .jbsu-cal-dot.penimbangan { background: #013236; }
 .jbsu-cal-day.selected .jbsu-cal-dot.pengangkutan { background: #7c4700; }
 
-/* ── Selected date detail (below calendar) ── */
 .jbsu-selected-detail {
     background: #4EA771;
     border-radius: 16px;
@@ -312,16 +301,12 @@
     color: #fde68a;
 }
 
-/* =========================================================
-   RIGHT COLUMN — Stacked sections
-   ========================================================= */
 .jbsu-right-col {
     display: flex;
     flex-direction: column;
     gap: 22px;
 }
 
-/* ── Section Header Row ── */
 .jbsu-section-header {
     display: flex;
     align-items: center;
@@ -335,7 +320,6 @@
     gap: 8px;
 }
 
-/* ── Jadwal List (shared for penimbangan & pengangkutan) ── */
 .jbsu-schedule-list {
     display: flex;
     flex-direction: column;
@@ -438,7 +422,6 @@
     font-size: 13px;
 }
 
-/* ── Type Badge (small inline) ── */
 .jbsu-badge {
     font-family: 'Poppins', sans-serif;
     font-size: 9.5px;
@@ -455,11 +438,6 @@
     color: #a855f7;
 }
 
-/* =========================================================
-   RIWAYAT SECTION
-   ========================================================= */
-
-/* ── 2-column grid untuk 2 card riwayat sejajar ── */
 .jbsu-riwayat-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -473,12 +451,10 @@
     }
 }
 
-/* ── Row accent untuk pengangkutan ── */
 .jbsu-riwayat-row.angkut .jbsu-riwayat-time {
     color: #d97706;
 }
 
-/* ── Filter btn variant untuk pengangkutan ── */
 .jbsu-filter-btn.angkut.active {
     background: #f59e0b;
     color: #fff;
@@ -586,9 +562,6 @@
     color: #94a3b8;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
 @media (max-width: 768px) {
     .jbsu {
         padding: 0 16px 24px;
@@ -608,9 +581,6 @@
 
 }
 
-/* =========================================================
-   JADWAL MODAL
-   ========================================================= */
 .jmodal-overlay {
     position: fixed;
     inset: 0;
@@ -685,7 +655,6 @@
 
 .jmodal-close:hover { background: rgba(1, 50, 54, 0.12); }
 
-/* Toggle */
 .jmodal-type-toggle {
     display: flex;
     background: rgba(1, 50, 54, 0.06);
@@ -715,7 +684,6 @@
     box-shadow: 0 2px 8px rgba(1, 50, 54, 0.2);
 }
 
-/* Toggle */
 .jmodal-type-toggle {
     display: flex;
     background: #f1f5f9;
@@ -752,7 +720,6 @@
     box-shadow: 0 3px 8px rgba(1, 50, 54, 0.08);
 }
 
-/* Form layout */
 .jmodal-form {
     display: flex;
     flex-direction: column;
@@ -778,7 +745,6 @@
     color: #013236;
 }
 
-/* Neutral input override for the form fields */
 .jmodal-field .input-wrapper {
     background-color: #ffffff !important;
     border: 1px solid #d1d9d4 !important;
@@ -788,7 +754,6 @@
     border-color: transparent !important;
 }
 
-/* ── Modern toggle switch (aktif/nonaktif jadwal) ── */
 .jm-toggle {
     display: inline-flex;
     align-items: center;
@@ -873,11 +838,6 @@
     justify-content: center;
 }
 
-/* =========================================================
-   JADWAL BSM — Weekly Grid Layout
-   ========================================================= */
-
-/* Top grid: calendar | jadwal card, both stretch to same height */
 .jbsm-top-grid {
     display: grid;
     grid-template-columns: 340px 1fr;
@@ -889,14 +849,12 @@
     .jbsm-top-grid { grid-template-columns: 1fr; }
 }
 
-/* Card stretches to fill the grid cell and distributes rows evenly */
 .jbsm-jadwal-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* Scrollable rows container that fills remaining card height */
 .jbsm-weekly-rows {
     flex: 1;
     display: flex;
@@ -905,7 +863,6 @@
     min-height: 0;
 }
 
-/* Each of the 5 rows gets equal height */
 .jbsm-week-row {
     flex: 1;
     display: flex;
@@ -945,7 +902,6 @@
     padding-top: 3px;
 }
 
-/* ── Chip base ── */
 .jbsm-chip {
     display: inline-flex;
     align-items: center;
@@ -958,7 +914,6 @@
     transition: box-shadow 0.15s;
 }
 
-/* ── Rutin: green ── */
 .jbsm-chip.rutin {
     background: rgba(78, 167, 113, 0.1);
     color: #2a6645;
@@ -969,7 +924,6 @@
     box-shadow: 0 2px 8px rgba(78, 167, 113, 0.2);
 }
 
-/* ── Spesial: blue, 2-row layout ── */
 .jbsm-chip.spesial {
     background: rgba(59, 130, 246, 0.07);
     color: #1d4ed8;
@@ -983,7 +937,6 @@
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
 }
 
-/* ── Angkut (pengangkutan rutin): amber ── */
 .jbsm-chip.angkut {
     background: rgba(245, 158, 11, 0.1);
     color: #b45309;
@@ -994,7 +947,6 @@
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
 
-/* First row of spesial chip: day | time + action buttons */
 .jbsm-chip-row1 {
     display: flex;
     align-items: center;
@@ -1002,7 +954,6 @@
     width: 100%;
 }
 
-/* Second row of spesial chip: nama jadwal spesial */
 .jbsm-chip-row2 {
     font-family: 'Poppins', sans-serif;
     font-size: 10px;
@@ -1026,7 +977,6 @@
     white-space: nowrap;
 }
 
-/* Action buttons inside chips */
 .jbsm-chip-actions {
     display: flex;
     gap: 3px;
@@ -1039,10 +989,6 @@
     font-size: 9px;
     border-radius: 6px;
 }
-
-/* =========================================================
-   JADWAL BSM — Detail Date Popup
-   ========================================================= */
 
 .jbsm-detail-overlay {
     position: fixed;
@@ -1179,11 +1125,6 @@
     color: #b45309;
 }
 
-/* =========================================================
-   Pengangkutan Matrix — admin_bsi (jbsi-angkut-*)
-   ========================================================= */
-
-/* ── Week navigator pill ── */
 .jbsi-angkut-nav {
     display: inline-flex;
     align-items: center;
@@ -1223,21 +1164,18 @@
     padding: 0 4px;
 }
 
-/* ── Scrollable wrapper ── */
 .jbsi-angkut-scroll {
     overflow-x: auto;
     border-radius: 12px;
     border: 1px solid rgba(1, 50, 54, 0.09);
 }
 
-/* ── Table ── */
 .jbsi-angkut-table {
     width: 100%;
     border-collapse: collapse;
     min-width: 780px;
 }
 
-/* ── Header cells ── */
 .jbsi-angkut-th {
     padding: 11px 14px;
     font-family: 'Poppins', sans-serif;
@@ -1256,7 +1194,7 @@
     position: sticky;
     left: 0;
     z-index: 2;
-    background: #f5f7f7; /* solid — prevents bleed-through on scroll */
+    background: #f5f7f7;
 }
 
 .jbsi-angkut-th-day {
@@ -1286,11 +1224,9 @@
     color: #2a6645;
 }
 
-/* ── Body cells ── */
 .jbsi-angkut-table tbody tr:hover .jbsi-angkut-td-cell {
     background: rgba(1, 50, 54, 0.018);
 }
-/* solid bg on sticky column — rgba would show scrolling content through it */
 .jbsi-angkut-table tbody tr:hover .jbsi-angkut-td-bsu {
     background: #f7fafa;
 }
@@ -1326,7 +1262,6 @@
     background: rgba(148, 223, 12, 0.04);
 }
 
-/* ── Empty cell ── */
 .jbsi-angkut-empty {
     display: block;
     text-align: center;
@@ -1336,7 +1271,6 @@
     padding: 6px 0;
 }
 
-/* ── Chips inside cells ── */
 .jbsi-angkut-chip {
     border-radius: 8px;
     padding: 6px 8px;
@@ -1385,7 +1319,6 @@
     margin-top: 2px;
 }
 
-/* ── Edit/delete actions — appear on chip hover ── */
 .jbsi-angkut-chip-actions {
     display: none;
     gap: 4px;
@@ -1397,11 +1330,6 @@
 }
 
 
-/* =========================================================
-   JADWAL PENIMBANGAN — Monthly Calendar Matrix
-   (used by JadwalPenimbanganCalendar layout component)
-   ========================================================= */
-
 .jadwal-cal-card {
     background: #ffffff;
     border-radius: 18px;
@@ -1410,7 +1338,6 @@
     overflow: hidden;
 }
 
-/* ── Header ── */
 .jadwal-cal-header {
     display: flex;
     align-items: center;
@@ -1426,7 +1353,6 @@
     gap: 14px;
 }
 
-/* ── Month navigation ── */
 .jadwal-cal-nav {
     display: flex;
     align-items: center;
@@ -1460,7 +1386,6 @@
     text-align: center;
 }
 
-/* ── Day-of-week header row ── */
 .jadwal-cal-grid-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -1483,7 +1408,6 @@
 
 .jadwal-cal-dh:last-child { border-right: none; }
 
-/* ── Calendar body ── */
 .jadwal-cal-body {
     display: flex;
     flex-direction: column;
@@ -1497,7 +1421,6 @@
 
 .jadwal-cal-week:last-child { border-bottom: none; }
 
-/* ── Date cells ── */
 .jadwal-cal-cell {
     min-height: 100px;
     padding: 8px 8px;
@@ -1518,7 +1441,6 @@
 .jadwal-cal-cell.today:hover,
 .jadwal-cal-cell.today.selected:hover { background: rgba(148, 223, 12, 0.6); }
 
-/* ── Date number ── */
 .jadwal-cal-date-num {
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -1554,7 +1476,6 @@
     font-weight: 700;
 }
 
-/* ── Chips inside cells ── */
 .jadwal-cal-chips {
     display: flex;
     flex-direction: column;
@@ -1573,11 +1494,9 @@
     min-width: 0;
 }
 
-/* penimbangan variants */
 .jadwal-cal-chip.rutin   { background: rgba(78,  167, 113, 0.10); }
 .jadwal-cal-chip.spesial { background: rgba(234,  88,  12,  0.09); }
 
-/* pengangkutan variants */
 .jadwal-cal-chip.angkut-rutin   { background: rgba(2,  132, 199, 0.10); }
 .jadwal-cal-chip.angkut-spesial { background: rgba(234, 88,  12,  0.09); }
 
@@ -1616,7 +1535,6 @@
     padding: 1px 6px;
 }
 
-/* ── Selected-date detail strip ── */
 .jadwal-cal-detail-panel {
     border-top: 1px solid rgba(1, 50, 54, 0.06);
     background: rgba(1, 50, 54, 0.02);
@@ -1688,7 +1606,6 @@
     border-color: rgba(234, 88, 12, 0.16);
 }
 
-/* Bank label chip (BSI → shows target BSU) */
 .jadwal-cal-detail-bank {
     font-family: 'Poppins', sans-serif;
     font-size: 10.5px;
@@ -1701,7 +1618,6 @@
     flex-shrink: 0;
 }
 
-/* Today cell — angkut chip overrides */
 .jadwal-cal-cell.today .jadwal-cal-chip.angkut-rutin,
 .jadwal-cal-cell.today .jadwal-cal-chip.angkut-spesial { background: rgba(1, 50, 54, 0.14); }
 .jadwal-cal-cell.today .jadwal-cal-chip.angkut-rutin   .jadwal-cal-chip-dot,
@@ -1741,7 +1657,6 @@
     margin-left: auto;
 }
 
-/* ── BSM: pengelompokan jadwal rutin per Minggu ke-N ── */
 .pjp-week-group {
     display: flex;
     flex-direction: column;
@@ -1764,13 +1679,11 @@
     margin: 0 0 2px;
 }
 
-/* ── BSM: status badge di kanan card (ganti tombol edit/delete) ── */
 .jadwal-cal-detail-status {
     margin-left: auto;
     flex-shrink: 0;
 }
 
-/* ── BSM: card "mati" — jadwal nonaktif / sudah lewat / dibatalkan ── */
 .jadwal-cal-detail-item.dead {
     background: rgba(1, 50, 54, 0.03);
     border-color: rgba(1, 50, 54, 0.08);
@@ -1790,7 +1703,6 @@
 .jadwal-cal-chip.dead .jadwal-cal-chip-dot  { background: #94a3b8 !important; }
 .jadwal-cal-chip.dead .jadwal-cal-chip-text { color: #7a9e8a !important; }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .jadwal-cal-header { flex-direction: column; align-items: flex-start; }
     .jadwal-cal-cell   { min-height: 68px; padding: 6px 4px; }

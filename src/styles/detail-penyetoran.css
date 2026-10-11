@@ -1,14 +1,8 @@
-/* =========================================================
-   Detail Penyetoran — Page Styles
-   (Mirrors detail-penimbangan.css with dps- prefix)
-   ========================================================= */
-
 @keyframes dpsFadeIn {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Page Wrapper ── */
 .dps-page {
     display: flex;
     flex-direction: column;
@@ -16,7 +10,6 @@
     animation: dpsFadeIn 0.4s ease both;
 }
 
-/* ── Hero ── */
 .dps-hero {
     padding: 28px 0 20px;
 }
@@ -38,7 +31,6 @@
     margin: 0;
 }
 
-/* ── Loading / Error ── */
 .dps-loading,
 .dps-error {
     display: flex;
@@ -52,9 +44,6 @@
 
 .dps-error { color: #ef4444; }
 
-/* =========================================================
-   2-Column Card
-   ========================================================= */
 .dps-card {
     background: #ffffff;
     border-radius: 20px;
@@ -70,7 +59,6 @@
     .dps-card { grid-template-columns: 1fr; }
 }
 
-/* ── Left Column ── */
 .dps-overview {
     padding: 28px 28px 32px;
     border-right: 1px solid rgba(1, 50, 54, 0.06);
@@ -86,7 +74,6 @@
     }
 }
 
-/* ── Overview header ── */
 .dps-overview-header {
     display: flex;
     align-items: center;
@@ -110,7 +97,6 @@
     word-break: break-all;
 }
 
-/* ── Status pill ── */
 .dps-status-pill {
     display: inline-flex;
     align-items: center;
@@ -146,21 +132,18 @@
     flex-shrink: 0;
 }
 
-/* ── Divider ── */
 .dps-divider {
     height: 1px;
     background: rgba(1, 50, 54, 0.06);
     margin: 4px 0;
 }
 
-/* ── Info list ── */
 .dps-info-list {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-/* Nasabah row — avatar + info */
 .dps-nasabah-row {
     display: flex;
     align-items: center;
@@ -242,7 +225,6 @@
     text-overflow: ellipsis;
 }
 
-/* ── Stats chips ── */
 .dps-stats-row {
     display: flex;
     gap: 10px;
@@ -275,9 +257,6 @@
     letter-spacing: 0.5px;
 }
 
-/* =========================================================
-   Right Column — Item List
-   ========================================================= */
 .dps-items-col {
     padding: 28px 28px 32px;
     display: flex;
@@ -285,7 +264,6 @@
     gap: 16px;
 }
 
-/* ── Section header ── */
 .dps-items-header {
     display: flex;
     align-items: center;
@@ -319,7 +297,6 @@
     flex-shrink: 0;
 }
 
-/* ── Item list container ── */
 .dps-items-list {
     display: flex;
     flex-direction: column;
@@ -329,7 +306,6 @@
     overflow: hidden;
 }
 
-/* ── Table header row ── */
 .dps-item-thead {
     display: grid;
     grid-template-columns: 36px 1fr 60px 80px;
@@ -353,7 +329,6 @@
 .dps-item-col-qty  { text-align: right; }
 .dps-item-col-unit { text-align: left; }
 
-/* ── Data rows ── */
 .dps-item-row {
     display: grid;
     grid-template-columns: 36px 1fr 60px 80px;
@@ -427,7 +402,6 @@
     text-transform: lowercase;
 }
 
-/* ── Empty state ── */
 .dps-items-empty {
     display: flex;
     flex-direction: column;
@@ -445,7 +419,6 @@
     opacity: 0.5;
 }
 
-/* ── Bukti Via Manual ── */
 .dps-bukti-section {
     display: flex;
     flex-direction: column;
@@ -506,7 +479,6 @@
     opacity: 1;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .dps-page {
         padding: 0 16px 24px;

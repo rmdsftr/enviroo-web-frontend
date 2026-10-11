@@ -1,7 +1,6 @@
 import { TableAvatar, TableBadge, TableActionBtn, type ColumnDef } from "../components/table";
 import { FaEye } from "react-icons/fa6";
 
-// ── Types ────────────────────────────────────────────────
 export type StatusNasabah = "aktif" | "nonaktif" | "pending";
 
 export type NasabahRow = {
@@ -14,14 +13,12 @@ export type NasabahRow = {
     status: StatusNasabah;
 };
 
-// ── Labels ───────────────────────────────────────────────
 export const statusLabel: Record<StatusNasabah, string> = {
     aktif: "Aktif",
     nonaktif: "Nonaktif",
     pending: "Pending",
 };
 
-// ── Filter options ───────────────────────────────────────
 export const STATUS_FILTER_OPTIONS = [
     { label: "Semua", value: "" },
     { label: "Aktif", value: "aktif" },
@@ -29,9 +26,6 @@ export const STATUS_FILTER_OPTIONS = [
     { label: "Pending", value: "pending" },
 ];
 
-// ── Sort options ─────────────────────────────────────────
-
-// ── Status badge ─────────────────────────────────────────
 function StatusBadge({ status }: { status: StatusNasabah }) {
     if (status === "pending") {
         return (
@@ -44,7 +38,6 @@ function StatusBadge({ status }: { status: StatusNasabah }) {
     return <TableBadge label={statusLabel[status]} active={status === "aktif"} />;
 }
 
-// ── Table columns ────────────────────────────────────────
 export function buildColumns(
     isAdminBsi: boolean,
     isAdminBsu: boolean,
@@ -100,7 +93,6 @@ export function buildColumns(
         render: (row) => <StatusBadge status={row.status} />,
     });
 
-    // ── Action column ────────────────────────────────────
     cols.push({
         key: "aksi",
         header: "Aksi",

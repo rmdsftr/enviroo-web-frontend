@@ -17,16 +17,6 @@ export const ProfilService = {
         return response.data;
     },
 
-    async toggleAktivasiBank(bank_id: string): Promise<GetBankSampahProfileResponse> {
-        const response = await api.patch<GetBankSampahProfileResponse>(`/profil/bank-sampah/aktivasi/${bank_id}`);
-        return response.data;
-    },
-
-    async toggleAktivasiNasabah(nasabah_id: string): Promise<any> {
-        const response = await api.patch(`/profil/nasabah/aktivasi/${nasabah_id}`);
-        return response.data;
-    },
-
     async hapusBankSampah(bank_id: string): Promise<any> {
         const response = await api.delete(`/profil/bank-sampah/${bank_id}`);
         return response.data;

@@ -38,15 +38,14 @@ function RewardIcon({ nama }: { nama: string }) {
 const DIVIDER = <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />;
 
 export default function KonfigurasiPage() {
-    /* ── Reward ─────────────────────────────────────────────── */
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [isLoadingReward, setIsLoadingReward] = useState(true);
     const [rewardError, setRewardError] = useState<string | null>(null);
     const [rewardModalOpen, setRewardModalOpen] = useState(false);
     const [editReward, setEditReward] = useState<RewardFormData | null>(null);
 
-    const hasUang = rewards.some(r => rewardVariant(r.NamaReward) === "uang");
-    const hasBarang = rewards.some(r => rewardVariant(r.NamaReward) === "barang");
+    const hasUang = rewards.some(r => rewardVariant(r.nama_reward) === "uang");
+    const hasBarang = rewards.some(r => rewardVariant(r.nama_reward) === "barang");
     const allRewardsPresent = hasUang && hasBarang;
 
     const fetchRewards = useCallback(async () => {
@@ -80,7 +79,6 @@ export default function KonfigurasiPage() {
         fetchRewards();
     };
 
-    /* ── Kategori Sampah ────────────────────────────────────── */
     const [kategoris, setKategoris] = useState<KategoriSampah[]>([]);
     const [isLoadingKategori, setIsLoadingKategori] = useState(true);
     const [kategoriModalOpen, setKategoriModalOpen] = useState(false);
@@ -128,21 +126,17 @@ export default function KonfigurasiPage() {
         }
     };
 
-    /* ── Shared notif ───────────────────────────────────────── */
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const showNotif = (message: string, type: "success" | "error") => setPopupNotif({ message, type });
 
-    /* ── Init ───────────────────────────────────────────────── */
     useEffect(() => {
         fetchRewards();
         fetchKategoris();
     }, [fetchRewards, fetchKategoris]);
 
-    /* ── Render ─────────────────────────────────────────────── */
     return (
         <section className="mr-section">
 
-            {/* ══ REWARD ══════════════════════════════════════════ */}
             <div className="mr-header">
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Konfigurasi</h2>
@@ -173,37 +167,28 @@ export default function KonfigurasiPage() {
                         <div className="mr-empty-icon"><FaGift /></div>
                         <h3>Belum Ada Reward</h3>
                         <p>Tambahkan jenis reward pertama untuk memulai sistem konversi poin nasabah.</p>
-                        {/* <Button
-                            color="neon"
-                            isRounded
-                            icon={<FaPlus />}
-                            onClick={() => { setEditReward(null); setRewardModalOpen(true); }}
-                            style={{ marginTop: "8px" }}
-                        >
-                            Tambah Reward Pertama
-                        </Button> */}
                     </div>
                 ) : (
                     rewards.map(reward => {
-                        const variant = rewardVariant(reward.NamaReward);
+                        const variant = rewardVariant(reward.nama_reward);
                         return (
-                            <div key={reward.RewardID} className={`mr-card mr-card--${variant}`}>
+                            <div key={reward.reward_id} className={`mr-card mr-card--${variant}`}>
                                 <div className={`mr-card-icon mr-card-icon--${variant}`}>
-                                    <RewardIcon nama={reward.NamaReward} />
+                                    <RewardIcon nama={reward.nama_reward} />
                                 </div>
                                 <div className="mr-card-body">
                                     <div className="mr-card-header">
-                                        <h3 className="mr-card-name">{reward.NamaReward}</h3>
+                                        <h3 className="mr-card-name">{reward.nama_reward}</h3>
                                         <button
                                             type="button"
                                             className="mr-card-action-btn"
                                             title="Edit reward"
                                             onClick={() => {
                                                 setEditReward({
-                                                    reward_id: reward.RewardID,
-                                                    nama_reward: reward.NamaReward,
-                                                    satuan: reward.Satuan,
-                                                    deskripsi: reward.Deskripsi || "",
+                                                    reward_id: reward.reward_id,
+                                                    nama_reward: reward.nama_reward,
+                                                    satuan: reward.satuan,
+                                                    deskripsi: reward.deskripsi || "",
                                                 });
                                                 setRewardModalOpen(true);
                                             }}
@@ -211,9 +196,9 @@ export default function KonfigurasiPage() {
                                             <FaGear />
                                         </button>
                                     </div>
-                                    <span className="mr-card-satuan">Satuan: {reward.Satuan}</span>
+                                    <span className="mr-card-satuan">Satuan: {reward.satuan}</span>
                                     <p style={{ fontSize: "13px", color: "var(--c-text-muted)", marginTop: "4px", lineHeight: 1.4 }}>
-                                        {reward.Deskripsi || "Tidak ada deskripsi"}
+                                        {reward.deskripsi || "Tidak ada deskripsi"}
                                     </p>
                                 </div>
                             </div>
@@ -224,7 +209,6 @@ export default function KonfigurasiPage() {
 
             {DIVIDER}
 
-            {/* ══ KATEGORI SAMPAH ══════════════════════════════════ */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Kategori Sampah</h2>
@@ -290,7 +274,6 @@ export default function KonfigurasiPage() {
 
             <br /><br /><br /><br />
 
-            {/* ══ MODALS ══════════════════════════════════════════ */}
             <KategoriFormModal
                 isOpen={kategoriModalOpen}
                 onClose={() => { setKategoriModalOpen(false); setEditKategori(null); }}
@@ -303,8 +286,8 @@ export default function KonfigurasiPage() {
                 onClose={() => { setRewardModalOpen(false); setEditReward(null); }}
                 onSubmit={handleRewardSubmit}
                 initialData={editReward}
-                existingNames={rewards.map(r => r.NamaReward)}
-                existingSatuans={rewards.map(r => r.Satuan)}
+                existingNames={rewards.map(r => r.nama_reward)}
+                existingSatuans={rewards.map(r => r.satuan)}
             />
 
             <PopupConfirmation

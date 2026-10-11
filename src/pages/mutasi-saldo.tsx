@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { DashboardService, type MutasiItem } from "../services/dashboard.service";
-import { formatThousands } from "../utils/number.utils";
+import { formatDecimalInput, formatNominal, parseDecimalInput } from "../utils/number.utils";
 import { formatTanggalJam } from "../utils/date.utils";
 import FilterRange, { defaultMonthRange } from "../components/filter-range";
 import Tabs from "../components/tabs";
@@ -19,9 +19,7 @@ function lastDayOf(yyyymm: string) {
 }
 
 function fmtNominal(n: number, satuan: string, isUang: boolean) {
-    return isUang
-        ? `Rp ${n.toLocaleString("id-ID")}`
-        : `${n.toLocaleString("id-ID")} ${satuan}`;
+    return formatNominal(n, isUang ? "Rp" : satuan);
 }
 
 export default function MutasiSaldoPage() {
@@ -44,7 +42,6 @@ export default function MutasiSaldoPage() {
     const [error, setError] = useState("");
     const [isEmpty, setIsEmpty] = useState(false);
 
-    // ── Modal Catat Manual ──
     const [showModal, setShowModal] = useState(false);
     const [tipeMutasi, setTipeMutasi] = useState<"kredit" | "debit">("kredit");
     const [jenisReward, setJenisReward] = useState<"uang" | "poin">("uang");
@@ -62,8 +59,8 @@ export default function MutasiSaldoPage() {
 
     const handleCatatManual = async (e: React.FormEvent) => {
         e.preventDefault();
-        const nominalNum = parseFloat(nominal.replace(/\./g, ""));
-        if (!nominalNum || nominalNum <= 0) {
+        const nominalNum = parseDecimalInput(nominal);
+        if (nominalNum === null || nominalNum <= 0) {
             setNotif({ message: "Nominal harus lebih dari 0.", type: "error" });
             return;
         }
@@ -150,7 +147,6 @@ export default function MutasiSaldoPage() {
                 ]}
             />
 
-            {/* ── Modal Catat Manual ── */}
             {showModal && (
                 <div className="ms-modal-overlay" onClick={() => { setShowModal(false); resetModal(); }}>
                     <div className="ms-modal" onClick={(e) => e.stopPropagation()}>
@@ -163,7 +159,6 @@ export default function MutasiSaldoPage() {
                         </div>
                         <form onSubmit={handleCatatManual}>
                             <div className="ms-modal-body">
-                                {/* Tipe Mutasi */}
                                 <div className="ms-form-group">
                                     <span className="ms-form-label">Tipe Mutasi</span>
                                     <div className="ms-toggle-group">
@@ -184,7 +179,6 @@ export default function MutasiSaldoPage() {
                                     </div>
                                 </div>
 
-                                {/* Jenis Reward */}
                                 {!isBsu && (
                                     <div className="ms-form-group">
                                         <span className="ms-form-label">Jenis Reward</span>
@@ -207,7 +201,6 @@ export default function MutasiSaldoPage() {
                                     </div>
                                 )}
 
-                                {/* Nominal */}
                                 <div className="ms-form-group">
                                     <span className="ms-form-label">Nominal</span>
                                     <Input
@@ -216,17 +209,16 @@ export default function MutasiSaldoPage() {
                                         inputSize="default"
                                         fullWidth
                                         type="text"
-                                        inputMode="numeric"
+                                        inputMode="decimal"
                                         placeholder={jenisReward === "uang" ? "0" : "0"}
                                         iconLeft={jenisReward === "uang" ? <span style={{ fontSize: 13, fontWeight: 600, color: "#5a7a68" }}>Rp</span> : undefined}
                                         iconRight={jenisReward === "poin" ? <span style={{ fontSize: 12, fontWeight: 600, color: "#5a7a68" }}>poin</span> : undefined}
                                         value={nominal}
-                                        onChange={(e) => setNominal(formatThousands(e.target.value))}
+                                        onChange={(e) => setNominal(formatDecimalInput(e.target.value))}
                                         required
                                     />
                                 </div>
 
-                                {/* Keterangan */}
                                 <div className="ms-form-group">
                                     <span className="ms-form-label">Keterangan</span>
                                     <Input
@@ -271,7 +263,6 @@ export default function MutasiSaldoPage() {
 
         <div className="ms-page">
 
-            {/* Filters */}
             <div className="ms-filters">
                 <Tabs
                     tabs={tabs}
@@ -298,13 +289,11 @@ export default function MutasiSaldoPage() {
                 <div className="ms-state">Belum ada data rekening untuk jenis reward ini.</div>
             ) : (
                 <>
-                    {/* Chart Card */}
                     <div className="ms-card">
                         <p className="ms-card-title">Ringkasan Mutasi — {namaReward}</p>
 
                         <div className="ms-chart">
                             <div className="ms-chart-bars">
-                                {/* Kredit */}
                                 <div className="ms-bar-group">
                                     <span className="ms-bar-label-top">
                                         {fmtNominal(totalKredit, satuanReward, isUang)}
@@ -318,7 +307,6 @@ export default function MutasiSaldoPage() {
                                     <span className="ms-bar-label-bot">Kredit (Masuk)</span>
                                 </div>
 
-                                {/* Debit */}
                                 <div className="ms-bar-group">
                                     <span className="ms-bar-label-top">
                                         {fmtNominal(totalDebit, satuanReward, isUang)}
@@ -348,7 +336,6 @@ export default function MutasiSaldoPage() {
                         </div>
                     </div>
 
-                    {/* Mutasi List */}
                     <div className="ms-card">
                         <p className="ms-card-title">Riwayat Transaksi</p>
                         {items.length === 0 ? (

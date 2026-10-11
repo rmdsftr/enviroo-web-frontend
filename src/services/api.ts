@@ -2,6 +2,8 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export const AUTH_NOTICE_KEY = "authNotice";
+
 export const api = axios.create({
     baseURL: API_URL,
     timeout: 10000,
@@ -11,42 +13,63 @@ export const api = axios.create({
     withCredentials: true,
 });
 
+
+const PUBLIC_AUTH_URLS = [
+  "/auth/login",
+  "/auth/logout",
+  "/auth/aktivasi-akun",
+  "/auth/forget-password/",
+];
+
+const NO_REFRESH_URLS = ["/auth/refresh"];
+
+const isSessionRevoked = (error: unknown) =>
+  axios.isAxiosError(error) &&
+  (error.response?.data as { code?: string } | undefined)?.code === "SESSION_REVOKED";
+
+const forceLogout = (error: unknown) => {
+  if (window.location.pathname === "/") return;
+
+  if (isSessionRevoked(error)) {
+    sessionStorage.setItem(
+      AUTH_NOTICE_KEY,
+      "Sesi Anda berakhir karena akun digunakan di perangkat lain. Silakan login kembali."
+    );
+  }
+
+  localStorage.removeItem("userData");
+  window.location.href = "/";
+};
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = originalRequest?.url ?? "";
 
-    // Jika error 401 dan bukan dari request yang sudah di-retry
+    if (PUBLIC_AUTH_URLS.some((url) => requestUrl.includes(url))) {
+      return Promise.reject(error);
+    }
+
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      
-      // Jika error berasal dari endpoint login atau refresh itu sendiri,
-      // jangan coba refresh lagi untuk menghindari infinite loop.
-      if (originalRequest.url?.includes("/auth/refresh") || originalRequest.url?.includes("/auth/login")) {
-        if (window.location.pathname !== "/") {
-          localStorage.removeItem("userData");
-          window.location.href = "/";
-        }
+
+      if (NO_REFRESH_URLS.some((url) => requestUrl.includes(url))) {
+        forceLogout(error);
         return Promise.reject(error);
       }
 
       originalRequest._retry = true;
 
       try {
-        // Panggil endpoint refresh token
         await api.post("/auth/refresh");
-        
-        // Ulangi request asli
+
         return api(originalRequest);
       } catch (refreshError) {
-        // Jika refresh gagal, logout user
-        if (window.location.pathname !== "/") {
-          localStorage.removeItem("userData");
-          window.location.href = "/";
-        }
+        forceLogout(refreshError);
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
   }
-);
+);

@@ -3,7 +3,6 @@ import { api } from "./api";
 export type StatusPenarikan =
     | "pending" | "canceled" | "request_expired" | "rejected" | "approved" | "pickup_expired" | "completed";
 
-/** Item dari GET /penarikan/list-bank/:bank_id */
 export interface PenarikanItem {
     penarikan_id: string;
     nasabah_id: string;
@@ -20,7 +19,6 @@ export interface PenarikanItem {
     bukti_foto: string | null;
 }
 
-/** Item dari GET /penarikan/list/:nasabah_id — shape lebih ringkas */
 export interface PenarikanNasabahItem {
     penarikan_id: string;
     created_at: string;

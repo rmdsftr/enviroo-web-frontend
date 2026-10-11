@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { KatalogBarangItem, RiwayatDistribusi } from "../types/barang.type";
 import { FaCoins, FaBasketShopping, FaTrash, FaPen } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
+import ViewPhoto from "../components/view-photo";
 import { formatTanggal, formatTanggalJam } from "../utils/date.utils";
+import { formatNominal } from "../utils/number.utils";
 
 interface Props {
     item: KatalogBarangItem;
@@ -19,6 +22,8 @@ interface Props {
 }
 
 export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAdminBsi, isAdminBsm, filterBankName, isViewingBSU, onClose, onDelete, onEdit }: Props) {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+
     return createPortal(
         <div className="katalog-modal-overlay" onClick={onClose}>
             <div
@@ -41,9 +46,12 @@ export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAd
                 <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <div className="km-body" style={{ display: 'grid', gridTemplateColumns: isAdminBsm ? '1fr' : 'minmax(0,1fr) minmax(0,1.2fr)', gap: '24px', alignItems: 'start', paddingBottom: '24px' }}>
 
-                        {/* Kolom 1: Foto + Nama + Stats */}
                         <div>
-                            <div style={{ background: "linear-gradient(135deg, rgba(148, 223, 12, 0.15) 0%, rgba(1, 50, 54, 0.05) 100%)", borderRadius: '12px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '16px' }}>
+                            <div
+                                style={{ background: "linear-gradient(135deg, rgba(148, 223, 12, 0.15) 0%, rgba(1, 50, 54, 0.05) 100%)", borderRadius: '12px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '16px', cursor: item.photo_url ? 'pointer' : 'default' }}
+                                onClick={() => item.photo_url && setLightboxOpen(true)}
+                                title={item.photo_url ? "Klik untuk memperbesar" : undefined}
+                            >
                                 {item.photo_url ? (
                                     <img src={item.photo_url} alt={item.nama_barang} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                 ) : (
@@ -56,7 +64,7 @@ export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAd
                                 <div className="kd-stat-row" style={{ fontSize: '12.5px' }}>
                                     <span className="kd-stat-label">Harga (Poin)</span>
                                     <div className="katalog-price-tag price-poin" style={{ margin: 0, padding: '4px 10px', fontSize: '12px' }}>
-                                        <FaCoins />{item.nilai_poin} poin
+                                        <FaCoins />{formatNominal(item.nilai_poin, "poin")}
                                     </div>
                                 </div>
                                 <div className="kd-stat-row" style={{ fontSize: '12.5px' }}>
@@ -72,7 +80,6 @@ export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAd
                             </div>
                         </div>
 
-                        {/* Kolom 2: Riwayat Distribusi */}
                         {!isAdminBsm && (
                             <div>
                                 <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--k-dark)', marginBottom: '14px' }}>Riwayat Distribusi</h4>
@@ -129,6 +136,9 @@ export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAd
                     )}
                 </div>
             </div>
+            {lightboxOpen && item.photo_url && (
+                <ViewPhoto src={item.photo_url} alt={item.nama_barang} onClose={() => setLightboxOpen(false)} />
+            )}
         </div>,
         document.body
     );

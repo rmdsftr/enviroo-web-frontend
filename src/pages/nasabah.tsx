@@ -47,7 +47,6 @@ export default function NasabahPage() {
     const columns = buildColumns(isAdminBsi, isAdminBsu, navigate, isAdminBsm);
     const [isExporting, setIsExporting] = useState(false);
 
-    // ── Popup notifikasi state ────────────────────────────
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
     const nasabahNewPath = isAdminBsi ? "/bsi/nasabah/new"
@@ -55,7 +54,6 @@ export default function NasabahPage() {
         : isAdminBsm ? "/bsm/nasabah/new"
         : "/nasabah/new";
 
-    // ── Export laporan nasabah ────────────────────────────
     const handleExportLaporan = async () => {
         if (!user?.bank_id) return;
         setIsExporting(true);
@@ -78,7 +76,6 @@ export default function NasabahPage() {
 
     return (
         <>
-            {/* ── Page Header: Title LEFT, Actions RIGHT ── */}
             <div className="nasabah-hero">
                 <div className="nasabah-hero-left">
                     <h1 className="nasabah-hero-title">Manajemen Nasabah</h1>
@@ -98,7 +95,7 @@ export default function NasabahPage() {
                             onClick={handleExportLaporan}
                             disabled={isExporting}
                         >
-                            {isExporting ? "Mengekspor..." : "Ekspor Laporan"}
+                            {isExporting ? "Mengekspor..." : "Ekspor Data"}
                         </Button>
                     )}
                     <Button
@@ -114,7 +111,6 @@ export default function NasabahPage() {
                 </div>
             </div>
 
-            {/* ── Statistik Cards ── */}
             <div className="statistik">
                 <StatistikLayout icon={FaUsers} angka={stats.total} status="Total Nasabah" variant="default" />
                 <StatistikLayout icon={FaCircleCheck} angka={stats.aktif} status="Aktif" variant="success" />
@@ -122,7 +118,6 @@ export default function NasabahPage() {
                 <StatistikLayout icon={FaClock} angka={stats.pending} status="Pending" variant="warning" />
             </div>
 
-            {/* ── Filter Bar: Pills LEFT, Search RIGHT ── */}
             <div className="nasabah-filter-bar">
                 <FilterPill
                     options={STATUS_FILTER_OPTIONS}
@@ -137,39 +132,40 @@ export default function NasabahPage() {
                 />
             </div>
 
-            {/* ── Table Section ── */}
             <div className="bsu-table-section">
-                {/* Error */}
                 {error && (
                     <div className="nasabah-error-banner">{error}</div>
                 )}
 
-                {/* Table Content */}
                 {loading ? (
                     <SkeletonTable rows={6} columns={columns.length} />
-                ) : paginatedNasabah.length === 0 ? (
-                    <EmptyState
-                        icon={<FaUserSlash />}
-                        title={
-                            searchQuery
-                                ? "Nasabah tidak ditemukan"
-                                : statusFilter
-                                    ? `Tidak ada nasabah dengan status "${statusFilter}"`
-                                    : "Belum ada nasabah"
-                        }
-                        description={
-                            searchQuery
-                                ? `Tidak ada hasil untuk "${searchQuery}". Coba kata kunci lain.`
-                                : statusFilter
-                                    ? "Coba ubah filter status untuk melihat nasabah lainnya."
-                                    : "Mulai dengan mendaftarkan nasabah baru menggunakan tombol di atas."
+                ) : (
+                    <Table
+                        columns={columns}
+                        data={paginatedNasabah}
+                        rowKey={(row) => row.id}
+                        emptyMessage={
+                            <EmptyState
+                                icon={<FaUserSlash />}
+                                title={
+                                    searchQuery
+                                        ? "Nasabah tidak ditemukan"
+                                        : statusFilter
+                                            ? `Tidak ada nasabah dengan status "${statusFilter}"`
+                                            : "Belum ada nasabah"
+                                }
+                                description={
+                                    searchQuery
+                                        ? `Tidak ada hasil untuk "${searchQuery}". Coba kata kunci lain.`
+                                        : statusFilter
+                                            ? "Coba ubah filter status untuk melihat nasabah lainnya."
+                                            : "Mulai dengan mendaftarkan nasabah baru menggunakan tombol di atas."
+                                }
+                            />
                         }
                     />
-                ) : (
-                    <Table columns={columns} data={paginatedNasabah} rowKey={(row) => row.id} />
                 )}
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                     <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                         <Pagination
@@ -181,7 +177,6 @@ export default function NasabahPage() {
                 )}
             </div>
 
-            {/* Popup Notifikasi */}
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}

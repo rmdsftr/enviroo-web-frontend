@@ -1,10 +1,5 @@
-/* =========================================================
-   Katalog Page — Sampah & Barang Catalog
-   ========================================================= */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;700&display=swap');
 
-/* ── CSS Variables ── */
 :root {
     --k-dark:   #013236;
     --k-green:  #4EA771;
@@ -18,7 +13,6 @@
     --k-border: rgba(1,50,54,0.07);
 }
 
-/* ── Page Shell ── */
 .katalog-page {
     padding: 24px 28px 48px;
     display: flex;
@@ -41,11 +35,6 @@
 
 
 
-/* =========================================================
-   HEADER ROW (tabs left, filters right)
-   ========================================================= */
-
-/* Description area */
 .katalog-desc-section {
     display: flex;
     flex-direction: column;
@@ -69,9 +58,6 @@
 }
 
 
-/* =========================================================
-   FILTER BAR (header-level: bank dropdown + count)
-   ========================================================= */
 .katalog-filter-bar {
     display: flex;
     align-items: center;
@@ -81,23 +67,6 @@
     width: 100%;
 }
 
-/* Item count */
-.katalog-count {
-    display: inline-flex;
-    align-items: center;
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--k-dark);
-    background: #e2ebe6; /* slightly more prominent than f0f4f2 since it's a label */
-    padding: 6px 14px;
-    border-radius: 50px;
-    user-select: none;
-}
-
-
-/* =========================================================
-   ACTION ROW (count + add button)
-   ========================================================= */
 .katalog-action-row {
     display: flex;
     align-items: center;
@@ -105,9 +74,6 @@
 }
 
 
-/* =========================================================
-   TWO-COLUMN CONTENT LAYOUT (cards 3/4, filter sidebar 1/4)
-   ========================================================= */
 .katalog-content-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -132,9 +98,6 @@
 }
 
 
-/* =========================================================
-   CARD GRID
-   ========================================================= */
 .katalog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -142,9 +105,6 @@
 }
 
 
-/* =========================================================
-   CARD
-   ========================================================= */
 .katalog-card {
     background: var(--k-white);
     border-radius: 22px;
@@ -157,15 +117,12 @@
     cursor: pointer;
 }
 
-/* ── Utility: Hide Number Input Spinners ── */
-/* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* Firefox */
 input[type=number] {
     -moz-appearance: textfield;
 }
@@ -176,7 +133,6 @@ input[type=number] {
     border-color: rgba(78,167,113,0.3);
 }
 
-/* Image area */
 .katalog-card-img {
     position: relative;
     height: 128px;
@@ -198,7 +154,6 @@ input[type=number] {
     transform: scale(1.15) translateY(-4px);
 }
 
-/* Card body */
 .katalog-card-body {
     padding: 14px 16px 16px;
     display: flex;
@@ -222,7 +177,6 @@ input[type=number] {
     margin: 0;
 }
 
-/* Price Tag — redesigned */
 .katalog-price-tag {
     display: inline-flex;
     align-items: center;
@@ -236,13 +190,13 @@ input[type=number] {
 }
 
 .price-uang {
-    background: rgba(14, 165, 233, 0.15); /* Premium Sky Blue Background */
-    color: #0284c7; /* Sky 600 Text */
+    background: rgba(14, 165, 233, 0.15);
+    color: #0284c7;
 }
 
 .price-poin {
-    background: rgba(249, 115, 22, 0.12); /* Orange 500 */
-    color: #c2410c; /* Orange 700 */
+    background: rgba(249, 115, 22, 0.12);
+    color: #c2410c;
 }
 
 .katalog-satuan {
@@ -251,7 +205,6 @@ input[type=number] {
     opacity: 0.65;
 }
 
-/* Bank info row */
 .katalog-card-bank {
     display: flex;
     align-items: center;
@@ -267,9 +220,6 @@ input[type=number] {
 .katalog-card-bank svg { font-size: 10px; flex-shrink: 0; color: var(--k-green); }
 
 
-/* =========================================================
-   FILTER SIDEBAR
-   ========================================================= */
 .katalog-filter-sidebar {
     position: sticky;
     top: 24px;
@@ -283,9 +233,42 @@ input[type=number] {
     padding: 22px 20px 26px;
     box-shadow: 0 4px 24px rgba(1,50,54,0.03);
     animation: katalogFadeIn 0.3s ease both;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
 }
 
-/* Filter group */
+.kf-body {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.kf-mobile-toggle {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--ff-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--k-dark);
+    cursor: pointer;
+}
+
+.kf-mobile-toggle-icon {
+    font-size: 11px;
+    color: var(--k-muted);
+    transition: transform 0.2s ease;
+}
+
+.katalog-filter-sidebar.is-open .kf-mobile-toggle-icon {
+    transform: rotate(180deg);
+}
+
 .kf-group {
     display: flex;
     flex-direction: column;
@@ -303,9 +286,6 @@ input[type=number] {
 
 
 
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
 .katalog-empty {
     display: flex;
     flex-direction: column;
@@ -325,9 +305,6 @@ input[type=number] {
 }
 
 
-/* =========================================================
-   ADD CATALOG MODAL
-   ========================================================= */
 .katalog-modal-overlay {
     position: fixed;
     inset: 0;
@@ -405,7 +382,6 @@ input[type=number] {
     gap: 8px;
 }
 
-/* Neutral input theme override */
 .km-input-neutral .input-field {
     background-color: #ffffff;
 }
@@ -422,7 +398,6 @@ input[type=number] {
     box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15) !important;
 }
 
-/* Textarea — visually matches Input component */
 .km-textarea {
     width: 100%;
     box-sizing: border-box;
@@ -449,7 +424,6 @@ input[type=number] {
     box-shadow: 0 0 0 3px rgba(78, 167, 113, 0.15);
 }
 
-/* Hide spin buttons for number inputs */
 .km-body input[type="number"]::-webkit-outer-spin-button,
 .km-body input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -472,7 +446,6 @@ input[type=number] {
     color: #e11d48;
 }
 
-/* File Upload Area */
 .km-file-area {
     border: 2px dashed rgba(1, 50, 54, 0.15);
     border-radius: 16px;
@@ -569,7 +542,6 @@ input[type=number] {
     font-size: 11px;
 }
 
-/* Radio Buttons */
 .km-radio-group {
     display: flex;
     gap: 12px;
@@ -608,7 +580,6 @@ input[type=number] {
     background: #f1f5f9;
 }
 
-/* Footer */
 .km-footer {
     display: flex;
     justify-content: flex-end;
@@ -618,16 +589,17 @@ input[type=number] {
 }
 
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
-
-
 @media (max-width: 768px) {
     .katalog-page { padding: 16px 16px 36px; }
 
     .katalog-filter-bar { margin-left: 0; }
-    .katalog-count { display: none; }
+
+    .katalog-action-row {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .katalog-action-row .searchbar { width: 100% !important; }
 
     .katalog-content-layout,
     .katalog-content-layout:has(.katalog-filter-sidebar) {
@@ -637,7 +609,24 @@ input[type=number] {
     .katalog-filter-sidebar {
         position: static;
         order: -1;
+        max-height: none;
+        overflow: visible;
     }
+
+    .katalog-filter-sidebar.kf-collapsible {
+        padding: 14px 16px;
+        gap: 14px;
+    }
+
+    .katalog-filter-sidebar.kf-collapsible.is-open {
+        padding-bottom: 20px;
+    }
+
+    .kf-mobile-toggle { display: flex; }
+
+    .kf-body { display: none; }
+
+    .katalog-filter-sidebar.is-open .kf-body { display: flex; }
 
     .km-body {
         grid-template-columns: 1fr;
@@ -649,7 +638,6 @@ input[type=number] {
     .katalog-card-emoji { font-size: 44px; }
 }
 
-/* ── Detial Modal Timeline ── */
 .kd-stat-card {
     background: #f8fafc;
     border: 1px solid var(--k-border);
@@ -755,9 +743,6 @@ input[type=number] {
 }
 
 
-/* =========================================================
-   DISTRIBUSI BARANG SECTION
-   ========================================================= */
 .katalog-distribusi-section {
     margin-top: 8px;
 }

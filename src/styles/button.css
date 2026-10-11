@@ -1,6 +1,3 @@
-/* =========================================================
-   Button — solid / outline / ghost
-   ========================================================= */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -43,7 +40,6 @@
     line-height: 0;
 }
 
-/* ── Sizes ── */
 .btn--small {
     padding: 6px 14px;
     font-size: 11px;
@@ -70,7 +66,6 @@
     width: 100%;
 }
 
-/* ── PRIMARY ── */
 .btn--primary.btn--solid {
     background: var(--c-primary);
     color: #ffffff;
@@ -98,7 +93,6 @@
     background: var(--c-primary-50);
 }
 
-/* ── SECONDARY (Dark Teal) ── */
 .btn--secondary.btn--solid {
     background: var(--c-secondary);
     color: #ffffff;
@@ -126,7 +120,6 @@
     background: rgba(1, 50, 54, 0.06);
 }
 
-/* ── TERTIARY (Soft Green) ── */
 .btn--tertiary.btn--solid {
     background: var(--c-primary-100);
     color: var(--c-primary-700);
@@ -154,7 +147,6 @@
     background: var(--c-primary-50);
 }
 
-/* ── NEON (Accent) ── */
 .btn--neon.btn--solid {
     background: var(--c-accent);
     color: var(--c-secondary);
@@ -182,7 +174,6 @@
     background: rgba(148, 223, 12, 0.12);
 }
 
-/* ── DANGER ── */
 .btn--danger.btn--solid {
     background: var(--c-danger);
     color: #ffffff;

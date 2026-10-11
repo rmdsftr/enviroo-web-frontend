@@ -7,33 +7,28 @@ import { defaultMonthRange } from "../components/filter-range";
 import type { ProfilNasabah, SaldoNasabah } from "../types/profil.type";
 
 export function useProfilNasabahData(id: string | undefined) {
-    // ── Core ──
     const [nasabah, setNasabah] = useState<ProfilNasabah | null>(null);
     const [saldo, setSaldo] = useState<SaldoNasabah | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // ── Setoran ──
     const [setoranList, setSetoranList] = useState<RiwayatSetoranNasabahItem[]>([]);
     const [setoranLoading, setSetoranLoading] = useState(false);
     const [setoranSearch, setSetoranSearch] = useState("");
     const [setoranFrom, setSetoranFrom] = useState(() => defaultMonthRange().from);
     const [setoranTo, setSetoranTo] = useState(() => defaultMonthRange().to);
 
-    // ── Bagi Hasil ──
     const [bagiHasilList, setBagiHasilList] = useState<RiwayatBagiHasilNasabahItem[]>([]);
     const [bagiHasilLoading, setBagiHasilLoading] = useState(false);
     const [bagiHasilSearch, setBagiHasilSearch] = useState("");
     const [bagiHasilFrom, setBagiHasilFrom] = useState(() => defaultMonthRange().from);
     const [bagiHasilTo, setBagiHasilTo] = useState(() => defaultMonthRange().to);
 
-    // ── Penarikan ──
     const [penarikanList, setPenarikanList] = useState<PenarikanNasabahItem[]>([]);
     const [penarikanLoading, setPenarikanLoading] = useState(false);
     const [penarikanSearch, setPenarikanSearch] = useState("");
     const [penarikanFrom, setPenarikanFrom] = useState(() => defaultMonthRange().from);
     const [penarikanTo, setPenarikanTo] = useState(() => defaultMonthRange().to);
 
-    // ── Effects ──
     useEffect(() => {
         if (!id) return;
         Promise.all([
@@ -91,7 +86,6 @@ export function useProfilNasabahData(id: string | undefined) {
     useEffect(() => { fetchBagiHasil(); }, [fetchBagiHasil]);
     useEffect(() => { fetchPenarikan(); }, [fetchPenarikan]);
 
-    // ── Computed ──
     const filteredSetoran = useMemo(() => {
         const q = setoranSearch.toLowerCase();
         return setoranList.filter((item) => {
@@ -125,15 +119,12 @@ export function useProfilNasabahData(id: string | undefined) {
 
     return {
         nasabah, setNasabah, saldo, loading,
-        // setoran
         setoranLoading, setoranSearch, setSetoranSearch,
         setoranFrom, setSetoranFrom, setoranTo, setSetoranTo,
         filteredSetoran,
-        // bagi hasil
         bagiHasilLoading, bagiHasilSearch, setBagiHasilSearch,
         bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo,
         filteredBagiHasil,
-        // penarikan
         penarikanLoading, penarikanSearch, setPenarikanSearch,
         penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo,
         filteredPenarikan,

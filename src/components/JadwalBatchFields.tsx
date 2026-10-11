@@ -1,31 +1,10 @@
+import { HARI_OPTIONS, MINGGU_OPTIONS, WEEKDAYS, ALL_WEEKS } from "../constants/jadwal.constants";
+import type { JadwalBatchItem } from "../types/jadwal.type";
 import "../styles/jadwal-batch.css";
 
-const HARI_OPTIONS = [
-    { label: "Senin",  value: "senin"  }, { label: "Selasa", value: "selasa" },
-    { label: "Rabu",   value: "rabu"   }, { label: "Kamis",  value: "kamis"  },
-    { label: "Jumat",  value: "jumat"  }, { label: "Sabtu",  value: "sabtu"  },
-    { label: "Minggu", value: "minggu" },
-];
-const MINGGU_OPTIONS = [
-    { label: "Minggu ke-1", value: "1" }, { label: "Minggu ke-2", value: "2" },
-    { label: "Minggu ke-3", value: "3" }, { label: "Minggu ke-4", value: "4" },
-    { label: "Minggu ke-5", value: "5" },
-];
-export const WEEKDAYS = ["senin", "selasa", "rabu", "kamis", "jumat"];
-export const ALL_WEEKS = ["1", "2", "3", "4", "5"];
+export { WEEKDAYS, ALL_WEEKS };
+export type { JadwalBatchItem };
 
-export interface JadwalBatchItem {
-    hari: string;
-    minggu_ke: number;
-    jam_mulai: string;
-    jam_selesai: string;
-}
-
-/**
- * Bangun daftar item jadwal dari pilihan hari & minggu.
- * Tiap kombinasi hari × minggu jadi satu item. "Setiap minggu" = minggu 1–5
- * (DB hanya mengizinkan minggu_ke 1–5, tidak ada 0).
- */
 export function buildJadwalBatchItems(
     hariList: string[],
     mingguList: string[],

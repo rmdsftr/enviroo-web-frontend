@@ -12,8 +12,8 @@ import { SetoranService, type SetoranDetail } from "../services/setoran.service"
 import ViewPhoto from "../components/view-photo";
 import "../styles/detail-penyetoran.css";
 import { formatTanggalPanjang, formatJam } from "../utils/date.utils";
+import { formatDecimal } from "../utils/number.utils";
 
-/* ── Helpers ── */
 function getInitials(name: string): string {
     return name
         .split(" ")
@@ -23,7 +23,6 @@ function getInitials(name: string): string {
         .toUpperCase();
 }
 
-/* ── Component ── */
 export default function DetailPenyetoranPage() {
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
@@ -32,7 +31,6 @@ export default function DetailPenyetoranPage() {
     const role = user?.role?.toLowerCase();
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : "/bsm";
 
-    /* penimbanganId diteruskan via navigate state dari detail-penimbangan */
     const penimbanganId: string | undefined = location.state?.penimbanganId;
 
     const [detail, setDetail] = useState<SetoranDetail | null>(null);
@@ -50,7 +48,6 @@ export default function DetailPenyetoranPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    /* ── Breadcrumb: Riwayat > Detail Penimbangan > Detail Setoran ── */
     const breadcrumbItems = [
         { label: "Riwayat", path: `${rolePrefix}/riwayat` },
         {
@@ -67,7 +64,6 @@ export default function DetailPenyetoranPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dps-page">
-                {/* Hero */}
                 <div className="dps-hero">
                     <h1>Detail Setoran</h1>
                     <p>Rincian transaksi setoran sampah nasabah</p>
@@ -84,7 +80,6 @@ export default function DetailPenyetoranPage() {
                 {!loading && !error && detail && (
                     <div className="dps-card">
 
-                        {/* ── LEFT: Header / Overview ── */}
                         <div className="dps-overview">
 
                             <div className="dps-overview-header">
@@ -98,7 +93,6 @@ export default function DetailPenyetoranPage() {
 
                             <div className="dps-info-list">
 
-                                {/* Nasabah row with avatar */}
                                 <div className="dps-nasabah-row">
                                     <div className="dps-nasabah-avatar">
                                         {getInitials(detail.header.nama_nasabah)}
@@ -146,7 +140,6 @@ export default function DetailPenyetoranPage() {
 
                         </div>
 
-                        {/* ── RIGHT: Item List ── */}
                         <div className="dps-items-col">
                             <div className="dps-items-header">
                                 <div>
@@ -163,7 +156,6 @@ export default function DetailPenyetoranPage() {
                                 </div>
                             ) : (
                                 <div className="dps-items-list">
-                                    {/* Table header */}
                                     <div className="dps-item-thead">
                                         <span className="dps-item-th dps-item-col-no">#</span>
                                         <span className="dps-item-th dps-item-col-name">Nama Sampah</span>
@@ -177,7 +169,7 @@ export default function DetailPenyetoranPage() {
                                             <div className="dps-item-name-wrap">
                                                 <span className="dps-item-name">{item.nama_sampah}</span>
                                             </div>
-                                            <span className="dps-item-qty">{item.qty}</span>
+                                            <span className="dps-item-qty">{formatDecimal(item.qty)}</span>
                                             <span className="dps-item-unit">{item.satuan}</span>
                                         </div>
                                     ))}

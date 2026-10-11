@@ -1,6 +1,3 @@
-/* =========================================================
-   Pagination
-   ========================================================= */
 .pagination {
     display: flex;
     align-items: center;
@@ -61,7 +58,6 @@
     user-select: none;
 }
 
-/* ── Compact / neutral variant ──────────────────────────── */
 .pagination--compact {
     padding: 12px 0 4px;
     gap: 3px;

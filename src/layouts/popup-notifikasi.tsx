@@ -13,12 +13,11 @@ export const PopupNotifikasi: React.FC<PopupNotifikasiProps> = ({
   message, 
   type = 'success', 
   onClose,
-  duration = 2000 // default 2 detik
+  duration = 2000
 }) => {
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Mulai animasi menghilang (closing) setelah durasi yang ditentukan
     const timer = setTimeout(() => {
       setIsClosing(true);
     }, duration);
@@ -28,7 +27,6 @@ export const PopupNotifikasi: React.FC<PopupNotifikasiProps> = ({
 
   useEffect(() => {
     if (isClosing) {
-      // Tunggu hingga animasi CSS fadeOutUp selesai (0.3s) sebelum memanggil onClose prop
       const timer = setTimeout(() => {
         onClose();
       }, 300);

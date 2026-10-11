@@ -1,8 +1,15 @@
-import type { Reward } from "./reward.type";
 import type { MasterBarang } from "./barang.type";
 
-export type { Reward };
 export type { MasterBarang };
+
+export interface KatalogReward {
+    RewardID: number;
+    NamaReward: string;
+    Satuan: string;
+    Deskripsi?: string | null;
+    CreatedAt: string;
+    UpdatedAt: string;
+}
 
 export interface KategoriSampah {
     KategoriID: number;
@@ -143,7 +150,7 @@ export interface KatalogSampah {
     syarat_pemilahan: string;
     stok: number;
     kategori: KategoriSampah;
-    reward: Reward;
+    reward: KatalogReward;
 }
 
 export interface KatalogDetail {
@@ -154,7 +161,7 @@ export interface KatalogDetail {
     bank_id: string;
     syarat_pemilahan: string;
     kategori: KategoriSampah;
-    reward: Reward;
+    reward: KatalogReward;
     stok: number;
     harga_per_level: HargaPerLevel[];
     history_harga: KatalogHistoryItem[];
@@ -183,8 +190,6 @@ export interface GetKatalogDetailResponse {
     message: string;
 }
 
-// ── Request payloads ──────────────────────────────────────────
-
 export interface AddKatalogRequest {
     nama_sampah: string;
     sarok_id? : number;
@@ -197,5 +202,6 @@ export interface AddKatalogRequest {
 
 export interface EditKatalogRequest {
     syarat_pemilahan?: string;
+    kategori_id?: number;
     foto?: File;
 }

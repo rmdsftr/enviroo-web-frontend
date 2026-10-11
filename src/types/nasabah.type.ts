@@ -53,8 +53,3 @@ export interface NasabahBankSampah {
     bank_sampah_unit: string;
     status_nasabah: string;
 }
-
-export interface NasabahBankSampahResponse {
-    message: string;
-    data: NasabahBankSampah[];
-}

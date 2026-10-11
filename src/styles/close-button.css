@@ -1,6 +1,3 @@
-/* =========================================================
-   Close Button — circular icon button
-   ========================================================= */
 .popup-close-btn {
     background: var(--c-surface-muted);
     border: 1px solid var(--c-border);

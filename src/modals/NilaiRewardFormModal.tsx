@@ -5,6 +5,7 @@ import Input from "../components/input";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import type { Reward } from "../types/reward.type";
+import { formatDecimalInput, parseDecimalInput, toDecimalInput } from "../utils/number.utils";
 import "../styles/reward.css";
 import "../styles/manajemen-reward.css";
 
@@ -44,7 +45,7 @@ export default function NilaiRewardFormModal({
 
         if (initialData && initialData.persentase) {
             const nasabah = initialData.persentase.find(p => p.level_user === "nasabah");
-            setPersenNasabah(nasabah ? String(nasabah.persen_bagi_hasil) : "");
+            setPersenNasabah(nasabah ? toDecimalInput(nasabah.persen_bagi_hasil) : "");
         } else {
             setPersenNasabah("");
         }
@@ -56,9 +57,9 @@ export default function NilaiRewardFormModal({
         e.preventDefault();
         setError(null);
 
-        const pNasabah = parseFloat(persenNasabah);
-        if (!isFinite(pNasabah) || pNasabah < 0 || pNasabah > 100) {
-            setError("Persentase Nasabah harus antara 0 dan 100.");
+        const pNasabah = parseDecimalInput(persenNasabah);
+        if (pNasabah === null || pNasabah <= 0 || pNasabah > 100) {
+            setError("Persentase Nasabah harus lebih dari 0 dan maksimal 100.");
             return;
         }
 
@@ -100,7 +101,7 @@ export default function NilaiRewardFormModal({
                                 {isEdit ? "Edit Konfigurasi Reward" : "Atur Konfigurasi Reward"}
                             </h2>
                             <p className="mr-modal-sub">
-                                Konfigurasi bagi hasil untuk <strong>{reward.NamaReward}</strong>.
+                                Konfigurasi bagi hasil untuk <strong>{reward.nama_reward}</strong>.
                             </p>
                         </div>
                     </div>
@@ -111,20 +112,17 @@ export default function NilaiRewardFormModal({
                     {error && <div className="mr-form-error">{error}</div>}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '8px 0' }}>
-                        {/* Section: Persentase Bagi Hasil */}
                         <div>
                             <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--k-dark)', marginBottom: '12px', borderBottom: '1px solid var(--k-border)', paddingBottom: '8px' }}>Persentase Bagi Hasil</div>
                             <div className="mr-form-field">
                                 <label className="mr-form-label">Nasabah (%) <span style={{ color: 'red' }}>*</span></label>
                                 <Input
                                     className="rw-input-override"
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    step="any"
+                                    type="text"
+                                    inputMode="decimal"
                                     placeholder="Contoh: 100"
                                     value={persenNasabah}
-                                    onChange={e => setPersenNasabah(e.target.value)}
+                                    onChange={e => setPersenNasabah(formatDecimalInput(e.target.value))}
                                     required
                                 />
                             </div>

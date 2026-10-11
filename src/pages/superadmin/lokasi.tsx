@@ -16,7 +16,6 @@ import "../../styles/table.css";
 const DIVIDER = <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />;
 
 export default function LokasiPage() {
-    /* ── Kecamatan ──────────────────────────────────────────── */
     const [kecamatans, setKecamatans] = useState<Kecamatan[]>([]);
     const [isLoadingKec, setIsLoadingKec] = useState(true);
     const [kecModalOpen, setKecModalOpen] = useState(false);
@@ -65,7 +64,6 @@ export default function LokasiPage() {
         }
     };
 
-    /* ── Kelurahan ──────────────────────────────────────────── */
     const [kelurahans, setKelurahans] = useState<Kelurahan[]>([]);
     const [isLoadingKel, setIsLoadingKel] = useState(true);
     const [kelModalOpen, setKelModalOpen] = useState(false);
@@ -134,11 +132,9 @@ export default function LokasiPage() {
         }
     };
 
-    /* ── Shared notif ───────────────────────────────────────── */
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const showNotif = (message: string, type: "success" | "error") => setPopupNotif({ message, type });
 
-    /* ── Init ───────────────────────────────────────────────── */
     useEffect(() => {
         fetchKecamatan();
     }, [fetchKecamatan]);
@@ -152,11 +148,9 @@ export default function LokasiPage() {
         ...kecamatans.map(k => ({ label: k.kecamatan, value: String(k.id_kecamatan) })),
     ];
 
-    /* ── Render ─────────────────────────────────────────────── */
     return (
         <section className="mr-section">
 
-            {/* ══ KECAMATAN ═══════════════════════════════════════ */}
             <div className="mr-header">
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Manajemen Kecamatan</h2>
@@ -222,7 +216,6 @@ export default function LokasiPage() {
 
             {DIVIDER}
 
-            {/* ══ KELURAHAN ════════════════════════════════════════ */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Manajemen Kelurahan</h2>
@@ -319,7 +312,6 @@ export default function LokasiPage() {
             )}
             <br /><br /><br /><br />
 
-            {/* ══ MODALS ══════════════════════════════════════════ */}
             <KecamatanFormModal
                 isOpen={kecModalOpen}
                 onClose={() => { setKecModalOpen(false); setEditKec(null); }}

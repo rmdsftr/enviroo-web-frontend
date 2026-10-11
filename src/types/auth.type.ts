@@ -12,13 +12,14 @@ export interface UserData {
   role: string;
   bank_id: string;
   identity_id: string;
-  access_token: string;
-  refresh_token: string;
 }
 
 export interface LoginResponse {
   message: string;
-  data: UserData;
+  data: UserData & {
+    access_token: string;
+    refresh_token: string;
+  };
 }
 
 export interface AktivasiPayload {

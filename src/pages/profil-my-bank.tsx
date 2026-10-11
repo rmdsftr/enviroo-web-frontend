@@ -12,10 +12,10 @@ import {
     FaMoneyBillWave,
     FaStar,
     FaGear,
-    FaToggleOff,
     FaUserPlus,
     FaPenToSquare,
 } from "react-icons/fa6";
+import defaultBankPhoto from "../assets/enviroo-pfp.png";
 import "../styles/layout.css";
 import "../styles/profil-my-bank.css";
 import "../styles/profil-nasabah.css";
@@ -32,19 +32,21 @@ import PopupMenu from "../components/popup-menu";
 import PopupConfirmation from "../layouts/popup-confirmation";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
 import PopupAktivasiResult from "../layouts/popup-aktivasi-result";
-import PopupInputKeterangan from "../layouts/popup-input-keterangan";
 
+import { useAuth } from "../contexts/AuthContext";
 import { useProfilMyBankData } from "../hooks/useProfilMyBankData";
-import { buildAdminColumns, HISTORY_COLUMNS, formatRupiah } from "../constants/profil-my-bank.constants";
+import { buildAdminColumns, HISTORY_COLUMNS } from "../constants/profil-my-bank.constants";
+import { formatNominal } from "../utils/number.utils";
 import { EditProfilBankModal } from "../modals/EditProfilBankModal";
 import { TambahAdminModal } from "../modals/TambahAdminModal";
 
 export default function ProfilMyBankPage() {
     const navigate = useNavigate();
+    const { refreshActiveAdmin } = useAuth();
     const [activeTab, setActiveTab] = useState("Staff");
 
     const {
-        user, logout, bankId,
+        user, bankId,
         bank, saldo, loading,
         filteredAdminList, staffFilter, setStaffFilter,
         historyList,
@@ -52,27 +54,22 @@ export default function ProfilMyBankPage() {
         setAdminList,
     } = useProfilMyBankData(activeTab);
 
-    // ── Modals ──
     const [showEditProfilModal, setShowEditProfilModal] = useState(false);
     const [showTambahAdminModal, setShowTambahAdminModal] = useState(false);
 
-    // ── Popups ──
     const [isDeleteAdminOpen, setIsDeleteAdminOpen] = useState(false);
     const [pendingDeleteAdminId, setPendingDeleteAdminId] = useState<string | null>(null);
     const [isReactivateModalOpen, setIsReactivateModalOpen] = useState(false);
     const [reactivateData, setReactivateData] = useState<ReactivateNasabahResponse["data"] | null>(null);
-    const [isActivationConfirmOpen, setIsActivationConfirmOpen] = useState(false);
-    const [isInputKeteranganOpen, setIsInputKeteranganOpen] = useState(false);
     const [isPhotoOpen, setIsPhotoOpen] = useState(false);
 
-    // ── Notif ──
     const [notif, setNotif] = useState<{ message: string; type: "success" | "error" | "warning" | "info" } | null>(null);
     const showNotif = (message: string, type: "success" | "error" | "warning" | "info") => setNotif({ message, type });
 
-    // ── Handlers ──
     const handleEditProfilBank = async (formData: FormData) => {
         await BankService.editProfilBank(bankId, formData);
         await fetchBank();
+        await refreshActiveAdmin();
         showNotif("Profil bank berhasil diperbarui.", "success");
     };
 
@@ -121,34 +118,12 @@ export default function ProfilMyBankPage() {
         }
     };
 
-    const handleAktivasiBank = async (keterangan: string) => {
-        if (!bank || !bankId) return;
-        const wasActive = bank.is_active;
-        try {
-            await BankService.AktivasiBank(bankId, {
-                admin_id: user?.identity_id ?? "",
-                informasi: wasActive ? "Bank sampah dinonaktifkan" : "Bank sampah diaktifkan",
-                keterangan,
-            });
-            setIsInputKeteranganOpen(false);
-            if (wasActive) {
-                logout();
-            } else {
-                await fetchBank();
-                showNotif("Bank sampah berhasil diaktifkan.", "success");
-            }
-        } catch {
-            showNotif("Terjadi kesalahan saat mengubah status bank sampah.", "error");
-        }
-    };
-
     const adminColumns = useMemo(
         () => buildAdminColumns(user?.identity_id ?? "", handleToggleAktivasiStaff, handleDeleteAdmin),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [user?.identity_id]
     );
 
-    // ── Render ──
     if (loading) {
         return <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>Memuat profil bank...</div>;
     }
@@ -160,29 +135,6 @@ export default function ProfilMyBankPage() {
 
     return (
         <>
-            {/* ── Aktivasi Bank ── */}
-            <PopupConfirmation
-                isOpen={isActivationConfirmOpen}
-                type={bank.is_active ? "danger" : "warning"}
-                title={bank.is_active ? "Nonaktifkan Bank Sampah?" : "Aktifkan Bank Sampah?"}
-                message={
-                    bank.is_active
-                        ? "Apakah Anda yakin ingin menonaktifkan bank sampah ini? Anda akan ter-logout otomatis dan tidak dapat mengakses sistem selama bank sampah tidak beroperasi."
-                        : "Apakah Anda yakin ingin mengaktifkan kembali bank sampah ini? Bank sampah akan kembali beroperasional."
-                }
-                confirmText={bank.is_active ? "Ya, Nonaktifkan" : "Ya, Aktifkan"}
-                cancelText="Batal"
-                onConfirm={() => { setIsActivationConfirmOpen(false); setIsInputKeteranganOpen(true); }}
-                onCancel={() => setIsActivationConfirmOpen(false)}
-            />
-            <PopupInputKeterangan
-                isOpen={isInputKeteranganOpen}
-                title={bank.is_active ? "Kenapa bank sampah ini perlu dinonaktifkan?" : "Kenapa bank sampah ini diaktifkan kembali?"}
-                onConfirm={(keterangan) => handleAktivasiBank(keterangan)}
-                onCancel={() => setIsInputKeteranganOpen(false)}
-            />
-
-            {/* ── Hapus Staff ── */}
             <PopupConfirmation
                 isOpen={isDeleteAdminOpen}
                 type="danger"
@@ -194,7 +146,6 @@ export default function ProfilMyBankPage() {
                 onCancel={() => { setIsDeleteAdminOpen(false); setPendingDeleteAdminId(null); }}
             />
 
-            {/* ── Notifikasi ── */}
             {notif && (
                 <PopupNotifikasi
                     message={notif.message}
@@ -203,7 +154,6 @@ export default function ProfilMyBankPage() {
                 />
             )}
 
-            {/* ── Reactivate Result ── */}
             <PopupAktivasiResult
                 isOpen={isReactivateModalOpen}
                 onClose={() => setIsReactivateModalOpen(false)}
@@ -211,12 +161,10 @@ export default function ProfilMyBankPage() {
                 description="Berikan informasi berikut kepada staff untuk proses aktivasi akun mereka."
             />
 
-            {/* ── View Photo ── */}
             {isPhotoOpen && bank.photo_url && (
                 <ViewPhoto src={bank.photo_url} alt={bank.nama_bank} onClose={() => setIsPhotoOpen(false)} />
             )}
 
-            {/* ── Top Card ── */}
             <div className="pmb-card">
                 <div className="pmb-card-left">
                     <div className="pmb-photo-wrapper">
@@ -225,11 +173,7 @@ export default function ProfilMyBankPage() {
                             style={bank.photo_url ? { cursor: "pointer" } : undefined}
                             onClick={() => bank.photo_url && setIsPhotoOpen(true)}
                         >
-                            {bank.photo_url ? (
-                                <img src={bank.photo_url} alt={bank.nama_bank} />
-                            ) : (
-                                <div className="pmb-photo-fallback"><FaBuilding /></div>
-                            )}
+                            <img src={bank.photo_url || defaultBankPhoto} alt={bank.nama_bank} />
                         </div>
                         <div
                             className={`pmb-status-dot ${bank.is_active ? "active" : "inactive"}`}
@@ -250,11 +194,6 @@ export default function ProfilMyBankPage() {
                             }
                             items={[
                                 { label: "Edit Profil Bank Sampah", icon: <FaPenToSquare />, onClick: () => setShowEditProfilModal(true) },
-                                {
-                                    label: bank.is_active ? "Nonaktifkan Bank Sampah" : "Aktifkan Bank Sampah",
-                                    icon: <FaToggleOff />,
-                                    onClick: () => setIsActivationConfirmOpen(true),
-                                },
                             ]}
                         />
                     </div>
@@ -275,7 +214,6 @@ export default function ProfilMyBankPage() {
                 </div>
             </div>
 
-            {/* ── Middle Row: Saldo + Alamat ── */}
             <div className="pmb-mid-row">
                 <div className="pmb-panel">
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -289,7 +227,7 @@ export default function ProfilMyBankPage() {
                             <div className="pn-saldo-icon"><FaMoneyBillWave /></div>
                             <div className="pn-saldo-body">
                                 <span className="pn-saldo-number">
-                                    {saldo?.uang.satuan_uang ?? "Rp"} {formatRupiah(saldo?.uang.total_uang ?? 0)}
+                                    {formatNominal(saldo?.uang.total_uang ?? 0, saldo?.uang.satuan_uang ?? "Rp")}
                                 </span>
                                 <span className="pn-saldo-status">Saldo Uang</span>
                             </div>
@@ -299,7 +237,7 @@ export default function ProfilMyBankPage() {
                                 <div className="pn-saldo-icon"><FaStar /></div>
                                 <div className="pn-saldo-body">
                                     <span className="pn-saldo-number">
-                                        {formatRupiah(saldo?.poin.total_poin ?? 0)} {saldo?.poin.satuan_poin ?? "poin"}
+                                        {formatNominal(saldo?.poin.total_poin ?? 0, saldo?.poin.satuan_poin ?? "poin")}
                                     </span>
                                     <span className="pn-saldo-status">Saldo Poin</span>
                                 </div>
@@ -336,7 +274,6 @@ export default function ProfilMyBankPage() {
                 </div>
             </div>
 
-            {/* ── Tabs ── */}
             <Tabs
                 tabs={[
                     { id: "Staff", label: "Staff" },
@@ -394,7 +331,6 @@ export default function ProfilMyBankPage() {
                 </div>
             )}
 
-            {/* ── Modals ── */}
             {showEditProfilModal && (
                 <EditProfilBankModal
                     bank={bank}

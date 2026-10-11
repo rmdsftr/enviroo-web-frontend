@@ -88,7 +88,7 @@ export default function JadwalModal({ isOpen, onClose, onSuccess, initialData, b
         setIsSubmitting(true);
         try {
             const payload: JadwalFormData = { ...form, isInsidental, bankId };
-            await new Promise(r => setTimeout(r, 400)); // mock API call
+            await new Promise(r => setTimeout(r, 400));
             onSuccess(payload);
         } finally {
             setIsSubmitting(false);
@@ -98,7 +98,6 @@ export default function JadwalModal({ isOpen, onClose, onSuccess, initialData, b
     return (
         <div className="jmodal-overlay" onClick={onClose}>
             <div className="jmodal-box" onClick={e => e.stopPropagation()}>
-                {/* Header */}
                 <div className="jmodal-header">
                     <div>
                         <h2 className="jmodal-title">{isEdit ? "Ubah Jadwal" : "Tambah Jadwal Penimbangan"}</h2>
@@ -107,7 +106,6 @@ export default function JadwalModal({ isOpen, onClose, onSuccess, initialData, b
                     <button className="jmodal-close" onClick={onClose}><FaXmark /></button>
                 </div>
 
-                {/* Toggle Rutin / Insidental */}
                 <div className="jmodal-type-toggle">
                     <button
                         type="button"
@@ -121,7 +119,6 @@ export default function JadwalModal({ isOpen, onClose, onSuccess, initialData, b
                     >Insidental</button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="jmodal-form">
                     {isInsidental ? (
                         <div className="jmodal-field">

@@ -26,19 +26,17 @@ import {
     FaPlus,
 } from "react-icons/fa6";
 
-// ── Unified row type ──────────────────────────────────────
 type BankRow = {
     BankID: string;
     NamaBank: string;
     PhotoURL: string;
     IsActive: boolean;
     jumlah_nasabah?: number;
-    jumlah_bsu?: number;    // BSI only
-    nama_bsi?: string;      // BSU (superadmin) only
-    jumlah_staff?: number;  // BSM only
+    jumlah_bsu?: number;
+    nama_bsi?: string;
+    jumlah_staff?: number;
 };
 
-// ── Page type ─────────────────────────────────────────────
 export type BankListType = "bsi" | "bsu" | "bsm";
 
 interface PageConfig {
@@ -96,7 +94,6 @@ const ADMIN_BSI_CONFIG: PageConfig = {
     breadcrumbLabel: "Bank Sampah Unit",
 };
 
-// ── Column builders ───────────────────────────────────────
 function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: string) => void): ColumnDef<BankRow>[] {
     const getDetailPath = (bankId: string) => {
         if (isAdminBsi) return `/bsi/bsu/${bankId}`;
@@ -140,7 +137,6 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         },
     ];
 
-    // BSI only: show jumlah BSU
     if (type === "bsi" && !isAdminBsi) {
         cols.push({
             key: "jumlah_bsu",
@@ -151,7 +147,6 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         });
     }
 
-    // BSU (superadmin): show parent BSI name
     if (type === "bsu" && !isAdminBsi) {
         cols.push({
             key: "nama_bsi",
@@ -160,7 +155,6 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         });
     }
 
-    // All: jumlah nasabah
     cols.push({
         key: "jumlah_nasabah",
         header: "Jumlah Nasabah",
@@ -169,7 +163,6 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         render: (row) => <span style={{ fontWeight: 600 }}>{row.jumlah_nasabah ?? 0}</span>,
     });
 
-    // BSU & BSM: jumlah staff
     if (type === "bsu" || type === "bsm") {
         cols.push({
             key: "jumlah_staff",
@@ -180,7 +173,6 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
         });
     }
 
-    // All: status
     cols.push({
         key: "status",
         header: "Status",
@@ -193,14 +185,12 @@ function buildColumns(type: BankListType, isAdminBsi: boolean, navigate: (path: 
     return cols;
 }
 
-// ── Props ─────────────────────────────────────────────────
 interface BankListPageProps {
     type: BankListType;
 }
 
 const PAGE_SIZE = 20;
 
-// ── Page ──────────────────────────────────────────────────
 export default function BankListPage({ type }: BankListPageProps) {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -216,22 +206,18 @@ export default function BankListPage({ type }: BankListPageProps) {
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // admin_bsi: server-paged current page + all-data cache
     const [bankList, setBankList] = useState<BankRow[]>([]);
     const [totalPages, setTotalPages] = useState(1);
     const [allBsuList, setAllBsuList] = useState<BankRow[]>([]);
 
-    // superadmin: server-paged current page
     const [pageData, setPageData] = useState<BankRow[]>([]);
     const [serverTotalPages, setServerTotalPages] = useState(1);
     const [serverTotalItems, setServerTotalItems] = useState(0);
-    // superadmin: all-data cache for search/filter
     const [allBankList, setAllBankList] = useState<BankRow[]>([]);
     const [allBankListLoaded, setAllBankListLoaded] = useState(false);
 
     const isSuperadminLocalMode = !isAdminBsi && (searchQuery.trim() !== "" || statusFilter !== "all");
 
-    // Reset superadmin cache when bank type changes
     useEffect(() => {
         if (isAdminBsi) return;
         setPageData([]);
@@ -242,7 +228,6 @@ export default function BankListPage({ type }: BankListPageProps) {
         setServerTotalItems(0);
     }, [type, isAdminBsi]);
 
-    // admin_bsi: fetch all BSU once for search/filter
     useEffect(() => {
         if (!isAdminBsi || !user?.bank_id) return;
         BsiService.getUnit(user.bank_id).then((res) => {
@@ -255,10 +240,8 @@ export default function BankListPage({ type }: BankListPageProps) {
                 jumlah_staff: b.jumlah_staff,
             })));
         }).catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.bank_id, isAdminBsi]);
 
-    // admin_bsi: server-paged BSU
     useEffect(() => {
         if (!isAdminBsi || !user?.bank_id) return;
         setLoading(true);
@@ -277,10 +260,8 @@ export default function BankListPage({ type }: BankListPageProps) {
             })
             .catch(() => setError("Gagal memuat data. Silakan coba lagi."))
             .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.bank_id, isAdminBsi, currentPage]);
 
-    // superadmin server mode: fetch current page
     useEffect(() => {
         if (isAdminBsi || isSuperadminLocalMode) return;
         setLoading(true);
@@ -321,10 +302,8 @@ export default function BankListPage({ type }: BankListPageProps) {
             }
         };
         fetchPage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type, currentPage, isAdminBsi, isSuperadminLocalMode]);
 
-    // superadmin local mode: fetch all (cached)
     useEffect(() => {
         if (isAdminBsi || !isSuperadminLocalMode || allBankListLoaded) return;
         setLoading(true);
@@ -360,10 +339,8 @@ export default function BankListPage({ type }: BankListPageProps) {
             }
         };
         fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type, isAdminBsi, isSuperadminLocalMode, allBankListLoaded]);
 
-    // ── admin_bsi filtering ───────────────────────────────
     const isSearching = isAdminBsi && !!searchQuery;
     const isStatusFiltering = isAdminBsi && statusFilter !== "all";
 
@@ -381,7 +358,6 @@ export default function BankListPage({ type }: BankListPageProps) {
         return bankList;
     }, [bankList, allBsuList, isAdminBsi, isSearching, isStatusFiltering, statusFilter, searchQuery, currentPage]);
 
-    // ── superadmin filtering ──────────────────────────────
     const superadminFiltered = useMemo(() => {
         if (isAdminBsi || !isSuperadminLocalMode) return [];
         let list = allBankList;
@@ -410,7 +386,6 @@ export default function BankListPage({ type }: BankListPageProps) {
         ? Math.max(1, Math.ceil(allBsuList.filter(b => b.IsActive === statusFilter).length / PAGE_SIZE))
         : totalPages;
 
-    // ── Stats ─────────────────────────────────────────────
     const total = isAdminBsi
         ? allBsuList.length
         : (allBankListLoaded ? allBankList.length : serverTotalItems);
@@ -429,7 +404,6 @@ export default function BankListPage({ type }: BankListPageProps) {
 
     return (
         <>
-            {/* Breadcrumb (superadmin only) */}
             {!isAdminBsi && (
                 <BreadcrumbLayout
                     items={[
@@ -439,7 +413,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 />
             )}
 
-            {/* ── Page Header ── */}
             <div className="nasabah-hero">
                 <div className="nasabah-hero-left">
                     <h1 className="nasabah-hero-title">{config.heroTitle}</h1>
@@ -459,7 +432,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 </div>
             </div>
 
-            {/* Statistik */}
             <div className="statistik">
                 <StatistikLayout
                     icon={FaLayerGroup}
@@ -484,7 +456,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 />
             </div>
 
-            {/* ── Filter Bar ── */}
             <div className="nasabah-filter-bar">
                 <FilterPill
                     options={[
@@ -503,7 +474,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 />
             </div>
 
-            {/* Tabel */}
             <div className="bsu-table-section">
                 {error && (
                     <div style={{ padding: "16px 24px", color: "#c13a3a", fontSize: "14px" }}>
@@ -525,7 +495,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 )}
             </div>
 
-            {/* Superadmin pagination */}
             {!isAdminBsi && superadminTotalPages > 1 && (
                 <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                     <Pagination
@@ -536,7 +505,6 @@ export default function BankListPage({ type }: BankListPageProps) {
                 </div>
             )}
 
-            {/* admin_bsi pagination */}
             {isAdminBsi && !isSearching && (
                 <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                     <Pagination

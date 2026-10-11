@@ -1,13 +1,8 @@
-/* =========================================================
-   Profil Nasabah — Detail Page
-   ========================================================= */
-
 @keyframes pnFadeIn {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Outer Card ── */
 .pn-card {
     margin: 0 24px 24px;
     background: #ffffff;
@@ -19,7 +14,6 @@
     animation: pnFadeIn 0.4s ease both;
 }
 
-/* ── Settings Button ── */
 .pn-settings-btn {
     position: absolute;
     top: 24px;
@@ -43,9 +37,6 @@
     border-color: rgba(78, 167, 113, 0.35);
 }
 
-/* =========================================================
-   Section 1 — Identity (full width)
-   ========================================================= */
 .pn-identity {
     display: flex;
     align-items: center;
@@ -54,7 +45,6 @@
     border-bottom: 1px solid rgba(1, 50, 54, 0.05);
 }
 
-/* ── Avatar ── */
 .pn-avatar {
     width: 125px;
     height: 125px;
@@ -83,7 +73,6 @@
     letter-spacing: 1px;
 }
 
-/* ── Identity Info ── */
 .pn-identity-info {
     display: flex;
     flex-direction: column;
@@ -165,9 +154,6 @@
     font-size: 11px;
 }
 
-/* =========================================================
-   Section — Saldo (full width, below admin banner)
-   ========================================================= */
 .pn-saldo-section {
     padding: 20px 32px 28px;
     border-top: 1px solid rgba(1, 50, 54, 0.05);
@@ -211,7 +197,6 @@
     border-color: rgba(78, 167, 113, 0.4);
 }
 
-/* ── Saldo Cards — identical to stat-card ── */
 .pn-saldo-cards {
     display: flex;
     gap: 16px;
@@ -236,7 +221,6 @@
     box-shadow: 0 8px 20px rgba(1, 50, 54, 0.12);
 }
 
-/* Decorative blob — top right */
 .pn-saldo-card::after {
     content: '';
     position: absolute;
@@ -248,7 +232,6 @@
     pointer-events: none;
 }
 
-/* Teal variant (Saldo Poin) */
 .pn-saldo-card--teal {
     background: #ffffff;
     border-color: rgba(6, 192, 201, 0.15);
@@ -264,7 +247,6 @@
 .pn-saldo-card--teal .pn-saldo-number { color: #035b60; }
 .pn-saldo-card--teal .pn-saldo-status { color: #06A0A8; }
 
-/* Green variant (Saldo Uang) */
 .pn-saldo-card--green {
     background: #ffffff;
     border-color: rgba(78, 167, 113, 0.15);
@@ -299,7 +281,6 @@
     letter-spacing: 1px;
 }
 
-/* Icon */
 .pn-saldo-icon {
     width: 48px;
     height: 48px;
@@ -315,7 +296,6 @@
     transform: scale(1.08);
 }
 
-/* Body */
 .pn-saldo-body {
     display: flex;
     flex-direction: column;
@@ -341,9 +321,6 @@
     margin-top: 3px;
 }
 
-/* =========================================================
-   Section 3 — Detail Info
-   ========================================================= */
 .pn-detail-section {
     padding: 24px 32px 28px;
 }
@@ -418,9 +395,6 @@
 
 
 
-/* =========================================================
-   Admin Banner
-   ========================================================= */
 .pn-admin-banner {
     display: flex;
     align-items: center;
@@ -458,7 +432,6 @@
     font-weight: 700;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .pn-card {
         margin: 0 16px 20px;

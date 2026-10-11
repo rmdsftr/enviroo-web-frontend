@@ -1,6 +1,3 @@
-/* =====================
-   BSU Table Section
-   ===================== */
 .bsu-table-section {
     padding: 0 24px 24px 24px;
     display: flex;
@@ -8,7 +5,6 @@
     gap: 14px;
 }
 
-/* Toolbar */
 .bsu-toolbar {
     display: flex;
     align-items: center;
@@ -30,7 +26,6 @@
     color: #013236;
 }
 
-/* Register button */
 .btn-register {
     display: inline-flex;
     align-items: center;

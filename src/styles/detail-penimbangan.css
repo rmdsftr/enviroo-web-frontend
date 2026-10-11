@@ -1,13 +1,8 @@
-/* =========================================================
-   Detail Penimbangan — Page Styles
-   ========================================================= */
-
 @keyframes dpFadeIn {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Page Wrapper ── */
 .dp-page {
     display: flex;
     flex-direction: column;
@@ -15,7 +10,6 @@
     animation: dpFadeIn 0.4s ease both;
 }
 
-/* ── Hero ── */
 .dp-hero {
     display: flex;
     align-items: flex-start;
@@ -57,7 +51,6 @@
     flex-shrink: 0;
 }
 
-/* ── Loading / Error states ── */
 .dp-loading,
 .dp-error {
     display: flex;
@@ -73,9 +66,6 @@
     color: #ef4444;
 }
 
-/* =========================================================
-   Main 2-Column Grid Card
-   ========================================================= */
 .dp-card {
     background: #ffffff;
     border-radius: 20px;
@@ -93,7 +83,6 @@
     }
 }
 
-/* ── Left Column: Overview ── */
 .dp-overview {
     padding: 28px 28px 32px;
     border-right: 1px solid rgba(1, 50, 54, 0.06);
@@ -109,7 +98,6 @@
     }
 }
 
-/* ── Overview header ── */
 .dp-overview-header {
     display: flex;
     align-items: center;
@@ -144,7 +132,6 @@
     margin: 2px 0 0;
 }
 
-/* ── Info rows ── */
 .dp-info-list {
     display: flex;
     flex-direction: column;
@@ -203,7 +190,6 @@
     text-overflow: ellipsis;
 }
 
-/* ── Status Pill (reuse jbsu pattern) ── */
 .dp-status-pill {
     display: inline-flex;
     align-items: center;
@@ -231,7 +217,6 @@
     color: #ef4444;
 }
 
-/* Pengangkutan status variants */
 .dp-status-pill.completed {
     background: rgba(78, 167, 113, 0.12);
     color: #2e7d50;
@@ -275,14 +260,12 @@
     flex-shrink: 0;
 }
 
-/* ── Divider ── */
 .dp-divider {
     height: 1px;
     background: rgba(1, 50, 54, 0.06);
     margin: 4px 0;
 }
 
-/* ── Stats row (total setoran / items) ── */
 .dp-stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -316,9 +299,6 @@
     letter-spacing: 0.5px;
 }
 
-/* =========================================================
-   Right Column: List Setoran
-   ========================================================= */
 .dp-setoran-col {
     padding: 28px 28px 32px;
     display: flex;
@@ -371,14 +351,12 @@
     border-radius: 20px;
 }
 
-/* ── List ── */
 .dp-setoran-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-/* ── Setoran Row (clickable card) ── */
 .dp-setoran-row {
     display: flex;
     align-items: center;
@@ -472,8 +450,6 @@
     color: #013236;
 }
 
-/* dp-setoran-poin removed */
-
 .dp-setoran-status-pill {
     font-family: 'Poppins', sans-serif;
     font-size: 9.5px;
@@ -510,7 +486,6 @@
     transform: translateX(2px);
 }
 
-/* ── Empty setoran ── */
 .dp-setoran-empty {
     display: flex;
     flex-direction: column;
@@ -528,7 +503,6 @@
     opacity: 0.5;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .dp-page {
         padding: 0 16px 24px;

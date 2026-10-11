@@ -69,7 +69,7 @@ export default function MitraFormModal({ isOpen, onClose, onSubmit, initialData 
                         </label>
                         <Input
                             type="text"
-                            placeholder="Contoh: PT Maju Jaya Recycle"
+                            placeholder="Contoh: PT Semen Padang"
                             value={nama}
                             onChange={e => setNama(e.target.value)}
                             required

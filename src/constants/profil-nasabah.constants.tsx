@@ -4,8 +4,7 @@ import { type RiwayatBagiHasilNasabahItem } from "../services/bagi_hasil_penjual
 import { type PenarikanNasabahItem } from "../services/penarikan.service";
 import { FaEye } from "react-icons/fa6";
 import { formatTanggalJam } from "../utils/date.utils";
-
-// ── Status Nasabah ──
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
 export type StatusNasabah = "aktif" | "nonaktif" | "pending";
 
@@ -24,8 +23,6 @@ export function formatRole(role?: string): string {
     ).join(" ");
 }
 
-// ── Setoran ──
-
 export const SETORAN_COLUMNS: ColumnDef<RiwayatSetoranNasabahItem>[] = [
     {
         key: "setoran_id",
@@ -43,7 +40,7 @@ export const SETORAN_COLUMNS: ColumnDef<RiwayatSetoranNasabahItem>[] = [
         key: "total_item",
         header: "Total Setoran",
         width: "130px",
-        render: (row) => `${row.total_item} item`,
+        render: (row) => `${formatDecimal(row.total_item)} item`,
     },
     {
         key: "aksi",
@@ -54,12 +51,6 @@ export const SETORAN_COLUMNS: ColumnDef<RiwayatSetoranNasabahItem>[] = [
     },
 ];
 
-// ── Bagi Hasil ──
-
-export function fmtBh(total: number, satuan: string): string {
-    const num = total.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
 export const BAGI_HASIL_COLUMNS: ColumnDef<RiwayatBagiHasilNasabahItem>[] = [
     {
@@ -84,7 +75,7 @@ export const BAGI_HASIL_COLUMNS: ColumnDef<RiwayatBagiHasilNasabahItem>[] = [
         key: "total_diterima",
         header: "Total Diterima",
         width: "160px",
-        render: (row) => fmtBh(row.total_diterima, row.satuan_diterima),
+        render: (row) => formatNominal(row.total_diterima, row.satuan_diterima),
     },
     {
         key: "aksi",
@@ -94,8 +85,6 @@ export const BAGI_HASIL_COLUMNS: ColumnDef<RiwayatBagiHasilNasabahItem>[] = [
         render: () => <TableActionBtn icon={FaEye} title="Lihat Detail" />,
     },
 ];
-
-// ── Penarikan ──
 
 export const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
     pending:         { label: "Diajukan",               cls: "mendatang"  },

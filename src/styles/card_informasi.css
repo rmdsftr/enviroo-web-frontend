@@ -1,6 +1,3 @@
-/* =========================================================
-   Info Card
-   ========================================================= */
 .info-card {
     background: var(--c-surface);
     border-radius: var(--r-2xl);
@@ -20,7 +17,6 @@
     border-color: rgba(78, 167, 113, 0.35);
 }
 
-/* ── Thumbnail ── */
 .info-card__thumb {
     position: relative;
     height: 140px;
@@ -58,7 +54,6 @@
     line-height: 1;
 }
 
-/* Timestamp badge */
 .info-card__badge {
     position: absolute;
     top: 12px;
@@ -82,7 +77,6 @@
     color: var(--c-primary);
 }
 
-/* ── Body ── */
 .info-card__body {
     padding: 16px 18px 14px;
     flex: 1;
@@ -121,7 +115,6 @@
     overflow: hidden;
 }
 
-/* Meta row */
 .info-card__meta {
     display: flex;
     align-items: center;
@@ -147,7 +140,6 @@
     opacity: 0.7;
 }
 
-/* ── Footer ── */
 .info-card__footer {
     display: flex;
     align-items: center;
@@ -212,7 +204,6 @@
     color: var(--c-primary-700);
 }
 
-/* ── Status Pill ── */
 .info-card__status {
     display: inline-flex;
     align-items: center;

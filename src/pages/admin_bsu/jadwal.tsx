@@ -15,7 +15,8 @@ import PopupConfirmation from "../../layouts/popup-confirmation";
 import JadwalPenimbanganCalendar from "../../layouts/jadwal-penimbangan-calendar";
 import JadwalPengangkutanCalendar from "../../layouts/jadwal-pengangkutan-calendar";
 import JadwalBatchFields, { buildJadwalBatchItems } from "../../components/JadwalBatchFields";
-import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
+import { JadwalService } from "../../services/jadwal.service";
+import type { JadwalItem } from "../../types/jadwal.type";
 import "../../styles/jadwal-bsu.css";
 import { formatTime } from "../../layouts/jadwal-penimbangan-calendar";
 
@@ -33,9 +34,6 @@ const MINGGU_OPTIONS = [
     { label: "Minggu ke-5", value: "5" },
 ];
 
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 export default function JadwalBsuPage() {
     const { user } = useAuth();
 
@@ -50,7 +48,6 @@ export default function JadwalBsuPage() {
     const [deleteJadwalId, setDeleteJadwalId]    = useState<string | null>(null);
     const [notif, setNotif] = useState<{ show: boolean; message: string; type: "success" | "error" }>({ show: false, message: "", type: "success" });
 
-    /* Form (single: dipakai untuk edit & jadwal spesial) */
     const [formType,        setFormType]        = useState<"rutin" | "spesial">("rutin");
     const [formHari,        setFormHari]        = useState("");
     const [formMingguKe,    setFormMingguKe]    = useState("");
@@ -60,11 +57,9 @@ export default function JadwalBsuPage() {
     const [formJamSelesai,  setFormJamSelesai]  = useState("");
     const [formError,       setFormError]       = useState("");
 
-    /* Form batch (tambah jadwal rutin banyak sekaligus) */
     const [formHariList,   setFormHariList]   = useState<string[]>([]);
     const [formMingguList, setFormMingguList] = useState<string[]>([]);
 
-    /* ── Fetch ── */
     const fetchJadwal = useCallback(async (month: number, year: number) => {
         if (!user?.bank_id) return;
         try {
@@ -78,7 +73,6 @@ export default function JadwalBsuPage() {
 
     useEffect(() => { fetchJadwal(calMonth.month, calMonth.year); }, [calMonth, fetchJadwal]);
 
-    /* ── Modal ── */
     const resetForm = () => {
         setFormType("rutin"); setFormHari(""); setFormMingguKe(""); setFormTanggal("");
         setFormNamaSpesial(""); setFormJamMulai(""); setFormJamSelesai(""); setFormError(""); setEditJadwalId(null);
@@ -102,7 +96,6 @@ export default function JadwalBsuPage() {
         if (!user?.bank_id) return;
         if (!formJamMulai || !formJamSelesai) { setFormError("Jam mulai dan jam selesai wajib diisi"); return; }
 
-        /* ── Edit (satu baris) atau Jadwal Spesial → jalur single lama ── */
         if (editJadwalId || formType === "spesial") {
             if (formType === "rutin") {
                 if (!formHari)     { setFormError("Hari wajib dipilih"); return; }
@@ -137,7 +130,6 @@ export default function JadwalBsuPage() {
             return;
         }
 
-        /* ── Tambah Jadwal Rutin (batch: banyak hari × minggu sekaligus) ── */
         if (formHariList.length === 0)   { setNotif({ show: true, message: "Pilih minimal satu hari", type: "error" }); return; }
         if (formMingguList.length === 0) { setNotif({ show: true, message: "Pilih minggu, atau centang 'Setiap minggu'", type: "error" }); return; }
         setIsSubmitting(true);
@@ -166,13 +158,9 @@ export default function JadwalBsuPage() {
         finally { setDeleteJadwalId(null); }
     };
 
-    /* ============================================================
-       RENDER
-       ============================================================ */
     return (
         <div className="jbsu">
 
-            {/* ── Header ── */}
             <div className="jbsu-header">
                 <div className="jbsu-header-left">
                     <h1>Manajemen Jadwal</h1>
@@ -185,7 +173,6 @@ export default function JadwalBsuPage() {
                 )}
             </div>
 
-            {/* ── Tabs ── */}
             <Tabs
                 tabs={[
                     { id: "penimbangan",  label: "Jadwal Penimbangan" },
@@ -196,7 +183,6 @@ export default function JadwalBsuPage() {
                 style={{ alignSelf: "flex-start" }}
             />
 
-            {/* ══ TAB: PENIMBANGAN ══ */}
             {activeTab === "penimbangan" && (
                 <JadwalPenimbanganCalendar
                     jadwalList={penimbanganList}
@@ -207,7 +193,6 @@ export default function JadwalBsuPage() {
                 />
             )}
 
-            {/* ══ TAB: PENGANGKUTAN ══ */}
             {activeTab === "pengangkutan" && (
                 <JadwalPengangkutanCalendar
                     jadwalList={pengangkutanList}
@@ -216,7 +201,6 @@ export default function JadwalBsuPage() {
                 />
             )}
 
-            {/* ── Modal Tambah / Edit ── */}
             {isModalOpen && createPortal(
                 <div className="jmodal-overlay" onClick={handleCloseModal}>
                     <div className="jmodal-box" onClick={e => e.stopPropagation()}>
@@ -242,7 +226,6 @@ export default function JadwalBsuPage() {
                         <div className="jmodal-form">
                             {formType === "rutin" ? (
                                 editJadwalId ? (
-                                    /* Edit: satu baris → dropdown tunggal */
                                     <>
                                         <div className="jmodal-field">
                                             <label className="jmodal-label">Hari Penimbangan</label>
@@ -254,7 +237,6 @@ export default function JadwalBsuPage() {
                                         </div>
                                     </>
                                 ) : (
-                                    /* Tambah: multi-select (batch) */
                                     <JadwalBatchFields
                                         hariLabel="Hari Penimbangan"
                                         hariList={formHariList} setHariList={setFormHariList}

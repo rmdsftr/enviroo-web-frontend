@@ -24,21 +24,15 @@ import {
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
-/* ── Status map ── */
 const STATUS_BAGI_HASIL: Record<string, { label: string; cls: string }> = {
     berhasil: { label: "Berhasil", cls: "selesai"    },
     pending:  { label: "Pending",  cls: "aktif"      },
     gagal:    { label: "Gagal",    cls: "dibatalkan" },
 };
 
-/* ── Helpers ── */
-function formatAmount(amount: number, satuan: string): string {
-    const num = amount.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
-/* ── Component ── */
 export default function DetailPenjualanPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -93,14 +87,13 @@ export default function DetailPenjualanPage() {
         ? (STATUS_BAGI_HASIL[detail.status_bagi_hasil] ?? { label: detail.status_bagi_hasil, cls: "" })
         : null;
 
-    const fmt = (amount: number) => detail ? formatAmount(amount, detail.satuan_reward) : "";
+    const fmt = (amount: number) => detail ? formatNominal(amount, detail.satuan_reward) : "";
 
     return (
         <>
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Penjualan</h1>
@@ -132,7 +125,6 @@ export default function DetailPenjualanPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
 
                             <div className="dp-overview-header">
@@ -151,7 +143,6 @@ export default function DetailPenjualanPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaCalendarDays /></div>
@@ -164,8 +155,8 @@ export default function DetailPenjualanPage() {
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaHandshake /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Identitas Pembeli</span>
-                                        <span className="dp-info-value">{detail.identitas_pembeli}</span>
+                                        <span className="dp-info-label">Nama Pengepul</span>
+                                        <span className="dp-info-value">{detail.nama_mitra}</span>
                                     </div>
                                 </div>
 
@@ -180,7 +171,7 @@ export default function DetailPenjualanPage() {
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaGift /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Reward</span>
+                                        <span className="dp-info-label">Insentif</span>
                                         <span className="dp-info-value">{detail.nama_reward}</span>
                                     </div>
                                 </div>
@@ -196,7 +187,6 @@ export default function DetailPenjualanPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Action buttons */}
                             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                                 <button className="dpj-foto-btn" onClick={() => setFotoOpen(true)}>
                                     <FaImage />
@@ -214,9 +204,7 @@ export default function DetailPenjualanPage() {
                             </div>
                         </div>
 
-                        {/* ── RIGHT: Daftar Sampah ── */}
                         <div className="dp-setoran-col">
-                            {/* Daftar Sampah Dijual */}
                             <div className="dp-setoran-header">
                                 <div>
                                     <p className="dp-setoran-title">Daftar Sampah Dijual</p>
@@ -240,7 +228,7 @@ export default function DetailPenjualanPage() {
                                             <div className="dpj-item-body">
                                                 <span className="dpj-item-name">{item.nama_sampah}</span>
                                                 <span className="dpj-item-detail">
-                                                    {item.qty} × {fmt(item.harga_jual)}
+                                                    {formatDecimal(item.qty)} × {fmt(item.harga_jual)}
                                                 </span>
                                             </div>
                                             <div className="dpj-item-right">
@@ -253,7 +241,6 @@ export default function DetailPenjualanPage() {
 
                             <div className="dp-divider" style={{ margin: "8px 0" }} />
 
-                            {/* Daftar Harga ke Nasabah */}
                             <div className="dp-setoran-header">
                                 <div>
                                     <p className="dp-setoran-title">Daftar Harga ke Nasabah</p>
@@ -284,7 +271,6 @@ export default function DetailPenjualanPage() {
                 )}
             </div>
 
-            {/* Popup Notifikasi */}
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}

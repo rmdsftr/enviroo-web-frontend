@@ -1,6 +1,3 @@
-/* =========================================================
-   Filter Pill — Segmented Control
-   ========================================================= */
 .n-filter-pills {
     display: inline-flex;
     gap: 6px;
@@ -43,4 +40,15 @@
 .n-filter-pill-check {
     font-size: 10px;
     color: var(--c-primary);
+}
+
+.n-filter-pill-more {
+    border-style: dashed;
+    font-weight: 500;
+}
+
+.n-filter-pill-more:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    background: var(--c-primary-50);
 }

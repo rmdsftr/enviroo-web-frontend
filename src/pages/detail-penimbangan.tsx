@@ -18,14 +18,12 @@ import { PenimbanganService, type PenimbanganDetail, type SetoranItem } from "..
 import "../styles/detail-penimbangan.css";
 import { formatTanggalDenganHari, formatJam } from "../utils/date.utils";
 
-/* ── Status maps ── */
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
     selesai:    { label: "Selesai",      cls: "selesai"    },
     aktif:      { label: "Berlangsung",  cls: "aktif"      },
     dibatalkan: { label: "Dibatalkan",   cls: "dibatalkan" },
 };
 
-/* ── Helpers ── */
 function getInitials(name: string): string {
     return name
         .split(" ")
@@ -35,7 +33,6 @@ function getInitials(name: string): string {
         .toUpperCase();
 }
 
-/* ── Component ── */
 export default function DetailPenimbanganPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -62,13 +59,11 @@ export default function DetailPenimbanganPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    /* ── Breadcrumb ── */
     const breadcrumbItems = [
         { label: "Riwayat", path: riwayatPath },
         { label: "Detail Penimbangan" },
     ];
 
-    /* ── Computed stats ── */
     const totalSetoran = detail?.list_setoran.length ?? 0;
     const totalNasabah = detail
         ? new Set(detail.list_setoran.map((s) => s.nasabah_id)).size
@@ -78,7 +73,6 @@ export default function DetailPenimbanganPage() {
         ? (STATUS_MAP[detail.status_penimbangan] ?? { label: detail.status_penimbangan, cls: "" })
         : null;
 
-    /* ── Handle export ── */
     const handleExport = async () => {
         if (!id) return;
         setExporting(true);
@@ -97,7 +91,6 @@ export default function DetailPenimbanganPage() {
         }
     };
 
-    /* ── Handle setoran click ── */
     const handleSetoranClick = (setoran: SetoranItem) => {
         navigate(`${rolePrefix}/riwayat/setoran/${setoran.setoran_id}`, {
             state: { penimbanganId: id },
@@ -109,7 +102,6 @@ export default function DetailPenimbanganPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Penimbangan</h1>
@@ -141,10 +133,8 @@ export default function DetailPenimbanganPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
 
-                            {/* Header */}
                             <div className="dp-overview-header">
                                 <div>
                                     <p className="dp-overview-title">Detail Penimbangan</p>
@@ -152,7 +142,6 @@ export default function DetailPenimbanganPage() {
                                 </div>
                             </div>
 
-                            {/* Status */}
                             {statusConf && (
                                 <span className={`dp-status-pill ${statusConf.cls}`}>
                                     <span className="dp-status-dot" />
@@ -181,7 +170,6 @@ export default function DetailPenimbanganPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaBuilding /></div>
@@ -236,7 +224,6 @@ export default function DetailPenimbanganPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Quick Stats */}
                             <div className="dp-stats-row">
                                 <div className="dp-stat-chip">
                                     <span className="dp-stat-chip-value">{totalSetoran}</span>
@@ -249,7 +236,6 @@ export default function DetailPenimbanganPage() {
                             </div>
                         </div>
 
-                        {/* ── RIGHT: List Setoran ── */}
                         <div className="dp-setoran-col">
                             <div className="dp-setoran-header">
                                 <div>
@@ -277,12 +263,10 @@ export default function DetailPenimbanganPage() {
                                                 onKeyDown={(e) => e.key === "Enter" && handleSetoranClick(setoran)}
                                                 aria-label={`Lihat detail setoran ${setoran.nama_nasabah}`}
                                             >
-                                                {/* Avatar */}
                                                 <div className="dp-setoran-avatar">
                                                     {getInitials(setoran.nama_nasabah)}
                                                 </div>
 
-                                                {/* Body */}
                                                 <div className="dp-setoran-body">
                                                     <span className="dp-setoran-name">{setoran.nama_nasabah}</span>
                                                     <div className="dp-setoran-meta">
@@ -291,7 +275,6 @@ export default function DetailPenimbanganPage() {
                                                     </div>
                                                 </div>
 
-                                                {/* Right Side */}
                                                 <div className="dp-setoran-right">
                                                     <span className="dp-setoran-items">
                                                         {setoran.total_item} item
@@ -308,7 +291,6 @@ export default function DetailPenimbanganPage() {
                 )}
             </div>
 
-            {/* Popup Notifikasi */}
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}

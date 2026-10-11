@@ -79,7 +79,6 @@ export default function RewardModal({ isOpen, onClose, onSubmit, initialData, ex
     return createPortal(
         <div className="rw-modal-overlay" onClick={onClose}>
             <div className="rw-modal-box" onClick={e => e.stopPropagation()}>
-                {/* Header */}
                 <div className="rw-modal-header">
                     <div>
                         <h2 className="rw-modal-title">{isEdit ? "Edit Reward" : "Tambah Reward Baru"}</h2>
@@ -92,7 +91,6 @@ export default function RewardModal({ isOpen, onClose, onSubmit, initialData, ex
                     <CloseButton onClick={onClose} />
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="rw-modal-form">
                     {error && (
                         <div style={{

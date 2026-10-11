@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { ProfilService } from "../services/profil.service";
-import { NasabahService } from "../services/nasabah.service";
+import { BankService } from "../services/bank.service";
 import { AdminService } from "../services/admin.service";
 import { BsuService } from "../services/bsu.service";
 import { PengangkutanService, type PengangkutanItem } from "../services/pengangkutan.service";
@@ -30,7 +30,6 @@ export function useProfilBankData({ id, isBsiUrl, isBsuUrl, userRole }: Props) {
     const [bagiHasilBsuList, setBagiHasilBsuList] = useState<BagiHasilBsuItem[]>([]);
     const [bagiHasilBsuLoading, setBagiHasilBsuLoading] = useState(false);
 
-    // Filter states
     const [staffFilter, setStaffFilter] = useState("all");
     const [angkutFrom, setAngkutFrom] = useState(() => defaultMonthRange().from);
     const [angkutTo, setAngkutTo] = useState(() => defaultMonthRange().to);
@@ -46,8 +45,17 @@ export function useProfilBankData({ id, isBsiUrl, isBsuUrl, userRole }: Props) {
             .then((res) => setBankProfile(res.data))
             .catch((err) => console.error("Gagal menarik profil bank:", err));
 
-        NasabahService.getNasabahByBankId(id)
-            .then((res) => setNasabahList(res.data))
+        BankService.getNasabah(id)
+            .then((res) => setNasabahList(res.data.map((item) => ({
+                nasabah_id: item.nasabah_id,
+                nama_nasabah: item.nama,
+                foto: item.foto,
+                nik: item.nik,
+                email: item.email,
+                bank_sampah_pusat: "",
+                bank_sampah_unit: "",
+                status_nasabah: item.status,
+            }))))
             .catch((err) => console.error("Gagal menarik daftar nasabah profil:", err));
 
         AdminService.getAdminByBankId(id)
@@ -75,7 +83,6 @@ export function useProfilBankData({ id, isBsiUrl, isBsuUrl, userRole }: Props) {
         }
     }, [id, isBsiUrl, isBsuUrl, userRole]);
 
-    // ── Computed stats ──
     const totalBsu = bsuList.length;
     const aktifBsu = bsuList.filter((b) => b.is_active).length;
     const nonaktifBsu = totalBsu - aktifBsu;
@@ -120,18 +127,14 @@ export function useProfilBankData({ id, isBsiUrl, isBsuUrl, userRole }: Props) {
     return {
         bankProfile, setBankProfile,
         nasabahList, adminList, bsuList,
-        // staff filter
         staffFilter, setStaffFilter, filteredAdminList,
-        // pengangkutan
         angkutLoading, angkutFrom, setAngkutFrom, angkutTo, setAngkutTo,
         angkutSearch, setAngkutSearch, filteredAngkut,
-        // bagi hasil bsu
         bagiHasilBsuLoading,
         bagiHasilBsuFrom, setBagiHasilBsuFrom,
         bagiHasilBsuTo, setBagiHasilBsuTo,
         bagiHasilBsuSearch, setBagiHasilBsuSearch,
         filteredBagiHasilBsu,
-        // stats
         totalBsu, aktifBsu, nonaktifBsu,
         totalNasabah, aktifNasabah, nonaktifNasabah, pendingNasabah,
     };

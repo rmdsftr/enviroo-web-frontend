@@ -1,6 +1,6 @@
 export interface NewBSU {
     nama_bsu: string;
-    parent_bank_id: string; // Wajib: Mengaitkan BSU ini dengan BSI mana
+    parent_bank_id: string;
     deskripsi: string;
     provinsi: string;
     kabupaten_kota: string;
@@ -9,8 +9,8 @@ export interface NewBSU {
     alamat_lengkap: string;
     latitude: number;
     longitude: number;
-    user_id: string[]; // Bisa lebih dari 1 ID user (sebagai admin BSU)
-    foto: File | null; // File gambar untuk profil BSU
+    user_id: string[];
+    foto: File | null;
     admin_id: string;
 }
 

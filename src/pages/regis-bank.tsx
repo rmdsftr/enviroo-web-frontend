@@ -129,12 +129,10 @@ export default function RegistrasiBSIPage() {
 
             <br />
 
-            {/* ══════════════ STEP 1: Bank Info Form ══════════════ */}
             {step === 1 && (
                 <form className="regis-bsi" onSubmit={handleStep1Submit}>
                     <div className="regis-form-card">
                         <div className="regis-form-row">
-                            {/* ── Informasi Dasar ── */}
                             <div className="regis-section" style={mountedStyle("0.1s")}>
                                 <div className="regis-section-header">
                                     <div className="regis-section-icon icon-info"><FaBuilding /></div>
@@ -180,7 +178,6 @@ export default function RegistrasiBSIPage() {
                                 </div>
                             </div>
 
-                            {/* ── Foto ── */}
                             <div className="regis-section" style={mountedStyle("0.2s")}>
                                 <div className="regis-section-header">
                                     <div className="regis-section-icon icon-photo"><FaCamera /></div>
@@ -231,7 +228,6 @@ export default function RegistrasiBSIPage() {
                             </div>
                         </div>
 
-                        {/* ── Alamat ── */}
                         <div className="regis-section" style={mountedStyle("0.3s")}>
                             <div className="regis-section-header">
                                 <div className="regis-section-icon icon-location"><FaLocationDot /></div>
@@ -271,7 +267,6 @@ export default function RegistrasiBSIPage() {
                             </div>
                         </div>
 
-                        {/* ── Peta ── */}
                         <div className="regis-section" style={mountedStyle("0.4s")}>
                             <div className="regis-section-header">
                                 <div className="regis-section-icon icon-map"><FaMap /></div>
@@ -318,7 +313,6 @@ export default function RegistrasiBSIPage() {
                 </form>
             )}
 
-            {/* ══════════════ STEP 2: Admin Selection ══════════════ */}
             {step === 2 && (
                 <div className="regis-bsi">
                     <div className="regis-form-card">
@@ -363,23 +357,23 @@ export default function RegistrasiBSIPage() {
                                     </thead>
                                     <tbody>
                                         {availableAdmins.map((admin) => {
-                                            const isSelected = selectedAdmins.includes(admin.UserID);
+                                            const isSelected = selectedAdmins.includes(admin.user_id);
                                             return (
-                                                <tr key={admin.UserID} className={isSelected ? "selected" : ""} onClick={() => toggleAdmin(admin.UserID)}>
+                                                <tr key={admin.user_id} className={isSelected ? "selected" : ""} onClick={() => toggleAdmin(admin.user_id)}>
                                                     <td style={{ textAlign: "center" }}>
                                                         <label className="regis-checkbox-wrapper" onClick={(e) => e.stopPropagation()}>
-                                                            <input type="checkbox" checked={isSelected} onChange={() => toggleAdmin(admin.UserID)} />
+                                                            <input type="checkbox" checked={isSelected} onChange={() => toggleAdmin(admin.user_id)} />
                                                             <span className="regis-checkbox-custom" />
                                                         </label>
                                                     </td>
                                                     <td style={{ textAlign: "center" }}>
                                                         <div className="regis-admin-avatar">
-                                                            {admin.PhotoURL ? <img src={admin.PhotoURL} alt={admin.Nama} /> : <span>{admin.Nama.charAt(0).toUpperCase()}</span>}
+                                                            {admin.photo_url ? <img src={admin.photo_url} alt={admin.nama} /> : <span>{admin.nama.charAt(0).toUpperCase()}</span>}
                                                         </div>
                                                     </td>
-                                                    <td><span className="regis-admin-userid">{admin.UserID}</span></td>
-                                                    <td><span className="regis-admin-name">{admin.Nama}</span></td>
-                                                    <td><span className="regis-admin-email">{admin.Email}</span></td>
+                                                    <td><span className="regis-admin-userid">{admin.user_id}</span></td>
+                                                    <td><span className="regis-admin-name">{admin.nama}</span></td>
+                                                    <td><span className="regis-admin-email">{admin.email}</span></td>
                                                 </tr>
                                             );
                                         })}
@@ -400,7 +394,6 @@ export default function RegistrasiBSIPage() {
                 </div>
             )}
 
-            {/* ── Notifikasi ── */}
             {notif && (
                 <PopupNotifikasi
                     message={notif.message}
@@ -414,7 +407,6 @@ export default function RegistrasiBSIPage() {
                 />
             )}
 
-            {/* ── Modal: Daftarkan Admin Baru ── */}
             {isAdminModalOpen && (
                 <DaftarkanAdminBaruModal
                     onUserCreated={refreshAvailableAdmins}

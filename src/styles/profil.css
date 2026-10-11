@@ -1,7 +1,3 @@
-/* =========================================================
-   Profil User — Page Styles
-   ========================================================= */
-
 .profil-page {
     padding: 0 24px 24px;
     display: flex;
@@ -22,7 +18,6 @@
     }
 }
 
-/* ── Settings icon button (top right of card) ── */
 .profil-settings-btn {
     width: 38px;
     height: 38px;
@@ -42,7 +37,6 @@
     border-color: rgba(78, 167, 113, 0.35);
 }
 
-/* ── Section Title ── */
 .profil-section-title {
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -60,9 +54,6 @@
     color: #4EA771;
 }
 
-/* =========================================================
-   SECTION 1 — Profile Card
-   ========================================================= */
 .profil-card {
     background: #ffffff;
     border-radius: 18px;
@@ -97,7 +88,6 @@
 }
 
 
-/* ── Baris 1: Identity ── */
 .profil-identity {
     display: flex;
     align-items: center;
@@ -163,7 +153,6 @@
     flex-wrap: wrap;
 }
 
-/* Photo toggle button */
 .profil-photo-toggle {
     display: flex;
     align-items: center;
@@ -189,7 +178,6 @@
     font-size: 11px;
 }
 
-/* ── Baris 2: Detail Info ── */
 .profil-detail-section {
     padding: 24px 32px 28px;
 }
@@ -263,9 +251,6 @@
 }
 
 
-/* =========================================================
-   SECTION 2 — Settings
-   ========================================================= */
 .profil-settings-card {
     background: #ffffff;
     border-radius: 18px;
@@ -351,7 +336,6 @@
     text-overflow: ellipsis;
 }
 
-/* ── Settings Block (accordion wrapper) ── */
 .profil-settings-block {
     border-bottom: 1px solid rgba(1, 50, 54, 0.06);
 }
@@ -372,7 +356,6 @@
     padding: 18px 36px;
 }
 
-/* Chevron icon */
 .profil-settings-chevron {
     font-size: 12px;
     color: #7a9e8a;
@@ -385,7 +368,6 @@
     color: #4EA771;
 }
 
-/* ── Dropdown Form ── */
 .profil-dropdown-form {
     padding: 0 0 20px 58px;
     display: flex;
@@ -471,7 +453,6 @@
     max-width: 380px;
 }
 
-/* ── Loading Skeleton ── */
 .profil-skeleton {
     animation: profilSkeleton 1.5s ease-in-out infinite;
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -509,7 +490,6 @@
     width: 280px;
 }
 
-/* ── Identity Row (status + admin ID badges) ── */
 .profil-identity-row {
     display: flex;
     align-items: center;
@@ -582,7 +562,6 @@
     color: #4EA771;
 }
 
-/* ── Section Divider ── */
 .profil-info-divider {
     display: flex;
     align-items: center;
@@ -608,12 +587,10 @@
     white-space: nowrap;
 }
 
-/* ── 3-column detail grid ── */
 .profil-detail-grid-3 {
     grid-template-columns: 1fr 1fr 1fr;
 }
 
-/* ── Nasabah Banner ── */
 .profil-nasabah-banner {
     display: flex;
     align-items: center;
@@ -645,7 +622,6 @@
     color: #013236b2;
 }
 
-/* ── Modal Edit Profil ── */
 .profil-modal-overlay {
     position: fixed;
     inset: 0;
@@ -699,7 +675,6 @@
     border-top: 1px solid rgba(1, 50, 54, 0.07);
 }
 
-/* ── Edit notice (is_nasabah) ── */
 .profil-edit-notice {
     display: flex;
     align-items: flex-start;
@@ -724,7 +699,6 @@
     line-height: 1.5;
 }
 
-/* ── Avatar uploader ── */
 .profil-edit-avatar-section {
     display: flex;
     justify-content: center;
@@ -775,7 +749,6 @@
     font-size: 20px;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .profil-page {
         padding: 0 16px 20px;

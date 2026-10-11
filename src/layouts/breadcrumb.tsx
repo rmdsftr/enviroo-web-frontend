@@ -4,7 +4,7 @@ import "../styles/breadcrumb.css";
 
 export interface BreadcrumbItem {
     label: string;
-    path?: string; // kalau undefined = item aktif (tidak bisa diklik)
+    path?: string;
 }
 
 interface Props {

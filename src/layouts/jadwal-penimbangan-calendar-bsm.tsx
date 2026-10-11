@@ -2,11 +2,10 @@ import { useState, useMemo } from "react";
 import {
     FaChevronLeft, FaChevronRight, FaCalendarDay, FaScaleBalanced,
 } from "react-icons/fa6";
-import type { JadwalPenimbanganOccurrence } from "../services/jadwal.service";
+import type { JadwalPenimbanganOccurrence } from "../types/jadwal.type";
 import { formatTime } from "./jadwal-penimbangan-calendar";
 import "../styles/jadwal-bsu.css";
 
-/* ── Constants ── */
 const CAL_HEADERS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
 const STATUS_JADWAL: Record<string, { label: string; cls: string }> = {
@@ -16,12 +15,10 @@ const STATUS_JADWAL: Record<string, { label: string; cls: string }> = {
     upcoming:   { label: "Perkiraan",  cls: "berlangsung" },
 };
 
-/** Jadwal dianggap "mati" (visual muted) kalau nonaktif, atau sesinya udah selesai/dibatalkan */
 function isDead(item: JadwalPenimbanganOccurrence): boolean {
     return !item.is_active || item.status_jadwal === "dibatalkan" || item.status_jadwal === "selesai";
 }
 
-/* ── Helpers (self-contained, sama pola dengan jadwal-penimbangan-calendar.tsx) ── */
 function getMondayFirstCol(date: Date): number {
     const d = date.getDay();
     return d === 0 ? 6 : d - 1;
@@ -50,14 +47,12 @@ function getItemsForDate(date: Date, list: JadwalPenimbanganOccurrence[]): Jadwa
         .sort((a, b) => formatTime(a.jam_mulai).localeCompare(formatTime(b.jam_mulai)));
 }
 
-/* ── Props ── */
 interface Props {
     jadwalList: JadwalPenimbanganOccurrence[];
     loading?: boolean;
     onMonthChange?: (month: number, year: number) => void;
 }
 
-/* ── Component ── */
 export default function JadwalPenimbanganCalendarBsm({ jadwalList, loading, onMonthChange }: Props) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate]  = useState(new Date());
@@ -93,7 +88,6 @@ export default function JadwalPenimbanganCalendarBsm({ jadwalList, loading, onMo
     return (
         <div className="jadwal-cal-card">
 
-            {/* ── Header ── */}
             <div className="jadwal-cal-header">
                 <div className="jadwal-cal-header-left">
                     <div className="jbsu-card-title-icon" style={{ background: "#4EA771", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 15, flexShrink: 0 }}>
@@ -111,12 +105,10 @@ export default function JadwalPenimbanganCalendarBsm({ jadwalList, loading, onMo
                 </div>
             </div>
 
-            {/* ── Day-of-week headers ── */}
             <div className="jadwal-cal-grid-header">
                 {CAL_HEADERS.map(d => <div key={d} className="jadwal-cal-dh">{d}</div>)}
             </div>
 
-            {/* ── Calendar body ── */}
             {loading ? (
                 <div className="jbsu-empty" style={{ padding: "48px 0" }}>
                     <span>Memuat jadwal...</span>
@@ -160,7 +152,6 @@ export default function JadwalPenimbanganCalendarBsm({ jadwalList, loading, onMo
                 </div>
             )}
 
-            {/* ── Selected-date detail strip ── */}
             <div className="jadwal-cal-detail-panel">
                 <div className="jadwal-cal-detail-header">
                     <FaCalendarDay className="jadwal-cal-detail-icon" />

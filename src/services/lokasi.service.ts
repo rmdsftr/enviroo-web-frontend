@@ -21,7 +21,6 @@ export const LokasiService = {
         return response.data;
     },
 
-    /* ── Kecamatan ──────────────────────────────────────────── */
     async getAllKecamatan(): Promise<KecamatanResponse> {
         const response = await api.get<KecamatanResponse>("/lokasi/kecamatan");
         return response.data;
@@ -42,7 +41,6 @@ export const LokasiService = {
         return response.data;
     },
 
-    /* ── Kelurahan ──────────────────────────────────────────── */
     async getAllKelurahan(params?: { page?: number; limit?: number }): Promise<KelurahanPaginatedResponse> {
         const response = await api.get<KelurahanPaginatedResponse>("/lokasi/kelurahan", { params });
         return response.data;

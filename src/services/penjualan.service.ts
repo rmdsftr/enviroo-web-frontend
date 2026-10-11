@@ -13,7 +13,7 @@ export interface PenjualanDetail {
     penjualan_id: string;
     bank_id: string;
     admin_name: string;
-    identitas_pembeli: string;
+    nama_mitra: string;
     nama_reward: string;
     satuan_reward: string;
     status_bagi_hasil: string;
@@ -26,7 +26,7 @@ export interface PenjualanDetail {
 
 export interface PenjualanExternalItem {
     penjualan_id: string;
-    identitas_pembeli: string;
+    nama_mitra: string;
     total_item: number;
     total_penjualan: number;
     nama_reward: string;

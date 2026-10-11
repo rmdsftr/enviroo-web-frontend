@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import "../styles/table.css";
 
-// ── Column definition ──────────────────────────────────────
 export type ColumnDef<T> = {
     key: string;
     header: string;
@@ -10,16 +9,14 @@ export type ColumnDef<T> = {
     render: (row: T, index: number) => ReactNode;
 };
 
-// ── Table props ────────────────────────────────────────────
 type TableProps<T> = {
     columns: ColumnDef<T>[];
     data: T[];
     rowKey: (row: T) => string | number;
-    emptyMessage?: string;
+    emptyMessage?: ReactNode;
     onRowClick?: (row: T) => void;
 };
 
-// ── Main component ─────────────────────────────────────────
 export default function Table<T>({
     columns,
     data,
@@ -79,9 +76,6 @@ export default function Table<T>({
     );
 }
 
-// ── Reusable cell helpers (export untuk dipakai di halaman) ─
-
-/** Foto bulat */
 export function TableAvatar({ src, alt }: { src?: string; alt: string }) {
     return (
         <div className="table-avatar">
@@ -96,7 +90,6 @@ export function TableAvatar({ src, alt }: { src?: string; alt: string }) {
     );
 }
 
-/** Status badge */
 export function TableBadge({
     label,
     active,
@@ -112,7 +105,6 @@ export function TableBadge({
     );
 }
 
-/** Tombol aksi icon */
 export function TableActionBtn({
     icon: Icon,
     onClick,

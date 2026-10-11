@@ -7,6 +7,7 @@ import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import Input from "../components/input";
 import SearchableInput, { type SearchableOption } from "../components/searchable-input";
+import { formatDecimalInput, parseDecimalInput, toDecimalInput } from "../utils/number.utils";
 
 export interface BarangFormData {
     nama_barang: string;
@@ -33,7 +34,7 @@ interface Props {
 export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, onSubmit, onClose }: Props) {
     const [barangNama, setBarangNama] = useState(initialValues?.nama_barang ?? "");
     const [barangBarangId, setBarangBarangId] = useState<number | null>(null);
-    const [barangPoin, setBarangPoin] = useState(initialValues?.nilai_poin?.toString() ?? "");
+    const [barangPoin, setBarangPoin] = useState(toDecimalInput(initialValues?.nilai_poin));
     const [barangStok, setBarangStok] = useState("");
     const [barangTambahStok, setBarangTambahStok] = useState("");
     const [barangFoto, setBarangFoto] = useState<File | null>(null);
@@ -66,10 +67,10 @@ export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, 
         onSubmit({
             nama_barang: barangNama,
             barang_id: barangBarangId ?? undefined,
-            nilai_poin: Number(barangPoin),
-            stok_awal: barangStok !== "" ? Number(barangStok) : undefined,
-            tambah_stok: barangTambahStok !== "" ? Number(barangTambahStok) : undefined,
-            stok: barangStok !== "" ? Number(barangStok) : undefined,
+            nilai_poin: parseDecimalInput(barangPoin) ?? 0,
+            stok_awal: parseDecimalInput(barangStok) ?? undefined,
+            tambah_stok: parseDecimalInput(barangTambahStok) ?? undefined,
+            stok: parseDecimalInput(barangStok) ?? undefined,
             foto: barangFoto || undefined,
         });
     };
@@ -94,7 +95,6 @@ export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, 
                 <form onSubmit={handleSubmit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 200px', gap: '28px', padding: '24px 28px 20px' }}>
 
-                        {/* Kolom Kiri: Data */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--k-muted)', paddingBottom: '6px', borderBottom: '1px solid var(--k-border)' }}>
                                 Informasi Item
@@ -131,11 +131,12 @@ export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                     <Input
                                         className="km-input-neutral"
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         placeholder="0"
                                         fullWidth
                                         value={barangPoin}
-                                        onChange={e => setBarangPoin(e.target.value)}
+                                        onChange={e => setBarangPoin(formatDecimalInput(e.target.value))}
                                         required
                                     />
                                     <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--k-green)', whiteSpace: 'nowrap', background: 'rgba(78,167,113,0.08)', padding: '8px 14px', borderRadius: '10px', border: '1px solid rgba(78,167,113,0.2)' }}>
@@ -149,11 +150,12 @@ export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, 
                                     <label className="km-label">Stok Awal</label>
                                     <Input
                                         className="km-input-neutral"
-                                        type="number"
+                                        type="text"
+                                        inputMode="decimal"
                                         placeholder="0"
                                         fullWidth
                                         value={barangStok}
-                                        onChange={e => setBarangStok(e.target.value)}
+                                        onChange={e => setBarangStok(formatDecimalInput(e.target.value))}
                                     />
                                 </div>
                             ) : (
@@ -162,29 +164,30 @@ export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, 
                                         <label className="km-label">Tambah Stok</label>
                                         <Input
                                             className="km-input-neutral"
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
                                             placeholder="0"
                                             fullWidth
                                             value={barangTambahStok}
-                                            onChange={e => setBarangTambahStok(e.target.value)}
+                                            onChange={e => setBarangTambahStok(formatDecimalInput(e.target.value))}
                                         />
                                     </div>
                                     <div className="km-group" style={{ margin: 0 }}>
                                         <label className="km-label">Koreksi Stok</label>
                                         <Input
                                             className="km-input-neutral"
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
                                             placeholder="—"
                                             fullWidth
                                             value={barangStok}
-                                            onChange={e => setBarangStok(e.target.value)}
+                                            onChange={e => setBarangStok(formatDecimalInput(e.target.value))}
                                         />
                                     </div>
                                 </div>
                             )}
                         </div>
 
-                        {/* Kolom Kanan: Foto */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--k-muted)', paddingBottom: '6px', borderBottom: '1px solid var(--k-border)' }}>
                                 Foto Item

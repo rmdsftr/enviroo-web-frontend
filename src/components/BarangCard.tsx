@@ -1,5 +1,6 @@
 import { FaCoins, FaBoxOpen, FaBasketShopping } from "react-icons/fa6";
 import type { KatalogBarangItem } from "../types/barang.type";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
 export function BarangCard({ item, onClick }: { item: KatalogBarangItem; onClick?: () => void }) {
     return (
@@ -17,10 +18,10 @@ export function BarangCard({ item, onClick }: { item: KatalogBarangItem; onClick
                 </div>
                 <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                     <div className="katalog-price-tag price-poin">
-                        <FaCoins size={10} />{item.nilai_poin} poin
+                        <FaCoins size={10} />{formatNominal(item.nilai_poin, "poin")}
                     </div>
                     <div className="katalog-price-tag" style={{ background: "rgba(1,50,54,0.06)", color: "var(--k-dark)" }}>
-                        <FaBoxOpen size={10} />{item.stok ?? 0}
+                        <FaBoxOpen size={10} />{formatDecimal(item.stok)}
                     </div>
                 </div>
             </div>

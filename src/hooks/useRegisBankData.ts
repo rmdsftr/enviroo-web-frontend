@@ -12,7 +12,6 @@ interface Props {
 }
 
 export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
-    // ── Form fields ──
     const [nama, setNama] = useState("");
     const [deskripsi, setDeskripsi] = useState("");
     const [provinsi, setProvinsi] = useState("");
@@ -29,12 +28,10 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
     const [geocodedPos, setGeocodedPos] = useState<[number, number] | null>(null);
     const [mounted, setMounted] = useState(false);
 
-    // ── Location data ──
     const [kecamatanData, setKecamatanData] = useState<Kecamatan[]>([]);
     const [kelurahanData, setKelurahanData] = useState<Kelurahan[]>([]);
     const [listBsi, setListBsi] = useState<{ label: string; value: string }[]>([]);
 
-    // ── Admin selection ──
     const [availableAdmins, setAvailableAdmins] = useState<NonAdminUser[]>([]);
     const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
 
@@ -45,7 +42,6 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
     const listKecamatanOptions = kecamatanData.map((k) => ({ label: k.kecamatan, value: String(k.id_kecamatan) }));
     const listKelurahanOptions = kelurahanData.map((k) => ({ label: k.kelurahan, value: String(k.id_kelurahan) }));
 
-    // ── Effects ──
     useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
@@ -98,7 +94,6 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
         return () => clearTimeout(timer);
     }, [kecamatan, kelurahan, kecamatanData, kelurahanData]);
 
-    // ── Handlers ──
     const handleProvinsiChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setProvinsi(e.target.value);
         setKota(""); setKecamatan(""); setKelurahan(""); setKelurahanData([]);
@@ -173,7 +168,7 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
         if (selectedAdmins.length > 0 && selectedAdmins.length === availableAdmins.length) {
             setSelectedAdmins([]);
         } else {
-            setSelectedAdmins(availableAdmins.map((a) => a.UserID));
+            setSelectedAdmins(availableAdmins.map((a) => a.user_id));
         }
     };
 
@@ -183,7 +178,6 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
     };
 
     return {
-        // form fields
         nama, setNama,
         deskripsi, setDeskripsi,
         provinsi, kota,
@@ -195,14 +189,10 @@ export function useRegisBankData({ step, isBsu, isAdminBsi }: Props) {
         dragging, setDragging,
         afiliasiBsi, setAfiliasiBsi,
         geocodedPos, mounted,
-        // location data
         listProvinsi, listKota, listBsi,
         listKecamatanOptions, listKelurahanOptions,
-        // admin selection
         availableAdmins, selectedAdmins,
-        // ref
         fileInputRef,
-        // handlers
         handleProvinsiChange, handleKotaChange, handleKecamatanChange,
         handleFile, handleFileChange, handleDrop, removeFoto,
         handleLocationSelect,

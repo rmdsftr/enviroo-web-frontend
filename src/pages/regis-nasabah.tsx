@@ -11,7 +11,7 @@ import { NasabahService } from "../services/nasabah.service";
 import { BsiService } from "../services/bsi.service";
 import { UsersService } from "../services/users.service";
 import { getApiError } from "../utils/error.utils";
-import { formatThousands } from "../utils/number.utils";
+import { formatDecimalInput, parseDecimalInput } from "../utils/number.utils";
 import type { NonAdminUser } from "../types/users.type";
 import { FaCircleInfo, FaUserPlus, FaUsers } from "react-icons/fa6";
 import "../styles/regis-bsi.css";
@@ -48,7 +48,6 @@ export default function RegisNasabahPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [notif, setNotif] = useState<{ message: string; type: "success" | "error" | "warning" } | null>(null);
 
-    // Fetch afiliasi options
     useEffect(() => {
         if (isAdminBsu || isAdminBsm) return;
         if (isAdminBsi && user?.bank_id) {
@@ -63,7 +62,6 @@ export default function RegisNasabahPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAdminBsi, isAdminBsu, isAdminBsm, user?.bank_id]);
 
-    // Load existing users when switching to "existing" mode
     useEffect(() => {
         if (mode !== "existing" || existingUsers.length > 0) return;
         setIsLoadingUsers(true);
@@ -77,12 +75,12 @@ export default function RegisNasabahPage() {
         const q = query.toLowerCase();
         return existingUsers
             .filter((u) =>
-                u.Nama.toLowerCase().includes(q) ||
-                u.Email.toLowerCase().includes(q) ||
-                u.UserID.toLowerCase().includes(q)
+                u.nama.toLowerCase().includes(q) ||
+                u.email.toLowerCase().includes(q) ||
+                u.user_id.toLowerCase().includes(q)
             )
             .slice(0, 10)
-            .map((u) => ({ value: u.UserID, label: u.Nama, raw: u }));
+            .map((u) => ({ value: u.user_id, label: u.nama, raw: u }));
     };
 
     const handleModeSwitch = (next: Mode) => {
@@ -115,12 +113,12 @@ export default function RegisNasabahPage() {
                     return;
                 }
                 await NasabahService.createNasabahFromOldUser({
-                    user_id: selectedUser.UserID,
+                    user_id: selectedUser.user_id,
                     bank_id: effectiveBankId,
                     admin_id: user?.identity_id || "",
                     ...(formData.noRekening && { no_rekening: formData.noRekening }),
-                    saldo_rupiah: formData.saldoRupiah ? parseFloat(formData.saldoRupiah) : 0,
-                    saldo_poin: formData.saldoPoin ? parseFloat(formData.saldoPoin) : 0,
+                    saldo_rupiah: parseDecimalInput(formData.saldoRupiah) ?? 0,
+                    saldo_poin: parseDecimalInput(formData.saldoPoin) ?? 0,
                 });
             } else {
                 await NasabahService.createNasabah({
@@ -131,8 +129,8 @@ export default function RegisNasabahPage() {
                     bank_id: effectiveBankId,
                     admin_id: user?.identity_id || "",
                     ...(formData.noRekening && { no_rekening: formData.noRekening }),
-                    saldo_rupiah: formData.saldoRupiah ? parseFloat(formData.saldoRupiah) : 0,
-                    saldo_poin: formData.saldoPoin ? parseFloat(formData.saldoPoin) : 0,
+                    saldo_rupiah: parseDecimalInput(formData.saldoRupiah) ?? 0,
+                    saldo_poin: parseDecimalInput(formData.saldoPoin) ?? 0,
                 });
             }
 
@@ -160,11 +158,9 @@ export default function RegisNasabahPage() {
             />
 
             <div className="regis-bsi">
-                {/* ── Form Card ── */}
                 <form onSubmit={handleSubmit}>
                     <div className="regis-form-card">
 
-                        {/* ── Mode Tabs ── */}
                         <div style={{ display: "flex", borderBottom: "1px solid #eef6f0" }}>
                             {(["manual", "existing"] as Mode[]).map((m) => (
                                 <button
@@ -195,7 +191,6 @@ export default function RegisNasabahPage() {
                             ))}
                         </div>
 
-                        {/* ── Info Banner ── */}
                         <div className="regis-section" style={{ paddingBottom: "16px" }}>
                             <div className="nasabah-info-text">
                                 <FaCircleInfo />
@@ -205,7 +200,6 @@ export default function RegisNasabahPage() {
                             </div>
                         </div>
 
-                        {/* ── BSU Checkbox (Admin BSI only) ── */}
                         {isAdminBsi && (
                             <div className="regis-section" style={{ paddingTop: "0", paddingBottom: "16px" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", background: "rgba(78,167,113,0.06)", borderRadius: "10px", border: "1.5px solid rgba(78,167,113,0.2)" }}>
@@ -230,13 +224,12 @@ export default function RegisNasabahPage() {
                             </div>
                         )}
 
-                        {/* ════════ MODE: DATA BARU ════════ */}
                         {mode === "manual" && (
                             <div className="regis-section">
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
                                     <div className="nasabah-form-group">
-                                        <label className="nasabah-label" htmlFor="nik">NIK <span className="required">*</span></label>
-                                        <Input id="nik" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="Masukkan 16 digit NIK" value={formData.nik} onChange={setField("nik")} required maxLength={16} />
+                                        <label className="nasabah-label" htmlFor="nik">ID Pengguna <span className="required">*</span></label>
+                                        <Input id="nik" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="Masukkan ID Pengguna" value={formData.nik} onChange={setField("nik")} required maxLength={25} />
                                     </div>
                                     <div className="nasabah-form-group">
                                         <label className="nasabah-label" htmlFor="nama">Nama Lengkap <span className="required">*</span></label>
@@ -271,22 +264,20 @@ export default function RegisNasabahPage() {
                                     </div>
                                     <div className="nasabah-form-group">
                                         <label className="nasabah-label" htmlFor="saldoRupiah">Saldo Rupiah Awal</label>
-                                        <Input id="saldoRupiah" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ fontWeight: 600 }}>Rp</span>} value={formatThousands(formData.saldoRupiah)} onChange={(e) => setFormData((p) => ({ ...p, saldoRupiah: e.target.value.replace(/[^\d]/g, "") }))} />
+                                        <Input id="saldoRupiah" type="text" inputMode="decimal" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ fontWeight: 600 }}>Rp</span>} value={formData.saldoRupiah} onChange={(e) => setFormData((p) => ({ ...p, saldoRupiah: formatDecimalInput(e.target.value) }))} />
                                     </div>
                                     <div className="nasabah-form-group">
                                         <label className="nasabah-label" htmlFor="saldoPoin">Saldo Poin Awal</label>
-                                        <Input id="saldoPoin" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ fontWeight: 500 }}>poin</span>} value={formatThousands(formData.saldoPoin)} onChange={(e) => setFormData((p) => ({ ...p, saldoPoin: e.target.value.replace(/[^\d]/g, "") }))} />
+                                        <Input id="saldoPoin" type="text" inputMode="decimal" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ fontWeight: 500 }}>poin</span>} value={formData.saldoPoin} onChange={(e) => setFormData((p) => ({ ...p, saldoPoin: formatDecimalInput(e.target.value) }))} />
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* ════════ MODE: AKUN EXISTING ════════ */}
                         {mode === "existing" && (
                             <div className="regis-section">
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "28px", alignItems: "start" }}>
 
-                                    {/* ── Kiri: Cari Akun ── */}
                                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                                         <div className="nasabah-form-group" style={{ margin: 0 }}>
                                             <label className="nasabah-label">Cari Akun <span className="required">*</span></label>
@@ -298,7 +289,7 @@ export default function RegisNasabahPage() {
                                                     onChange={setUserQuery}
                                                     onSelect={(opt) => {
                                                         if (!opt) { setSelectedUser(null); return; }
-                                                        const found = existingUsers.find((u) => u.UserID === opt.value) || null;
+                                                        const found = existingUsers.find((u) => u.user_id === opt.value) || null;
                                                         setSelectedUser(found);
                                                     }}
                                                     onSearch={handleUserSearch}
@@ -309,27 +300,25 @@ export default function RegisNasabahPage() {
                                             )}
                                         </div>
 
-                                        {/* Preview akun terpilih */}
                                         {selectedUser && (
                                             <div style={{ padding: "14px", background: "rgba(78,167,113,0.07)", borderRadius: "12px", border: "1.5px solid rgba(78,167,113,0.25)" }}>
                                                 <div style={{ fontSize: "11px", color: "#5a7a68", marginBottom: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>Akun Dipilih</div>
                                                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                                                     <img
-                                                        src={selectedUser.PhotoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.Nama)}&background=4EA771&color=fff`}
-                                                        alt={selectedUser.Nama}
+                                                        src={selectedUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.nama)}&background=4EA771&color=fff`}
+                                                        alt={selectedUser.nama}
                                                         style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
                                                     />
                                                     <div>
-                                                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#1a3d2b" }}>{selectedUser.Nama}</div>
-                                                        <div style={{ fontSize: "12px", color: "#5a7a68" }}>{selectedUser.Email}</div>
-                                                        <div style={{ fontSize: "11px", color: "#aebac1", marginTop: "2px" }}>ID: {selectedUser.UserID}</div>
+                                                        <div style={{ fontWeight: 700, fontSize: "14px", color: "#1a3d2b" }}>{selectedUser.nama}</div>
+                                                        <div style={{ fontSize: "12px", color: "#5a7a68" }}>{selectedUser.email}</div>
+                                                        <div style={{ fontSize: "11px", color: "#aebac1", marginTop: "2px" }}>ID: {selectedUser.user_id}</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* ── Kanan: Afiliasi + Rekening + Saldo ── */}
                                     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                                         {showAfiliasi && (
                                             <div className="nasabah-form-group" style={{ margin: 0 }}>
@@ -351,11 +340,11 @@ export default function RegisNasabahPage() {
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                                             <div className="nasabah-form-group" style={{ margin: 0 }}>
                                                 <label className="nasabah-label" htmlFor="saldoRupiahEx">Saldo Rupiah Awal</label>
-                                                <Input id="saldoRupiahEx" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ fontWeight: 600 }}>Rp</span>} value={formatThousands(formData.saldoRupiah)} onChange={(e) => setFormData((p) => ({ ...p, saldoRupiah: e.target.value.replace(/[^\d]/g, "") }))} />
+                                                <Input id="saldoRupiahEx" type="text" inputMode="decimal" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconLeft={<span style={{ fontWeight: 600 }}>Rp</span>} value={formData.saldoRupiah} onChange={(e) => setFormData((p) => ({ ...p, saldoRupiah: formatDecimalInput(e.target.value) }))} />
                                             </div>
                                             <div className="nasabah-form-group" style={{ margin: 0 }}>
                                                 <label className="nasabah-label" htmlFor="saldoPoinEx">Saldo Poin Awal</label>
-                                                <Input id="saldoPoinEx" type="text" inputMode="numeric" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ fontWeight: 500 }}>poin</span>} value={formatThousands(formData.saldoPoin)} onChange={(e) => setFormData((p) => ({ ...p, saldoPoin: e.target.value.replace(/[^\d]/g, "") }))} />
+                                                <Input id="saldoPoinEx" type="text" inputMode="decimal" variant="solid" className="nasabah-input-override" inputSize="large" fullWidth placeholder="0" iconRight={<span style={{ fontWeight: 500 }}>poin</span>} value={formData.saldoPoin} onChange={(e) => setFormData((p) => ({ ...p, saldoPoin: formatDecimalInput(e.target.value) }))} />
                                             </div>
                                         </div>
                                     </div>
@@ -363,7 +352,6 @@ export default function RegisNasabahPage() {
                             </div>
                         )}
 
-                        {/* ── Footer Actions ── */}
                         <div className="regis-section" style={{ display: "flex", justifyContent: "flex-end", gap: "12px", paddingTop: "20px", paddingBottom: "20px" }}>
                             <Button type="button" color="primary" variant="outline" size="default" onClick={() => navigate(backPath)} disabled={isSubmitting}>
                                 Batal

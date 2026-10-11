@@ -6,6 +6,7 @@ import type { ReactivateNasabahResponse } from "../types/auth.type";
 import { useAuth } from "../contexts/AuthContext";
 import { getApiError } from "../utils/error.utils";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 import "../styles/layout.css";
 import "../styles/profil-nasabah.css";
 import "../styles/riwayat.css";
@@ -56,7 +57,6 @@ export default function ProfilNasabahPage() {
         penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo, filteredPenarikan,
     } = useProfilNasabahData(id);
 
-    // ── UI states ──
     const [showSaldo, setShowSaldo] = useState(false);
     const [showPhoto, setShowPhoto] = useState(false);
     const [activeTab, setActiveTab] = useState("setoran");
@@ -65,7 +65,6 @@ export default function ProfilNasabahPage() {
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" | "warning" } | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    // ── Handlers ──
     const handleToggleAktivasi = async () => {
         if (!nasabah || !id) return;
         const isCurrentlyActive = nasabah.status_nasabah === "aktif";
@@ -107,7 +106,7 @@ export default function ProfilNasabahPage() {
     const initials = nasabah.nama.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 
     const INFO_ITEMS = [
-        { icon: <FaIdCard />,       label: "NIK",             value: nasabah.user_id },
+        { icon: <FaIdCard />,       label: "ID Pengguna",     value: nasabah.user_id },
         { icon: <FaCreditCard />,   label: "No. Rekening",    value: nasabah.nomor_rekening },
         { icon: <FaEnvelope />,     label: "Email",           value: nasabah.email || "-" },
         { icon: <FaBuilding />,     label: "Bank Sampah",     value: nasabah.nama_bank || "-" },
@@ -126,7 +125,6 @@ export default function ProfilNasabahPage() {
             <br />
 
             <div className="pn-card">
-                {/* ── Settings ── */}
                 <div style={{ position: "absolute", top: "24px", right: "28px", zIndex: 10 }}>
                     <PopupMenu
                         trigger={
@@ -148,7 +146,6 @@ export default function ProfilNasabahPage() {
                     />
                 </div>
 
-                {/* ── Profil Utama ── */}
                 <div className="pn-identity">
                     <div
                         className="pn-avatar"
@@ -176,7 +173,6 @@ export default function ProfilNasabahPage() {
                     </div>
                 </div>
 
-                {/* ── Informasi Detail ── */}
                 <div className="pn-detail-section">
                     <span className="pn-detail-title">Informasi Detail Nasabah</span>
                     <div className="pn-info-grid">
@@ -192,7 +188,6 @@ export default function ProfilNasabahPage() {
                     </div>
                 </div>
 
-                {/* ── Admin Banner ── */}
                 {nasabah.is_admin && (
                     <div className="pn-admin-banner">
                         <div className="pn-admin-banner-icon"><FaUserShield /></div>
@@ -204,7 +199,6 @@ export default function ProfilNasabahPage() {
                     </div>
                 )}
 
-                {/* ── Saldo ── */}
                 <div className="pn-saldo-section">
                     <div className="pn-saldo-header">
                         <span className="pn-saldo-title">Ringkasan Saldo Rekening</span>
@@ -218,18 +212,18 @@ export default function ProfilNasabahPage() {
                             <div className="pn-saldo-icon"><FaMoneyBillWave /></div>
                             <div className="pn-saldo-body">
                                 <span className="pn-saldo-number">
-                                    {showSaldo ? `Rp ${(saldo?.uang.total_uang ?? 0).toLocaleString("id-ID")}` : "••••••••"}
+                                    {showSaldo ? formatNominal(saldo?.uang.total_uang ?? 0, "Rp") : "••••••••"}
                                 </span>
-                                <span className="pn-saldo-status">Total Uang</span>
+                                <span className="pn-saldo-status">Total Saldo Rupiah</span>
                             </div>
                         </div>
                         <div className="pn-saldo-card pn-saldo-card--green">
                             <div className="pn-saldo-icon"><FaStar /></div>
                             <div className="pn-saldo-body">
                                 <span className="pn-saldo-number">
-                                    {showSaldo ? (saldo?.poin.total_poin ?? 0).toLocaleString("id-ID") : "••••••••"}
+                                    {showSaldo ? formatDecimal(saldo?.poin.total_poin) : "••••••••"}
                                 </span>
-                                <span className="pn-saldo-status">Total Poin</span>
+                                <span className="pn-saldo-status">Total Saldo Poin</span>
                             </div>
                         </div>
                     </div>
@@ -247,7 +241,6 @@ export default function ProfilNasabahPage() {
                 style={{ margin: "16px 24px 16px 24px" }}
             />
 
-            {/* ── Tab: Setoran ── */}
             {activeTab === "setoran" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
@@ -267,7 +260,6 @@ export default function ProfilNasabahPage() {
                 </div>
             )}
 
-            {/* ── Tab: Bagi Hasil ── */}
             {activeTab === "bagi-hasil" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
@@ -287,7 +279,6 @@ export default function ProfilNasabahPage() {
                 </div>
             )}
 
-            {/* ── Tab: Penarikan ── */}
             {activeTab === "penarikan" && (
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">

@@ -26,46 +26,38 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
     const hasAngkut = isBsi || isBsu;
     const hasPenjualan = isBsi || (!isBsi && !isBsu);
 
-    // ── Shared search ──
     const [searchQuery, setSearchQuery] = useState("");
 
-    // ── Penimbangan ──
     const [penimbanganList, setPenimbanganList] = useState<PenimbanganItem[]>([]);
     const [penimbanganLoading, setPenimbanganLoading] = useState(false);
     const [penimbanganFrom, setPenimbanganFrom] = useState(() => defaultMonthRange().from);
     const [penimbanganTo, setPenimbanganTo] = useState(() => defaultMonthRange().to);
 
-    // ── Pengangkutan ──
     const [angkutList, setAngkutList] = useState<PengangkutanItem[]>([]);
     const [angkutLoading, setAngkutLoading] = useState(false);
     const [angkutFrom, setAngkutFrom] = useState(() => defaultMonthRange().from);
     const [angkutTo, setAngkutTo] = useState(() => defaultMonthRange().to);
 
-    // ── Penjualan ──
     const [penjualanList, setPenjualanList] = useState<PenjualanExternalItem[]>([]);
     const [penjualanLoading, setPenjualanLoading] = useState(false);
     const [penjualanFrom, setPenjualanFrom] = useState(() => defaultMonthRange().from);
     const [penjualanTo, setPenjualanTo] = useState(() => defaultMonthRange().to);
 
-    // ── Bagi Hasil (BSI/BSM) ──
     const [bagiHasilList, setBagiHasilList] = useState<RiwayatBagiHasilItem[]>([]);
     const [bagiHasilLoading, setBagiHasilLoading] = useState(false);
     const [bagiHasilFrom, setBagiHasilFrom] = useState(() => defaultMonthRange().from);
     const [bagiHasilTo, setBagiHasilTo] = useState(() => defaultMonthRange().to);
 
-    // ── Bagi Hasil BSU ──
     const [bagiHasilBsuList, setBagiHasilBsuList] = useState<BagiHasilBsuItem[]>([]);
     const [bagiHasilBsuLoading, setBagiHasilBsuLoading] = useState(false);
     const [bagiHasilBsuFrom, setBagiHasilBsuFrom] = useState(() => defaultMonthRange().from);
     const [bagiHasilBsuTo, setBagiHasilBsuTo] = useState(() => defaultMonthRange().to);
 
-    // ── Penarikan ──
     const [penarikanList, setPenarikanList] = useState<PenarikanItem[]>([]);
     const [penarikanLoading, setPenarikanLoading] = useState(false);
     const [penarikanFrom, setPenarikanFrom] = useState(() => defaultMonthRange().from);
     const [penarikanTo, setPenarikanTo] = useState(() => defaultMonthRange().to);
 
-    // ── Fetch callbacks ──
     const fetchPenimbangan = useCallback(async (startDate: string, endDate: string) => {
         if (!bankId) return;
         setPenimbanganLoading(true);
@@ -144,7 +136,6 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
         }
     }, [bankId]);
 
-    // ── Effects ──
     useEffect(() => { fetchPenimbangan(toStartDate(penimbanganFrom), toEndDate(penimbanganTo)); }, [penimbanganFrom, penimbanganTo, fetchPenimbangan]);
     useEffect(() => { fetchAngkut(toStartDate(angkutFrom), toEndDate(angkutTo)); }, [angkutFrom, angkutTo, fetchAngkut]);
     useEffect(() => { fetchPenjualan(toStartDate(penjualanFrom), toEndDate(penjualanTo)); }, [penjualanFrom, penjualanTo, fetchPenjualan]);
@@ -152,7 +143,6 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
     useEffect(() => { fetchBagiHasilBsu(toStartDate(bagiHasilBsuFrom), toEndDate(bagiHasilBsuTo)); }, [bagiHasilBsuFrom, bagiHasilBsuTo, fetchBagiHasilBsu]);
     useEffect(() => { fetchPenarikan(toStartDate(penarikanFrom), toEndDate(penarikanTo)); }, [penarikanFrom, penarikanTo, fetchPenarikan]);
 
-    // ── Computed ──
     const filteredPenimbangan = useMemo(() => {
         const q = searchQuery.toLowerCase();
         if (!q) return penimbanganList;
@@ -174,7 +164,7 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
         if (!q) return penjualanList;
         return penjualanList.filter(item =>
             item.penjualan_id.toLowerCase().includes(q) ||
-            item.identitas_pembeli.toLowerCase().includes(q) ||
+            item.nama_mitra.toLowerCase().includes(q) ||
             item.nama_reward.toLowerCase().includes(q)
         );
     }, [penjualanList, searchQuery]);
@@ -210,29 +200,22 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
 
     return {
         hasAngkut, hasPenjualan,
-        // shared search
         searchQuery, setSearchQuery,
-        // penimbangan
         penimbanganLoading,
         penimbanganFrom, setPenimbanganFrom, penimbanganTo, setPenimbanganTo,
         filteredPenimbangan,
-        // pengangkutan
         angkutLoading, angkutColumns,
         angkutFrom, setAngkutFrom, angkutTo, setAngkutTo,
         filteredAngkut,
-        // penjualan
         penjualanLoading,
         penjualanFrom, setPenjualanFrom, penjualanTo, setPenjualanTo,
         filteredPenjualan,
-        // bagi hasil (BSI/BSM)
         bagiHasilLoading,
         bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo,
         filteredBagiHasil,
-        // bagi hasil BSU
         bagiHasilBsuLoading,
         bagiHasilBsuFrom, setBagiHasilBsuFrom, bagiHasilBsuTo, setBagiHasilBsuTo,
         filteredBagiHasilBsu,
-        // penarikan
         penarikanLoading,
         penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo,
         filteredPenarikan,

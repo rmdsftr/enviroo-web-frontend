@@ -32,11 +32,6 @@ export const AuthService = {
         return response.data;
     },
 
-    async reactivateAkun(user_id: string, otp: string): Promise<any> {
-        const response = await api.post("/auth/reactivate-akun", { user_id, otp });
-        return response.data;
-    },
-
     async sendEmailForgetPassword(email: string): Promise<any> {
         const response = await api.post("/auth/forget-password/send-email", { email });
         return response.data;

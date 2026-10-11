@@ -2,6 +2,7 @@ import { type ColumnDef, TableActionBtn } from "../components/table";
 import type { DistribusiBarangItem } from "../types/barang.type";
 import { FaEye } from "react-icons/fa6";
 import { formatTanggal } from "../utils/date.utils";
+import { formatDecimal } from "../utils/number.utils";
 
 export const SATUAN_OPTIONS: { value: "all" | "kg" | "pcs" | "liter"; label: string }[] = [
     { value: "all", label: "Semua" },
@@ -38,13 +39,13 @@ export function buildDistribusiColumns(isBsi: boolean): ColumnDef<DistribusiBara
             key: "total_item",
             header: "Total Item",
             width: "110px",
-            render: (row) => `${row.total_item} item`,
+            render: (row) => `${formatDecimal(row.total_item)} item`,
         },
         {
             key: "total_poin",
             header: "Total Poin",
             width: "110px",
-            render: (row) => `${row.total_poin} poin`,
+            render: (row) => `${formatDecimal(row.total_poin)} poin`,
         },
         {
             key: "status_distribusi",

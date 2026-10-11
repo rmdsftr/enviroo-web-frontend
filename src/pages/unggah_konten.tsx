@@ -15,38 +15,33 @@ import { PopupNotifikasi } from "../layouts/popup-notifikasi";
 import { getApiError } from "../utils/error.utils";
 import "../styles/unggah_konten.css";
 
-/* ── Block Types ── */
 type BlockType = "text" | "image";
 
 interface ContentBlock {
     id: string;
     type: BlockType;
-    content: string;       // Text content OR image URL (preview)
-    file?: File;           // File object for upload (image only)
-    media_url?: string;    // Original URL from backend (image only)
+    content: string;
+    file?: File;
+    media_url?: string;
 }
 
 function generateBlockId() {
     return `blk-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-/* ── Main Page ── */
 export default function UnggahKontenPage() {
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
     const isEditMode = !!id;
     const { user } = useAuth();
 
-    // ── Article metadata ──
     const [judul, setJudul] = useState("");
     const [deskripsi, setDeskripsi] = useState("");
 
-    // ── Thumbnail ──
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [thumbPreview, setThumbPreview] = useState<string | null>(null);
     const thumbInputRef = useRef<HTMLInputElement>(null);
 
-    // ── Content blocks ──
     const [blocks, setBlocks] = useState<ContentBlock[]>([
         { id: generateBlockId(), type: "text", content: "" }
     ]);
@@ -56,10 +51,8 @@ export default function UnggahKontenPage() {
     const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
     const [viewPhotoSrc, setViewPhotoSrc] = useState<string | null>(null);
 
-    // Block image file refs
     const blockFileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-    // ── Fetch data if edit mode ──
     useEffect(() => {
         if (isEditMode && id) {
             const fetchDetail = async () => {
@@ -70,7 +63,6 @@ export default function UnggahKontenPage() {
                     setDeskripsi(k.Deskripsi);
                     if (k.Thumbnail) setThumbPreview(k.Thumbnail);
 
-                    // Parse Blocks
                     const parsedBlocks: BodyBlock[] = JSON.parse(k.Body || "[]");
                     const mappedBlocks: ContentBlock[] = parsedBlocks.map(b => ({
                         id: generateBlockId(),
@@ -93,7 +85,6 @@ export default function UnggahKontenPage() {
         }
     }, [id, isEditMode]);
 
-    // ── Thumbnail Handlers ──
     const handleThumbChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !file.type.startsWith("image/")) return;
@@ -109,11 +100,9 @@ export default function UnggahKontenPage() {
         if (thumbInputRef.current) thumbInputRef.current.value = "";
     };
 
-    // ── Block CRUD ──
     const addBlock = useCallback((type: BlockType) => {
         const newBlock: ContentBlock = { id: generateBlockId(), type, content: "" };
         setBlocks(prev => [...prev, newBlock]);
-        // Auto-focus new block
         setTimeout(() => setActiveBlockId(newBlock.id), 50);
     }, []);
 
@@ -139,7 +128,6 @@ export default function UnggahKontenPage() {
         });
     }, []);
 
-    // ── Image block file handling ──
     const handleBlockImage = useCallback((blockId: string, file: File) => {
         if (!file.type.startsWith("image/")) return;
         const reader = new FileReader();
@@ -151,13 +139,11 @@ export default function UnggahKontenPage() {
         reader.readAsDataURL(file);
     }, []);
 
-    // ── Auto-resize textarea ──
     const autoResize = (el: HTMLTextAreaElement) => {
         el.style.height = "auto";
         el.style.height = el.scrollHeight + "px";
     };
 
-    // ── Submit ──
     const handlePublish = async (isPublished: boolean) => {
         if (!judul.trim()) {
             setNotif({ message: "Judul tidak boleh kosong.", type: "warning" });
@@ -178,12 +164,10 @@ export default function UnggahKontenPage() {
                     return { type: "text", content: b.content };
                 }
                 const currentIdx = imgIdx++;
-                // Jika ada file baru di-upload di filter ini:
                 if (b.file) {
                     imageBlocksForUpload.push({ index: currentIdx, file: b.file });
                     return { type: "image", media_url: "", index: currentIdx };
                 }
-                // Jika pakai gambar lama (media_url):
                 return { type: "image", media_url: b.media_url, index: currentIdx };
             });
 
@@ -232,7 +216,6 @@ export default function UnggahKontenPage() {
         );
     }
 
-    // ── Block count info ──
     const textBlockCount = blocks.filter(b => b.type === "text").length;
     const imageBlockCount = blocks.filter(b => b.type === "image").length;
 
@@ -248,7 +231,6 @@ export default function UnggahKontenPage() {
                     onClose={() => setNotif(null)}
                 />
             )}
-            {/* ── Top Bar ── */}
             <div className="uc-topbar">
                 <button className="uc-back-btn" onClick={() => navigate(-1)}>
                     <FaArrowLeft />
@@ -279,11 +261,8 @@ export default function UnggahKontenPage() {
                 </div>
             </div>
 
-            {/* ── Two-column Layout ── */}
             <div className="uc-layout">
-                {/* ── Left: Editor ── */}
                 <div className="uc-editor">
-                    {/* Judul */}
                     <div className="uc-title-area">
                         <input
                             type="text"
@@ -295,7 +274,6 @@ export default function UnggahKontenPage() {
                         />
                     </div>
 
-                    {/* Deskripsi */}
                     <div className="uc-desc-area">
                         <textarea
                             className="uc-desc-input"
@@ -309,7 +287,6 @@ export default function UnggahKontenPage() {
 
                     <hr className="uc-divider" />
 
-                    {/* Content Blocks */}
                     <div className="uc-blocks">
                         <span className="uc-blocks-label">Isi Konten</span>
 
@@ -319,7 +296,6 @@ export default function UnggahKontenPage() {
                                 className={`uc-block ${activeBlockId === block.id ? "active" : ""}`}
                                 onClick={() => setActiveBlockId(block.id)}
                             >
-                                {/* Block Controls */}
                                 <div className="uc-block-controls">
                                     {idx > 0 && (
                                         <button
@@ -350,7 +326,6 @@ export default function UnggahKontenPage() {
                                     )}
                                 </div>
 
-                                {/* Text Block */}
                                 {block.type === "text" && (
                                     <textarea
                                         className="uc-block-text"
@@ -365,7 +340,6 @@ export default function UnggahKontenPage() {
                                     />
                                 )}
 
-                                {/* Image Block */}
                                 {block.type === "image" && (
                                     <div className="uc-block-image">
                                         {block.content ? (
@@ -399,7 +373,6 @@ export default function UnggahKontenPage() {
                             </div>
                         ))}
 
-                        {/* Add Block Toolbar */}
                         <div className="uc-add-block-bar">
                             <span className="uc-add-block-bar-label">Tambah blok:</span>
                             <button className="uc-add-btn" onClick={() => addBlock("text")}>
@@ -412,9 +385,7 @@ export default function UnggahKontenPage() {
                     </div>
                 </div>
 
-                {/* ── Right: Sidebar ── */}
                 <div className="uc-sidebar">
-                    {/* Thumbnail Card */}
                     <div className="uc-sidebar-card">
                         <div className="uc-sidebar-card-header">
                             <h3 className="uc-sidebar-card-title">Foto Thumbnail</h3>
@@ -457,7 +428,6 @@ export default function UnggahKontenPage() {
                         </div>
                     </div>
 
-                    {/* Block Info Card */}
                     <div className="uc-sidebar-card">
                         <div className="uc-sidebar-card-header">
                             <h3 className="uc-sidebar-card-title">Ringkasan Konten</h3>

@@ -1,7 +1,3 @@
-/* =========================================================
-   Jadwal Page — 3-Section Schedule Dashboard
-   ========================================================= */
-
 .jadwal-page {
     padding: 0 24px 32px;
     margin-top: 25px;
@@ -16,7 +12,6 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Page Header / Tabs ── */
 .jadwal-page-header {
     display: flex;
     align-items: center;
@@ -26,9 +21,6 @@
 }
 
 
-/* =========================================================
-   TOP GRID: Section 1 (timeline) + Section 3 (calendar)
-   ========================================================= */
 .jadwal-top-grid {
     display: grid;
     grid-template-columns: 1fr 310px;
@@ -41,7 +33,6 @@
 }
 
 
-/* ── Shared Card ── */
 .jadwal-card {
     background: #ffffff;
     border-radius: 18px;
@@ -90,9 +81,6 @@
 }
 
 
-/* =========================================================
-   SECTION 1 — Today's Hourly Timeline
-   ========================================================= */
 .jadwal-today-section {
     overflow: hidden;
 }
@@ -148,7 +136,6 @@
     align-content: center;
 }
 
-/* Timeline chips */
 .jadwal-tl-chip {
     display: inline-flex;
     align-items: center;
@@ -177,7 +164,6 @@
     white-space: nowrap;
 }
 
-/* Status dot */
 .jadwal-status-dot {
     width: 7px;
     height: 7px;
@@ -203,16 +189,12 @@
 }
 
 
-/* =========================================================
-   SECTION 3 — Right Column: Calendar + Date Detail
-   ========================================================= */
 .jadwal-right-col {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* ── Calendar ── */
 .jadwal-calendar-container {
     background: #ffffff;
     border-radius: 18px;
@@ -323,7 +305,6 @@
     box-shadow: 0 3px 8px rgba(148, 223, 12, 0.35);
 }
 
-/* ── Date Detail ── */
 .jadwal-date-detail {
     background: #4EA771;
     border-radius: 16px;
@@ -409,9 +390,6 @@
 }
 
 
-/* =========================================================
-   SECTION 2 — Weekly Grid
-   ========================================================= */
 .jadwal-weekly-section {
     position: relative;
 }
@@ -509,7 +487,6 @@
     font-style: italic;
 }
 
-/* Weekly chips — colored by bank type */
 .jadwal-chip {
     display: inline-flex;
     align-items: center;
@@ -562,9 +539,6 @@
 }
 
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
 @media (max-width: 768px) {
     .jadwal-page {
         padding: 0 16px 24px;
@@ -600,9 +574,6 @@
         justify-content: center;
     }
 }
-/* =========================================================
-   JADWAL MODAL & ACTIONS
-   ========================================================= */
 
 .jadwal-modal-overlay {
     position: fixed;
@@ -761,7 +732,6 @@
     gap: 12px;
 }
 
-/* Actions in schedule rows */
 .jadwal-actions {
     display: flex;
     align-items: center;
@@ -831,10 +801,6 @@
 }
 
 
-/* =========================================================
-   CALENDAR MATRIX — Jadwal Penimbangan
-   ========================================================= */
-
 .jadwal-cal-card {
     background: #ffffff;
     border-radius: 18px;
@@ -843,7 +809,6 @@
     overflow: hidden;
 }
 
-/* ── Header ── */
 .jadwal-cal-header {
     display: flex;
     align-items: center;
@@ -866,7 +831,6 @@
     flex-wrap: wrap;
 }
 
-/* ── Month navigation ── */
 .jadwal-cal-nav {
     display: flex;
     align-items: center;
@@ -900,7 +864,6 @@
     text-align: center;
 }
 
-/* ── Day-of-week header row ── */
 .jadwal-cal-grid-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -923,7 +886,6 @@
 
 .jadwal-cal-dh:last-child { border-right: none; }
 
-/* ── Calendar body ── */
 .jadwal-cal-body {
     display: flex;
     flex-direction: column;
@@ -937,7 +899,6 @@
 
 .jadwal-cal-week:last-child { border-bottom: none; }
 
-/* ── Date cells ── */
 .jadwal-cal-cell {
     min-height: 104px;
     padding: 8px 10px;
@@ -970,7 +931,6 @@
     background: rgba(148, 223, 12, 0.07);
 }
 
-/* ── Date number ── */
 .jadwal-cal-date-num {
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -998,7 +958,6 @@
     font-weight: 700;
 }
 
-/* ── Chips inside cells ── */
 .jadwal-cal-chips {
     display: flex;
     flex-direction: column;
@@ -1069,7 +1028,6 @@
     padding: 1px 7px;
 }
 
-/* ── Selected-date detail strip ── */
 .jadwal-cal-detail-panel {
     border-top: 1px solid rgba(1, 50, 54, 0.06);
     background: rgba(1, 50, 54, 0.02);
@@ -1154,7 +1112,6 @@
     white-space: nowrap;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
     .jadwal-cal-header {
         flex-direction: column;
@@ -1185,11 +1142,6 @@
 }
 
 
-/* =========================================================
-   SUPERADMIN — Bank-type chip & detail colours (BSI/BSM/BSU)
-   ========================================================= */
-
-/* Chips inside calendar cells */
 .jadwal-cal-chip.bt-bsi   { background: rgba(1,   50,  54,  0.08); }
 .jadwal-cal-chip.bt-bsm   { background: rgba(2,  132, 199,  0.09); }
 .jadwal-cal-chip.bt-bsu   { background: rgba(234,  88,  12,  0.09); }
@@ -1205,7 +1157,6 @@
 .jadwal-cal-chip.bt-bsu    .jadwal-cal-chip-text { color: #c2410c; }
 .jadwal-cal-chip.bt-angkut .jadwal-cal-chip-text { color: #0369a1; }
 
-/* Today cell overrides */
 .jadwal-cal-cell.today .jadwal-cal-chip.bt-bsi,
 .jadwal-cal-cell.today .jadwal-cal-chip.bt-bsm,
 .jadwal-cal-cell.today .jadwal-cal-chip.bt-bsu { background: rgba(1, 50, 54, 0.14); }
@@ -1216,7 +1167,6 @@
 .jadwal-cal-cell.today .jadwal-cal-chip.bt-bsm .jadwal-cal-chip-text,
 .jadwal-cal-cell.today .jadwal-cal-chip.bt-bsu .jadwal-cal-chip-text { color: #013236; }
 
-/* Detail strip items */
 .jadwal-cal-detail-item.bt-angkut {
     background: rgba(2, 132, 199, 0.05);
     border-color: rgba(2, 132, 199, 0.16);
@@ -1234,7 +1184,6 @@
     border-color: rgba(234,  88,  12,  0.16);
 }
 
-/* Bank-type label chip (BSI / BSM / BSU) */
 .jadwal-bank-badge {
     font-family: 'Poppins', sans-serif;
     font-size: 9px;
@@ -1249,7 +1198,6 @@
 .jadwal-bank-badge.bt-bsm { background: rgba(2,  132, 199,  0.12); color: #0369a1; }
 .jadwal-bank-badge.bt-bsu { background: rgba(234,  88,  12,  0.10); color: #c2410c; }
 
-/* Rutin / Spesial badge (reuse in superadmin context) */
 .jadwal-type-badge {
     font-family: 'Poppins', sans-serif;
     font-size: 9px;

@@ -28,9 +28,6 @@ export default function Dropdown({
     const containerRef = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // Set lewat React state untuk render awal, lalu tulis langsung ke DOM saat
-    // scroll/resize supaya posisi selalu sinkron tiap frame (tanpa nunggu re-render,
-    // yang bikin menu keliatan "gerak-gerak" ketika layar di-scroll cepat).
     const updateMenuPos = () => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
@@ -134,7 +131,6 @@ export default function Dropdown({
                 document.body
             )}
 
-            {/* Hidden select for form compatibility */}
             <select
                 style={{ display: 'none' }}
                 value={value}

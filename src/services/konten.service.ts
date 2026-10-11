@@ -9,7 +9,7 @@ export interface UploadKontenPayload {
     thumbnail?: File | null;
     imageBlocks: { index: number; file: File }[];
     bodyJson: string;
-    isPublished: boolean;  // true → publish, false → simpan draft
+    isPublished: boolean;
 }
 
 export const KontenService = {

@@ -49,14 +49,14 @@ export function DaftarkanAdminBaruModal({ onUserCreated, onClose, onSuccess, onE
                 <form onSubmit={handleSubmit}>
                     <div className="regis-modal-body">
                         <div className="regis-form-group">
-                            <label className="regis-label" htmlFor="new-admin-nik">NIK <span className="required">*</span></label>
+                            <label className="regis-label" htmlFor="new-admin-nik">ID Pengguna <span className="required">*</span></label>
                             <Input
                                 id="new-admin-nik" className="regis-input-neutral"
                                 variant="solid" inputSize="large" fullWidth
-                                placeholder="Masukkan 16 digit NIK"
+                                placeholder="Masukkan ID Pengguna"
                                 value={form.nik}
                                 onChange={(e) => setForm({ ...form, nik: e.target.value })}
-                                required maxLength={16}
+                                required maxLength={25}
                             />
                         </div>
                         <div className="regis-form-group">

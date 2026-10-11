@@ -72,7 +72,6 @@ export default function InformasiPage() {
 
     return (
         <>
-            {/* Header toolbar */}
             <div className="info-header">
                 <div className="info-header__left">
                     <div className="info-header__title-row">
@@ -99,7 +98,6 @@ export default function InformasiPage() {
                 </div>
             </div>
 
-            {/* Filter row */}
             <div className="n-filter-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 24px 20px', gap: '16px', flexWrap: 'wrap' }}>
                 <FilterPill
                     options={STATUS_OPTIONS}
@@ -110,7 +108,6 @@ export default function InformasiPage() {
 
             <div className="info-divider"></div>
 
-            {/* Card grid */}
             {isLoading ? (
                 <div style={{ padding: '60px 24px', textAlign: 'center', color: '#6b9080', fontSize: '13px', fontFamily: 'Poppins, sans-serif' }}>
                     Memuat konten...
@@ -129,7 +126,6 @@ export default function InformasiPage() {
                 </div>
             )}
 
-            {/* Pagination */}
             {pagination && pagination.total_pages > 1 && (
                 <Pagination
                     currentPage={pagination.page}

@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import type { DetailBank } from "../types/profil.type";
-import { FaBuilding, FaCamera } from "react-icons/fa6";
+import { FaBuilding, FaCamera, FaTrash } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import Input from "../components/input";
@@ -20,6 +20,7 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
     const [editLongitude, setEditLongitude] = useState(bank.longitude?.toString() || "");
     const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
     const [editPhotoPreview, setEditPhotoPreview] = useState("");
+    const [hapusFoto, setHapusFoto] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const editPhotoInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,6 +29,7 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
         if (!file) return;
         setEditPhotoFile(file);
         setEditPhotoPreview(URL.createObjectURL(file));
+        setHapusFoto(false);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +44,7 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
             if (editLatitude) formData.append("latitude", editLatitude);
             if (editLongitude) formData.append("longitude", editLongitude);
             if (editPhotoFile) formData.append("foto_profil", editPhotoFile);
+            else if (hapusFoto) formData.append("hapus_foto", "true");
             await onSubmit(formData);
             onClose();
         } catch {
@@ -68,8 +71,10 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
                     <div className="regis-modal-body" style={{ overflowY: "auto", flex: 1 }}>
-                        {/* Foto Profil */}
-                        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                        <div style={{
+                            display: "flex", flexDirection: "column",
+                            alignItems: "center", gap: 8, marginBottom: 20,
+                        }}>
                             <div
                                 style={{
                                     position: "relative", width: 100, height: 100,
@@ -79,7 +84,7 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
                                 }}
                                 onClick={() => editPhotoInputRef.current?.click()}
                             >
-                                {editPhotoPreview || bank.photo_url ? (
+                                {!hapusFoto && (editPhotoPreview || bank.photo_url) ? (
                                     <img
                                         src={editPhotoPreview || bank.photo_url}
                                         alt="foto bank"
@@ -111,6 +116,24 @@ export function EditProfilBankModal({ bank, adminId, onSubmit, onClose }: Props)
                                     <span style={{ fontSize: 11, fontWeight: 600 }}>Ganti Foto</span>
                                 </div>
                             </div>
+                            {bank.photo_url && !editPhotoFile && (
+                                <button
+                                    type="button"
+                                    onClick={() => setHapusFoto((prev) => !prev)}
+                                    style={{
+                                        display: "flex", alignItems: "center", gap: 4,
+                                        padding: "3px 9px", borderRadius: 99, cursor: "pointer",
+                                        fontFamily: "inherit", fontSize: 10.5, fontWeight: 500,
+                                        border: `1px solid ${hapusFoto ? "rgba(78,167,113,0.4)" : "rgba(192,57,43,0.3)"}`,
+                                        background: hapusFoto ? "rgba(78,167,113,0.07)" : "rgba(192,57,43,0.05)",
+                                        color: hapusFoto ? "#4EA771" : "#c0392b",
+                                        transition: "all 0.15s ease",
+                                    }}
+                                >
+                                    <FaTrash style={{ fontSize: 10 }} />
+                                    {hapusFoto ? "Batalkan Hapus" : "Hapus Foto"}
+                                </button>
+                            )}
                             <input ref={editPhotoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} hidden />
                         </div>
 

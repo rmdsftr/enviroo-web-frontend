@@ -1,15 +1,9 @@
-/* ══════════════════════════════════════════
-   Saldo Page
-   ══════════════════════════════════════════ */
-
-/* ── Overview Cards row ── */
 .saldo-overview {
     display: flex;
     gap: 16px;
     padding: 0 24px 24px;
 }
 
-/* ── Saldo value cell in table ── */
 .saldo-value {
     font-family: 'Poppins', sans-serif;
     font-size: 13px;
@@ -27,7 +21,6 @@
     font-weight: 700;
 }
 
-/* ── Responsive ── */
 @media (max-width: 600px) {
     .saldo-overview {
         flex-direction: column;

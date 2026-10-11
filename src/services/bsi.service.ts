@@ -6,7 +6,6 @@ import { mockGetBsiPaged, mockGetBsiAll } from "../mocks/bsi-list";
 const USE_MOCK = false;
 
 export const BsiService = {
-    // ... existing methods ...
     async createBsi(data: NewBSI) {
         const formData = new FormData();
 

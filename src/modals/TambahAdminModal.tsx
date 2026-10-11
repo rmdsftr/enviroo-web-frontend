@@ -37,8 +37,8 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
 
     const roleOptions = getRoleOptions(userRole);
     const filteredUsers = nonAdminUsers.filter((u) =>
-        u.Nama.toLowerCase().includes(searchUser.toLowerCase()) ||
-        u.Email.toLowerCase().includes(searchUser.toLowerCase())
+        u.nama.toLowerCase().includes(searchUser.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchUser.toLowerCase())
     );
 
     const handleTambahAdmin = async (e: React.FormEvent) => {
@@ -115,7 +115,6 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                             className="regis-modal-body"
                             style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, padding: "24px", overflowY: "auto", flex: 1 }}
                         >
-                            {/* Kiri: Daftar Akun */}
                             <div className="regis-form-group" style={{ marginBottom: 0 }}>
                                 <label className="regis-label">Pilih Akun <span className="required">*</span></label>
                                 <p style={{ fontSize: 12, color: "#888", marginBottom: 12, marginTop: 0 }}>
@@ -141,12 +140,12 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                                                     </td>
                                                 </tr>
                                             ) : filteredUsers.map((u) => {
-                                                const isSelected = selectedUserId === u.UserID;
+                                                const isSelected = selectedUserId === u.user_id;
                                                 return (
                                                     <tr
-                                                        key={u.UserID}
+                                                        key={u.user_id}
                                                         className={isSelected ? "selected" : ""}
-                                                        onClick={() => setSelectedUserId(u.UserID)}
+                                                        onClick={() => setSelectedUserId(u.user_id)}
                                                         style={{ cursor: "pointer" }}
                                                     >
                                                         <td style={{ textAlign: "center" }}>
@@ -155,23 +154,23 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                                                                     type="radio"
                                                                     name="tambah-admin-user"
                                                                     checked={isSelected}
-                                                                    onChange={() => setSelectedUserId(u.UserID)}
+                                                                    onChange={() => setSelectedUserId(u.user_id)}
                                                                     style={{ accentColor: "#013236" }}
                                                                 />
                                                             </label>
                                                         </td>
                                                         <td style={{ textAlign: "center" }}>
                                                             <div className="regis-admin-avatar">
-                                                                {u.PhotoURL
-                                                                    ? <img src={u.PhotoURL} alt={u.Nama} />
-                                                                    : <span>{u.Nama.charAt(0).toUpperCase()}</span>
+                                                                {u.photo_url
+                                                                    ? <img src={u.photo_url} alt={u.nama} />
+                                                                    : <span>{u.nama.charAt(0).toUpperCase()}</span>
                                                                 }
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div style={{ display: "flex", flexDirection: "column" }}>
-                                                                <span className="regis-admin-name">{u.Nama}</span>
-                                                                <span className="regis-admin-email" style={{ fontSize: 11, color: "#888" }}>{u.Email}</span>
+                                                                <span className="regis-admin-name">{u.nama}</span>
+                                                                <span className="regis-admin-email" style={{ fontSize: 11, color: "#888" }}>{u.email}</span>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -182,7 +181,6 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                                 </div>
                             </div>
 
-                            {/* Kanan: Role */}
                             <div className="regis-form-group" style={{ marginBottom: 0 }}>
                                 <label className="regis-label" htmlFor="tambah-admin-role">
                                     Role <span className="required">*</span>
@@ -202,7 +200,7 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                                     <div style={{ marginTop: 24, padding: "16px", background: "#f0f5f2", borderRadius: "12px", border: "1px solid #c1d9c9" }}>
                                         <div style={{ fontSize: 12, color: "#5a7a68", marginBottom: 4 }}>Ringkasan Pilihan:</div>
                                         <div style={{ fontSize: 12, color: "#013236", fontWeight: 600 }}>
-                                            {nonAdminUsers.find((u) => u.UserID === selectedUserId)?.Nama ?? "Seseorang"}
+                                            {nonAdminUsers.find((u) => u.user_id === selectedUserId)?.nama ?? "Seseorang"}
                                         </div>
                                         <div style={{ fontSize: 12, color: "#3d5a48" }}>
                                             akan ditunjuk sebagai <strong>{roleOptions.find((r) => r.value === selectedRole)?.label ?? "Role"}</strong>
@@ -233,14 +231,14 @@ export function TambahAdminModal({ bankId, adminId, userRole, onStaffAdded, onCl
                     <form onSubmit={handleSaveNewUser} style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
                         <div className="regis-modal-body" style={{ overflowY: "auto", flex: 1 }}>
                             <div className="regis-form-group">
-                                <label className="regis-label" htmlFor="new-admin-nik">NIK <span className="required">*</span></label>
+                                <label className="regis-label" htmlFor="new-admin-nik">ID Pengguna <span className="required">*</span></label>
                                 <Input
                                     id="new-admin-nik" className="regis-input-neutral"
                                     variant="solid" inputSize="large" fullWidth
-                                    placeholder="Masukkan 16 digit NIK"
+                                    placeholder="Masukkan ID Pengguna"
                                     value={newUserForm.nik}
                                     onChange={(e) => setNewUserForm({ ...newUserForm, nik: e.target.value })}
-                                    required maxLength={16}
+                                    required maxLength={25}
                                 />
                             </div>
                             <div className="regis-form-group">

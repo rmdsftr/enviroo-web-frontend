@@ -1,6 +1,5 @@
 import { api } from "./api";
 
-/** Item dari GET /penimbangan/get/:bank_id — riwayat sesi (aktif/pending sengaja di-exclude backend) */
 export interface PenimbanganItem {
     penimbangan_id: string;
     tanggal_sesi: string;
@@ -20,11 +19,9 @@ export interface SetoranItem {
 export interface PenimbanganDetail {
     penimbangan_id: string;
     nama_bank: string;
-    /** tanggal sesi — selalu terisi, pakai ini buat nampilin tanggal (bukan started_at, itu nullable) */
     tanggal_sesi: string;
     started_at: string | null;
     ended_at: string | null;
-    /** bisa string kosong "" kalau sesi belum pernah dimulai/ditutup (di-COALESCE backend) */
     started_by: string;
     ended_by: string;
     status_penimbangan: string;

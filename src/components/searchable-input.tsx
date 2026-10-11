@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import "../styles/searchable-input.css";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 export interface SearchableOption<T> {
     value: T;
     label: string;
@@ -25,8 +23,6 @@ interface SearchableInputProps<T> {
     className?: string;
     renderOption?: (option: SearchableOption<T>) => React.ReactNode;
 }
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function SearchableInput<T>({
     value,
@@ -52,10 +48,6 @@ export default function SearchableInput<T>({
     const wrapperRef = useRef<HTMLDivElement>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    // ── Posisi menu (sama seperti Dropdown pakai portal) ──────────────────────
-    // Set lewat React state untuk render awal, lalu tulis langsung ke DOM saat
-    // scroll/resize supaya posisi selalu sinkron tiap frame (tanpa nunggu re-render,
-    // yang bikin menu keliatan "gerak-gerak" ketika layar di-scroll cepat).
     const updateMenuPos = () => {
         if (!wrapperRef.current) return;
         const rect = wrapperRef.current.getBoundingClientRect();
@@ -81,7 +73,6 @@ export default function SearchableInput<T>({
         };
     }, [isOpen]);
 
-    // ── Debounce search ───────────────────────────────────────────────────────
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -114,7 +105,6 @@ export default function SearchableInput<T>({
         };
     }, [value, debounceMs]);
 
-    // ── Tutup kalau klik di luar ──────────────────────────────────────────────
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             const target = e.target as Node;
@@ -126,7 +116,6 @@ export default function SearchableInput<T>({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // ── Handlers ──────────────────────────────────────────────────────────────
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
         onSelect(null);
@@ -156,7 +145,6 @@ export default function SearchableInput<T>({
         }
     };
 
-    // ── Classes ───────────────────────────────────────────────────────────────
     const containerClass = [
         "si-container",
         `si--${inputSize}`,
@@ -171,7 +159,6 @@ export default function SearchableInput<T>({
         loading ? "si-input--loading" : "",
     ].filter(Boolean).join(" ");
 
-    // ── Render ────────────────────────────────────────────────────────────────
     return (
         <div className={containerClass} ref={wrapperRef}>
             <div className="si-input-wrapper">

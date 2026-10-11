@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { KatalogSampah, KatalogDetail } from "../types/katalog.type";
 import { FaCoins, FaBoxOpen, FaBuilding, FaTrash, FaPen } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
+import ViewPhoto from "../components/view-photo";
 import { formatTanggalJam } from "../utils/date.utils";
+import { formatNominal } from "../utils/number.utils";
 
 interface Props {
     item: KatalogSampah;
@@ -15,6 +18,8 @@ interface Props {
 }
 
 export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDelete, onEdit }: Props) {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+
     return createPortal(
         <div className="katalog-modal-overlay" onClick={onClose}>
             <div className="katalog-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px', overflow: 'hidden' }}>
@@ -29,9 +34,12 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                 <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <div className="km-body" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '24px', alignItems: 'start', paddingBottom: '24px' }}>
 
-                        {/* Kolom 1: Info + Stok */}
                         <div>
-                            <div style={{ background: "linear-gradient(135deg, rgba(78, 167, 113, 0.15) 0%, rgba(1, 50, 54, 0.05) 100%)", borderRadius: '12px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '16px' }}>
+                            <div
+                                style={{ background: "linear-gradient(135deg, rgba(78, 167, 113, 0.15) 0%, rgba(1, 50, 54, 0.05) 100%)", borderRadius: '12px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginBottom: '16px', cursor: item.photo_url ? 'pointer' : 'default' }}
+                                onClick={() => item.photo_url && setLightboxOpen(true)}
+                                title={item.photo_url ? "Klik untuk memperbesar" : undefined}
+                            >
                                 {item.photo_url ? (
                                     <img src={item.photo_url} alt={item.nama_sampah} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                                 ) : (
@@ -62,7 +70,6 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                             </div>
                         </div>
 
-                        {/* Kolom 2: Harga + Riwayat */}
                         <div>
                             <h4 style={{ fontSize: '14.5px', color: 'var(--k-dark)', marginBottom: '12px' }}>Harga Sampah Saat Ini</h4>
                             <div className="kd-stat-card" style={{ padding: '14px', gap: '8px', marginBottom: '20px' }}>
@@ -75,7 +82,7 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                                         <div className="kd-stat-row" style={{ fontSize: '12.5px' }} key={h.level_user}>
                                             <span className="kd-stat-label" style={{ textTransform: 'capitalize' }}>{h.level_user}</span>
                                             <div className="katalog-price-tag price-poin" style={{ margin: 0, padding: '4px 10px', fontSize: '12px' }}>
-                                                <FaCoins />{h.harga} {h.satuan_reward}/{item.satuan}
+                                                <FaCoins />{formatNominal(h.harga, h.satuan_reward)}/{item.satuan}
                                             </div>
                                         </div>
                                     ))
@@ -108,8 +115,8 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                                                         <div className="kd-timeline-content" style={{ padding: '10px 12px' }}>
                                                             <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--k-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{rw.level_user}</div>
                                                             <div className="kd-timeline-price" style={{ fontSize: '12.5px' }}>
-                                                                <s>{rw.harga_lama} {satuanReward}</s>
-                                                                {rw.harga_baru} {satuanReward}
+                                                                <s>{formatNominal(rw.harga_lama, satuanReward)}</s>
+                                                                {formatNominal(rw.harga_baru, satuanReward)}
                                                             </div>
                                                             <div className="kd-timeline-admin" style={{ fontSize: '10.5px' }}>
                                                                 <FaBuilding size={9} /> Oleh {rw.changed_by_nama}
@@ -137,6 +144,9 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                     )}
                 </div>
             </div>
+            {lightboxOpen && item.photo_url && (
+                <ViewPhoto src={item.photo_url} alt={item.nama_sampah} onClose={() => setLightboxOpen(false)} />
+            )}
         </div>,
         document.body
     );

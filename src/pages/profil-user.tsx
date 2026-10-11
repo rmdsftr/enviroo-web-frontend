@@ -152,7 +152,6 @@ export default function ProfilUserPage() {
                     onCancel={() => setShowDeleteConfirm(false)}
                 />
 
-                {/* ── Profil Card ───────────────────────────────── */}
                 <div className="profil-card" style={{ position: "relative" }}>
                     {isBelumTerdaftar && (
                         <div style={{ position: "absolute", top: "24px", right: "28px", zIndex: 10 }}>
@@ -173,7 +172,6 @@ export default function ProfilUserPage() {
                             />
                         </div>
                     )}
-                    {/* Identity */}
                     <div className="profil-identity">
                         <div
                             className="profil-avatar"
@@ -205,7 +203,6 @@ export default function ProfilUserPage() {
                         </div>
                     </div>
 
-                    {/* Detail Info */}
                     <div className="profil-detail-section">
                         <div className="profil-info-grid">
                             {INFO_ITEMS.map(({ icon, label, value }) => (
@@ -221,7 +218,6 @@ export default function ProfilUserPage() {
                     </div>
                 </div>
 
-                {/* ── Akun Nasabah ─────────────────────────────── */}
                 <div>
                     <p className="profil-section-title">
                         Akun Nasabah
@@ -262,7 +258,6 @@ export default function ProfilUserPage() {
                     </div>
                 </div>
 
-                {/* ── Akun Admin / Staff ────────────────────────── */}
                 <div>
                     <p className="profil-section-title">
                         Akun Admin & Staff

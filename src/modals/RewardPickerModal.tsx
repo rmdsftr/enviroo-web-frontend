@@ -48,8 +48,8 @@ export default function RewardPickerModal({
         return rewards.filter(r => {
             if (!q) return true;
             return (
-                r.NamaReward.toLowerCase().includes(q) ||
-                r.Satuan.toLowerCase().includes(q)
+                r.nama_reward.toLowerCase().includes(q) ||
+                r.satuan.toLowerCase().includes(q)
             );
         });
     }, [rewards, query]);
@@ -101,23 +101,23 @@ export default function RewardPickerModal({
                     ) : (
                         <div className="mr-picker-list">
                             {filtered.map(r => {
-                                const isTaken = excludeIds.includes(r.RewardID);
+                                const isTaken = excludeIds.includes(r.reward_id);
                                 return (
                                     <button
-                                        key={r.RewardID}
+                                        key={r.reward_id}
                                         type="button"
                                         className={`mr-picker-item${isTaken ? " mr-picker-item--taken" : ""}`}
                                         disabled={isTaken}
                                         onClick={() => !isTaken && onPick(r)}
                                     >
-                                        <span className="mr-picker-item-icon">{rewardIcon(r.NamaReward)}</span>
+                                        <span className="mr-picker-item-icon">{rewardIcon(r.nama_reward)}</span>
                                         <span className="mr-picker-item-body">
-                                            <span className="mr-picker-item-name">{r.NamaReward}</span>
+                                            <span className="mr-picker-item-name">{r.nama_reward}</span>
                                             <span className="mr-picker-item-desc">
-                                                {r.Deskripsi || `Satuan: ${r.Satuan}`}
+                                                {r.deskripsi || `Satuan: ${r.satuan}`}
                                             </span>
                                         </span>
-                                        <span className="mr-picker-item-satuan">{r.Satuan}</span>
+                                        <span className="mr-picker-item-satuan">{r.satuan}</span>
                                         {isTaken && (
                                             <span className="mr-picker-item-taken">
                                                 <FaCheck /> Terpakai

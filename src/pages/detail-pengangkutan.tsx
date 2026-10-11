@@ -23,8 +23,8 @@ import {
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-pengangkutan.css";
 import { formatTanggalJamBullet } from "../utils/date.utils";
+import { formatDecimal } from "../utils/number.utils";
 
-/* ── Status maps ── */
 const SESI_STATUS_MAP: Record<string, { label: string; cls: string }> = {
     requested: { label: "Diminta",          cls: "requested" },
     approved:  { label: "Disetujui",        cls: "approved"  },
@@ -35,7 +35,6 @@ const SESI_STATUS_MAP: Record<string, { label: string; cls: string }> = {
     canceled:  { label: "Dibatalkan",       cls: "canceled"  },
 };
 
-/* ── Component ── */
 export default function DetailPengangkutanPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -108,7 +107,6 @@ export default function DetailPengangkutanPage() {
         }
     };
 
-    /* ── Breadcrumb ── */
     const breadcrumbItems = [
         { label: "Riwayat", path: riwayatPath },
         { label: "Detail Pengangkutan" },
@@ -123,7 +121,6 @@ export default function DetailPengangkutanPage() {
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Pengangkutan</h1>
@@ -155,10 +152,8 @@ export default function DetailPengangkutanPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
 
-                            {/* Header */}
                             <div className="dp-overview-header">
                                 <div>
                                     <p className="dp-overview-title">Detail Pengangkutan</p>
@@ -166,7 +161,6 @@ export default function DetailPengangkutanPage() {
                                 </div>
                             </div>
 
-                            {/* Status */}
                             {statusConf && (
                                 <span className={`dp-status-pill ${statusConf.cls}`}>
                                     <span className="dp-status-dot" />
@@ -176,7 +170,6 @@ export default function DetailPengangkutanPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaBuilding /></div>
@@ -217,14 +210,12 @@ export default function DetailPengangkutanPage() {
 
                             <div className="dp-divider" />
 
-                            {/* Sesi button */}
                             <button className="dpg-sesi-btn" onClick={handleOpenSesi}>
                                 <FaClockRotateLeft />
                                 Riwayat Sesi Pengangkutan
                             </button>
                         </div>
 
-                        {/* ── RIGHT: Daftar Sampah ── */}
                         <div className="dp-setoran-col">
                             <div className="dp-setoran-header">
                                 <div>
@@ -251,7 +242,7 @@ export default function DetailPengangkutanPage() {
                                                 <span className="dpg-sampah-id">{item.sampah_id}</span>
                                             </div>
                                             <div className="dpg-sampah-qty-wrap">
-                                                <span className="dpg-sampah-qty">{item.qty}</span>
+                                                <span className="dpg-sampah-qty">{formatDecimal(item.qty)}</span>
                                                 <span className="dpg-sampah-satuan">{item.satuan}</span>
                                             </div>
                                         </div>
@@ -288,7 +279,6 @@ export default function DetailPengangkutanPage() {
                 />
             )}
 
-            {/* Popup Notifikasi */}
             {popupNotif && (
                 <PopupNotifikasi
                     message={popupNotif.message}
@@ -297,12 +287,10 @@ export default function DetailPengangkutanPage() {
                 />
             )}
 
-            {/* ── Sesi Popup ── */}
             {sesiOpen && createPortal(
                 <div className="dpg-overlay" onClick={handleCloseSesi}>
                     <div className="dpg-popup" onClick={(e) => e.stopPropagation()}>
 
-                        {/* Popup Header */}
                         <div className="dpg-popup-header">
                             <p className="dpg-popup-title">Riwayat Sesi Pengangkutan</p>
                             <button className="dpg-popup-close" onClick={handleCloseSesi}>
@@ -322,14 +310,12 @@ export default function DetailPengangkutanPage() {
 
                         {!sesiLoading && !sesiError && sesiData && (
                             <>
-                                {/* Meta */}
                                 <div className="dpg-popup-meta">
                                     <span>{sesiData.nama_bsi}</span>
                                     <span className="dpg-popup-meta-arrow">→</span>
                                     <span>{sesiData.nama_bsu}</span>
                                 </div>
 
-                                {/* Timeline */}
                                 {sesiData.riwayat.length === 0 ? (
                                     <div className="dpg-popup-loading">Belum ada riwayat sesi.</div>
                                 ) : (

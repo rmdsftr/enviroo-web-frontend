@@ -15,12 +15,11 @@ import {
     FaWallet,
 } from "react-icons/fa6";
 import "../styles/sidebar.css";
-import photo from "../assets/logo-enviroo-new.png";
+import photo from "../assets/enviroo-pfp.png";
 import dlhPhoto from "../assets/dlh-padang.png";
 import logo from "../assets/logo-enviroo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { UsersService } from "../services/users.service";
 
 export type MenuItemData = {
     icon: ElementType;
@@ -39,7 +38,6 @@ export function isGroup(entry: SidebarEntry): entry is MenuGroupData {
     return "groupLabel" in entry;
 }
 
-/* ── Menu Definitions ── */
 export const SUPERADMIN_MENU: SidebarEntry[] = [
     { groupLabel: "Insight", items: [
         { icon: FaChartLine, menu: "Dashboard", id: "superadmin" },
@@ -113,7 +111,6 @@ export const ADMIN_BSM_MENU: SidebarEntry[] = [
     ]},
     { groupLabel: "Pencatatan", items: [
         { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },
-        { icon: FaCircleInfo,      menu: "Konten",  id: "bsm/konten"  },
     ]},
 ];
 
@@ -122,17 +119,24 @@ const DEFAULT_MENU: SidebarEntry[] = [
 ];
 
 export default function SidebarLayout() {
-    const { user } = useAuth();
+    const { user, activeAdmin } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [bankName, setBankName] = useState<string | null>(null);
-    const [bankTypeName, setBankTypeName] = useState<string | null>(null);
-    const [bankPhoto, setBankPhoto] = useState<string | null>(null);
+    const bankName = activeAdmin?.nama_bank ?? null;
+    const bankPhoto = activeAdmin?.photo_url ?? null;
+    const bankTypeName = useMemo(() => {
+        if (!activeAdmin) return null;
+        switch (activeAdmin.jenis_bank) {
+            case "bsi": return "Bank Sampah Induk";
+            case "bsm": return "Bank Sampah Mandiri";
+            case "bsu": return "Bank Sampah Unit";
+            default: return "";
+        }
+    }, [activeAdmin]);
 
-    /* ── Select menu based on role ── */
     const currentMenuItems = useMemo(() => {
         const role = user?.role?.toLowerCase();
         if (role === "superadmin") return SUPERADMIN_MENU;
@@ -142,13 +146,11 @@ export default function SidebarLayout() {
         return DEFAULT_MENU;
     }, [user?.role]);
 
-    /* ── Flatten all items (including those inside groups) ── */
     const allItems = useMemo(() =>
         currentMenuItems.flatMap(entry => isGroup(entry) ? entry.items : [entry]),
         [currentMenuItems]
     );
 
-    /* ── Sync active state with URL ── */
     const activeId = useMemo(() => {
         const path = location.pathname.substring(1).replace(/\/$/, "") || "";
         const matches = allItems.filter(item =>
@@ -171,35 +173,8 @@ export default function SidebarLayout() {
         return () => window.removeEventListener("resize", check);
     }, []);
 
-    /* ── Fetch Bank Name for active admin ── */
-    useEffect(() => {
-        if (user && user.role !== "superadmin" && user.identity_id) {
-            UsersService.getActiveAdmin(user.identity_id)
-                .then(res => {
-                    const data = res?.data;
-                    if (data?.nama_bank) {
-                        setBankName(data.nama_bank);
-                        setBankPhoto(data.photo_url || null);
-                        let typeName = "";
-                        switch (data.jenis_bank) {
-                            case "bsi": typeName = "Bank Sampah Induk"; break;
-                            case "bsm": typeName = "Bank Sampah Mandiri"; break;
-                            case "bsu": typeName = "Bank Sampah Unit"; break;
-                        }
-                        setBankTypeName(typeName);
-                    }
-                })
-                .catch((err: unknown) => console.error("Failed to fetch bank info:", err));
-        } else {
-            setBankName(null);
-            setBankTypeName(null);
-            setBankPhoto(null);
-        }
-    }, [user]);
-
     return (
         <>
-            {/* Hamburger — mobile only */}
             {isMobile && (
                 <button
                     className="mobile-toggle"
@@ -210,7 +185,6 @@ export default function SidebarLayout() {
                 </button>
             )}
 
-            {/* Backdrop */}
             {isMobile && mobileOpen && (
                 <div
                     className="sidebar-overlay"
@@ -218,17 +192,14 @@ export default function SidebarLayout() {
                 />
             )}
 
-            {/* Sidebar */}
             <nav
                 className={`sidebar${isMobile && !mobileOpen ? " hidden" : ""}`}
                 aria-label="Main navigation"
             >
-                {/* Logo aplikasi */}
                 <div className="sidebar-logo">
                     <img src={logo} alt="Enviroo" />
                 </div>
 
-                {/* Menu */}
                 <div className="menu">
                     {currentMenuItems.map((entry) =>
                         isGroup(entry) ? (
@@ -263,7 +234,6 @@ export default function SidebarLayout() {
                     )}
                 </div>
 
-                {/* Bank brand — footer */}
                 <div
                     className="sidebar-brand"
                     onClick={() => {

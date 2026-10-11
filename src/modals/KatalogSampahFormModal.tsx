@@ -41,7 +41,7 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
     const [addSarokId, setAddSarokId] = useState<number | null>(null);
     const [addSatuan, setAddSatuan] = useState(initialValues?.satuan ?? "kg");
     const [addKategori, setAddKategori] = useState(initialValues?.kategori_id ?? (categories[0]?.KategoriID ?? 0));
-    const [addRewardId, setAddRewardId] = useState(initialValues?.reward_id ?? (rewards[0]?.RewardID ?? 0));
+    const [addRewardId, setAddRewardId] = useState(initialValues?.reward_id ?? (rewards[0]?.reward_id ?? 0));
     const [addSyaratPemilahan, setAddSyaratPemilahan] = useState(initialValues?.syarat_pemilahan ?? "");
     const [addFoto, setAddFoto] = useState<File | null>(null);
     const [addFotoPreview, setAddFotoPreview] = useState<string | null>(initialValues?.photo_url ?? null);
@@ -119,7 +119,6 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
                 <form onSubmit={handleSubmit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px', padding: '24px 28px 0' }}>
 
-                        {/* Kolom 1: Info Dasar */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--k-muted)', paddingBottom: '6px', borderBottom: '1px solid var(--k-border)' }}>
                                 Informasi Item
@@ -176,7 +175,6 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
                                         options={categories.map(c => ({ label: c.Kategori, value: c.KategoriID }))}
                                         value={addKategori}
                                         onChange={(e) => setAddKategori(Number(e.target.value))}
-                                        disabled={formMode === "edit-item"}
                                     />
                                 </div>
                             </div>
@@ -185,7 +183,7 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
                                 <label className="km-label">Jenis Reward <span className="km-req">*</span></label>
                                 <Dropdown
                                     fullWidth
-                                    options={rewards.map(r => ({ label: `${r.NamaReward} (${r.Satuan})`, value: r.RewardID }))}
+                                    options={rewards.map(r => ({ label: `${r.nama_reward} (${r.satuan})`, value: r.reward_id }))}
                                     value={addRewardId}
                                     onChange={(e) => setAddRewardId(Number(e.target.value))}
                                     disabled={formMode === "edit-item"}
@@ -204,7 +202,6 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
                             </div>
                         </div>
 
-                        {/* Kolom 2: Upload Foto */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
                             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--k-muted)', paddingBottom: '6px', borderBottom: '1px solid var(--k-border)' }}>
                                 Foto Item

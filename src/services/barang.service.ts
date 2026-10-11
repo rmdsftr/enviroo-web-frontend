@@ -2,21 +2,18 @@ import { api } from "./api";
 import type { GetBarangPaginatedResponse, GetDetailBarangBSUResponse, MasterBarangResponse, ListDistribusiBarangResponse, GetDetailDistribusiBarangResponse } from "../types/barang.type";
 
 export const BarangService = {
-    /** GET /barang/get-master?q= — search master barang untuk autocomplete */
     getMasterBarang: async (q?: string): Promise<MasterBarangResponse> => {
         const res = await api.get<MasterBarangResponse>("/barang/get-master", { params: { q } });
         return res.data;
     },
 
-    /** GET /barang/get/:bank_id — katalog barang per bank (paginated) */
-    getBarangBank: async (bankId: string, page = 1): Promise<GetBarangPaginatedResponse> => {
+    getBarangBank: async (bankId: string, page?: number): Promise<GetBarangPaginatedResponse> => {
         const response = await api.get<GetBarangPaginatedResponse>(`/barang/get/${bankId}`, {
             params: { page },
         });
         return response.data;
     },
 
-    /** GET /barang/detail-bsu/:produk_id?bank_id=<BANK_ID> — riwayat distribusi */
     getDetailBarangBSU: async (produkId: string, bankId: string): Promise<GetDetailBarangBSUResponse> => {
         const response = await api.get<GetDetailBarangBSUResponse>(`/barang/detail-bsu/${produkId}`, {
             params: { bank_id: bankId },
@@ -24,7 +21,6 @@ export const BarangService = {
         return response.data;
     },
 
-    /** GET /barang/list-distribusi/:bank_id — list distribusi barang per bank (BSI/BSU) */
     listDistribusiBarang: async (bankId: string, startDate?: string, endDate?: string): Promise<ListDistribusiBarangResponse> => {
         const response = await api.get<ListDistribusiBarangResponse>(`/barang/list-distribusi/${bankId}`, {
             params: { start_date: startDate, end_date: endDate },
@@ -32,13 +28,11 @@ export const BarangService = {
         return response.data;
     },
 
-    /** GET /barang/detail-distribusi/:disba_id — detail satu distribusi barang */
     getDetailDistribusiBarang: async (disbaId: string): Promise<GetDetailDistribusiBarangResponse> => {
         const response = await api.get<GetDetailDistribusiBarangResponse>(`/barang/detail-distribusi/${disbaId}`);
         return response.data;
     },
 
-    /** POST /barang/add/:bank_id */
     addBarang: async (bankId: string, data: {
         nama_barang: string;
         barang_id?: number;
@@ -60,7 +54,6 @@ export const BarangService = {
         return response.data;
     },
 
-    /** PATCH /barang/edit/:produk_id */
     editBarang: async (produkId: string, data: {
         nama_barang?: string;
         nilai_poin?: number;
@@ -82,7 +75,6 @@ export const BarangService = {
         return response.data;
     },
 
-    /** DELETE /barang/delete/:produk_id */
     deleteBarang: async (produkId: string) => {
         const response = await api.delete(`/barang/delete/${produkId}`);
         return response.data;

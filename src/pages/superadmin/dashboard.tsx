@@ -3,10 +3,10 @@ import { StatistikService } from "../../services/statistik.service";
 import type { GetSuperadminRingkasanResponse, TrenPenjualanBulan, RankingBankItem, VolumeSampahItem } from "../../types/statistik.type";
 import FilterPill from "../../components/filter-pill";
 import Dropdown from "../../components/dropdown";
+import { formatCompact, formatDecimal, formatNominal, formatQty } from "../../utils/number.utils";
 import "../../styles/layout.css";
 import "../../styles/setoran-dashboard.css";
 
-// ─── Warna ──────────────────────────────────────────────
 const BANK_COLORS = {
     bsi: "#013236",
     bsu: "#4EA771",
@@ -19,7 +19,6 @@ const NASABAH_COLORS = {
     nonaktif: "#013236",
 };
 
-// ─── Donut Chart (bank by type) ──────────────────────────
 interface Slice { label: string; value: number; color: string }
 
 function DonutChart({ slices, size = 180 }: { slices: Slice[]; size?: number }) {
@@ -59,7 +58,6 @@ function DonutChart({ slices, size = 180 }: { slices: Slice[]; size?: number }) 
     );
 }
 
-// ─── Pie Chart (nasabah by status) ──────────────────────
 function PieChart({ slices, size = 180 }: { slices: Slice[]; size?: number }) {
     const nonZero = slices.filter(s => s.value > 0);
     const total = nonZero.reduce((s, i) => s + i.value, 0);
@@ -72,7 +70,6 @@ function PieChart({ slices, size = 180 }: { slices: Slice[]; size?: number }) {
         </svg>
     );
 
-    // Satu slice 100% → arc start=end, tidak bisa dirender → pakai circle biasa
     if (nonZero.length === 1) return (
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             <circle cx={cx} cy={cy} r={r} fill={nonZero[0].color} />
@@ -100,7 +97,6 @@ function PieChart({ slices, size = 180 }: { slices: Slice[]; size?: number }) {
     );
 }
 
-// ─── Legend Item ─────────────────────────────────────────
 function LegendItem({ color, label, value, pct }: {
     color: string; label: string; value: number; pct?: number
 }) {
@@ -113,29 +109,19 @@ function LegendItem({ color, label, value, pct }: {
                 {label}
             </span>
             <span style={{ fontSize: "13px", fontWeight: 700, color: "#0f1f15" }}>
-                {value.toLocaleString("id-ID")}
+                {formatDecimal(value)}
             </span>
             {pct !== undefined && (
                 <span style={{ fontSize: "11px", color: "#7a9e8a", minWidth: "40px", textAlign: "right" }}>
-                    {pct.toFixed(1)}%
+                    {formatDecimal(pct, 1)}%
                 </span>
             )}
         </div>
     );
 }
 
-// ─── Helpers ─────────────────────────────────────────────
 const MONTH_ABBR = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
 
-function fmtCompact(n: number | undefined | null): string {
-    const v = n ?? 0;
-    if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}M`;
-    if (v >= 1_000_000)     return `${(v / 1_000_000).toFixed(1)}jt`;
-    if (v >= 1_000)         return `${(v / 1_000).toFixed(0)}rb`;
-    return v.toLocaleString("id-ID");
-}
-
-// ─── Bar Chart ───────────────────────────────────────────
 function BarChart({ values, color, formatLabel }: {
     values: number[];
     color: string;
@@ -151,7 +137,6 @@ function BarChart({ values, color, formatLabel }: {
 
     return (
         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-            {/* Gridlines */}
             {[0, 0.25, 0.5, 0.75, 1].map((t) => {
                 const y = padTop + chartH * (1 - t);
                 return (
@@ -186,7 +171,6 @@ function BarChart({ values, color, formatLabel }: {
     );
 }
 
-// ─── Line Chart (stock-style) ────────────────────────────
 function LineChart({ values, color, formatLabel }: {
     values: number[];
     color: string;
@@ -264,7 +248,6 @@ function LineChart({ values, color, formatLabel }: {
     );
 }
 
-// ─── Card Wrapper ────────────────────────────────────────
 function InsightCard({ children, title, subtitle }: {
     children: React.ReactNode; title: string; subtitle: string
 }) {
@@ -288,7 +271,6 @@ function InsightCard({ children, title, subtitle }: {
     );
 }
 
-// ─── Page ────────────────────────────────────────────────
 export default function DashboardSuperadminPage() {
     const [data, setData] = useState<GetSuperadminRingkasanResponse | null>(null);
 
@@ -357,16 +339,13 @@ export default function DashboardSuperadminPage() {
                 <p>Ringkasan dan statistik seluruh bank sampah terdaftar</p>
             </div>
 
-            {/* ── 1 Row, 2 Kolom ── */}
             <div className="insight-row">
 
-                {/* ── Kolom Kiri: Bank Sampah (Donut) ── */}
                 <InsightCard
                     title="Sebaran Bank Sampah"
                     subtitle="Komposisi BSI, BSU, dan BSM berdasarkan total terdaftar"
                 >
                     <div className="insight-card-inner">
-                        {/* Chart */}
                         <div style={{ position: "relative", flexShrink: 0 }}>
                             <DonutChart slices={bankSlices} size={160} />
                             <div style={{
@@ -384,9 +363,7 @@ export default function DashboardSuperadminPage() {
                             </div>
                         </div>
 
-                        {/* Legend */}
                         <div style={{ flex: 1 }}>
-                            {/* Header kolom */}
                             <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto",
                                 gap: "8px", alignItems: "center",
                                 paddingBottom: "6px", marginBottom: "4px",
@@ -397,7 +374,6 @@ export default function DashboardSuperadminPage() {
                                 <span style={{ fontSize: "10.5px", color: "#a0b5a8", fontWeight: 600, textAlign: "right",  minWidth: "44px" }}>Total</span>
                             </div>
 
-                            {/* Baris data */}
                             {bank && ([
                                 { key: "bsi", label: "BSI", stats: bank.bsi, color: BANK_COLORS.bsi },
                                 { key: "bsu", label: "BSU", stats: bank.bsu, color: BANK_COLORS.bsu },
@@ -440,18 +416,15 @@ export default function DashboardSuperadminPage() {
                     </div>
                 </InsightCard>
 
-                {/* ── Kolom Kanan: Nasabah (Pie) ── */}
                 <InsightCard
                     title="Status Nasabah"
                     subtitle="Distribusi nasabah berdasarkan status pendaftaran"
                 >
                     <div className="insight-card-inner">
-                        {/* Chart */}
                         <div style={{ flexShrink: 0 }}>
                             <PieChart slices={nasabahSlices} size={160} />
                         </div>
 
-                        {/* Legend */}
                         <div style={{ flex: 1 }}>
                             {nasabah && [
                                 { label: "Aktif",    value: nasabah.aktif,    color: NASABAH_COLORS.aktif    },
@@ -471,7 +444,7 @@ export default function DashboardSuperadminPage() {
                                 display: "flex", justifyContent: "space-between", fontSize: "11.5px", color: "#7a9e8a" }}>
                                 <span>Total nasabah</span>
                                 <span style={{ fontWeight: 700, color: "#0f1f15" }}>
-                                    {nasabah?.total.toLocaleString("id-ID") ?? 0}
+                                    {formatDecimal(nasabah?.total)}
                                 </span>
                             </div>
                         </div>
@@ -480,7 +453,6 @@ export default function DashboardSuperadminPage() {
 
             </div>
 
-            {/* ── Volume Sampah ── */}
             <div style={{
                 background: "#fff",
                 borderRadius: "16px",
@@ -547,10 +519,10 @@ export default function DashboardSuperadminPage() {
                                         Total {volumeYear}
                                     </span>
                                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
-                                        {fmtCompact(total)}
+                                        {formatCompact(total)}
                                     </span>
                                     <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
-                                        {total % 1 !== 0 ? total.toFixed(2) : total.toLocaleString("id-ID")} {volumeSatuan}
+                                        {formatQty(total, volumeSatuan)}
                                     </span>
                                 </div>
                                 <div style={{
@@ -567,7 +539,7 @@ export default function DashboardSuperadminPage() {
                                         Rata-rata / Bulan
                                     </span>
                                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
-                                        {fmtCompact(avg)}
+                                        {formatCompact(avg)}
                                     </span>
                                     <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
                                         dari {activeMths} bulan aktif
@@ -577,14 +549,13 @@ export default function DashboardSuperadminPage() {
                             <BarChart
                                 values={filled}
                                 color={color}
-                                formatLabel={(n) => fmtCompact(n)}
+                                formatLabel={(n) => formatCompact(n)}
                             />
                         </>
                     );
                 })()}
             </div>
 
-            {/* ── Tren Penjualan ── */}
             <div style={{
                 background: "#fff",
                 borderRadius: "16px",
@@ -594,7 +565,6 @@ export default function DashboardSuperadminPage() {
                 flexDirection: "column",
                 gap: "16px",
             }}>
-                {/* Header */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <div style={{ flex: 1 }}>
                         <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f1f15" }}>
@@ -623,7 +593,6 @@ export default function DashboardSuperadminPage() {
                     </div>
                 </div>
 
-                {/* Chart */}
                 {(() => {
                     const filled: number[] = Array.from({ length: 12 }, (_, i) =>
                         trenData.find(d => d.bulan === i + 1)?.[trenMetric] ?? 0
@@ -631,14 +600,11 @@ export default function DashboardSuperadminPage() {
                     const isUang = trenMetric === "uang";
                     const color = isUang ? "#94DF0C" : "#06C0C9";
                     const total = filled.reduce((a, b) => a + b, 0);
-                    const totalLabel = isUang
-                        ? `Rp ${total.toLocaleString("id-ID")}`
-                        : `${total.toLocaleString("id-ID")} poin`;
+                    const totalLabel = formatNominal(total, isUang ? "Rp" : "poin");
 
                     return (
                         <>
                             <div style={{ display: "flex", gap: "12px" }}>
-                                {/* Total */}
                                 <div style={{
                                     background: "rgba(78,167,113,0.08)",
                                     border: "1.5px solid rgba(78,167,113,0.25)",
@@ -653,14 +619,13 @@ export default function DashboardSuperadminPage() {
                                         Total {trenYear}
                                     </span>
                                     <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
-                                        {isUang ? `Rp ${fmtCompact(total)}` : total.toLocaleString("id-ID")}
+                                        {isUang ? formatCompact(total, "Rp") : formatDecimal(total)}
                                     </span>
                                     <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
                                         {totalLabel}
                                     </span>
                                 </div>
 
-                                {/* Rata-rata bulan aktif */}
                                 {(() => {
                                     const activeMths = filled.filter(v => v > 0).length;
                                     const avg = activeMths > 0 ? Math.round(total / activeMths) : 0;
@@ -679,7 +644,7 @@ export default function DashboardSuperadminPage() {
                                                 Rata-rata / Bulan
                                             </span>
                                             <span style={{ fontSize: "16px", fontWeight: 600, color: "#013236", lineHeight: 1.3 }}>
-                                                {isUang ? `Rp ${fmtCompact(avg)}` : avg.toLocaleString("id-ID")}
+                                                {isUang ? formatCompact(avg, "Rp") : formatDecimal(avg)}
                                             </span>
                                             <span style={{ fontSize: "10.5px", color: "#a0b5a8" }}>
                                                 dari {activeMths} bulan aktif
@@ -691,14 +656,13 @@ export default function DashboardSuperadminPage() {
                             <LineChart
                                 values={filled}
                                 color={color}
-                                formatLabel={isUang ? fmtCompact : (n) => n.toLocaleString("id-ID")}
+                                formatLabel={isUang ? (n) => formatCompact(n) : (n) => formatDecimal(n)}
                             />
                         </>
                     );
                 })()}
             </div>
 
-            {/* ── Ranking Bank ── */}
             <div style={{
                 background: "#fff",
                 borderRadius: "16px",
@@ -708,7 +672,6 @@ export default function DashboardSuperadminPage() {
                 flexDirection: "column",
                 gap: "16px",
             }}>
-                {/* Header */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <div style={{ flex: 1 }}>
                         <p style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: "#0f1f15" }}>
@@ -748,7 +711,6 @@ export default function DashboardSuperadminPage() {
                     </div>
                 </div>
 
-                {/* List */}
                 {rankingData.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "32px 0", fontSize: "13px", color: "#a0b5a8" }}>
                         Belum ada data ranking.
@@ -763,9 +725,9 @@ export default function DashboardSuperadminPage() {
 
                     const formatVal = (item: RankingBankItem) => {
                         if (rankingMetric === "TotalUang")
-                            return `Rp ${fmtCompact(item.TotalUang ?? 0)}`;
+                            return formatCompact(item.TotalUang, "Rp");
                         if (rankingMetric === "TotalBarang")
-                            return `${(item.TotalBarang ?? 0).toLocaleString("id-ID")} poin`;
+                            return formatNominal(item.TotalBarang, "poin");
                         return `${item.JumlahPenjualan ?? 0} transaksi`;
                     };
 

@@ -9,7 +9,6 @@ export default function SkeletonTable({ rows = 6, columns = 5 }: SkeletonTablePr
     return (
         <div className="skeleton-table-wrapper">
             <div className="skeleton-table">
-                {/* Header */}
                 <div className="skeleton-row skeleton-header">
                     {Array.from({ length: columns }).map((_, i) => (
                         <div key={`h-${i}`} className="skeleton-cell">
@@ -18,7 +17,6 @@ export default function SkeletonTable({ rows = 6, columns = 5 }: SkeletonTablePr
                     ))}
                 </div>
 
-                {/* Body rows */}
                 {Array.from({ length: rows }).map((_, ri) => (
                     <div key={`r-${ri}`} className="skeleton-row">
                         {Array.from({ length: columns }).map((_, ci) => (

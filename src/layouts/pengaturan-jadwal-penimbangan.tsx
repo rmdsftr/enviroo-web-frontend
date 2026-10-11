@@ -1,32 +1,11 @@
 import { useState, useMemo } from "react";
 import { FaGear, FaPen, FaTrash, FaCalendarXmark } from "react-icons/fa6";
 import FilterPill from "../components/filter-pill";
-import type { JadwalMasterPenimbangan, JadwalMasterRutinItem, JadwalMasterKhususItem } from "../services/jadwal.service";
+import type { JadwalMasterPenimbangan, JadwalMasterRutinItem, JadwalMasterKhususItem, JadwalEditSeed } from "../types/jadwal.type";
+import { HARI_DISPLAY, HARI_ORDER } from "../constants/jadwal.constants";
 import { formatTime } from "./jadwal-penimbangan-calendar";
 import { formatTanggal } from "../utils/date.utils";
 import "../styles/jadwal-bsu.css";
-
-/* ── Seed dikirim ke modal edit di halaman — cukup field yang dibutuhkan form ── */
-export interface JadwalEditSeed {
-    jadwal_id: string;
-    is_rutin: boolean;
-    hari: string;
-    minggu_ke: number;
-    tanggal: string;
-    nama_jadwal_spesial: string;
-    jam_mulai: string;
-    jam_selesai: string;
-    is_active: boolean;
-}
-
-const HARI_DISPLAY: Record<string, string> = {
-    senin: "Senin", selasa: "Selasa", rabu: "Rabu",
-    kamis: "Kamis", jumat: "Jumat", sabtu: "Sabtu", minggu: "Minggu",
-};
-
-const HARI_ORDER: Record<string, number> = {
-    senin: 1, selasa: 2, rabu: 3, kamis: 4, jumat: 5, sabtu: 6, minggu: 7,
-};
 
 function weekLabel(mingguKe: number): string {
     return mingguKe === 0 ? "Setiap Minggu" : `Minggu ke-${mingguKe}`;
@@ -57,7 +36,6 @@ function khususToSeed(item: JadwalMasterKhususItem): JadwalEditSeed {
     };
 }
 
-/* ── Props ── */
 interface Props {
     data: JadwalMasterPenimbangan;
     loading?: boolean;
@@ -65,11 +43,9 @@ interface Props {
     onDelete: (jadwalId: string) => void;
 }
 
-/* ── Component ── */
 export default function PengaturanJadwalPenimbangan({ data, loading, onEdit, onDelete }: Props) {
     const [filter, setFilter] = useState<"rutin" | "khusus">("rutin");
 
-    /* Dikelompokkan per Minggu ke-N (0 = "Setiap Minggu", ditaruh paling atas), tiap grup diurutkan hari lalu jam */
     const rutinGrouped = useMemo(() => {
         const groups = new Map<number, JadwalMasterRutinItem[]>();
         for (const item of data.rutin) {

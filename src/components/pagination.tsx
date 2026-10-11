@@ -5,9 +5,7 @@ type PaginationProps = {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
-    /** Max page buttons shown before using ellipsis. Default: 5 */
     siblingCount?: number;
-    /** "compact" = smaller size, neutral gray palette */
     variant?: "default" | "compact";
 };
 
@@ -20,7 +18,6 @@ export default function Pagination({
 }: PaginationProps) {
     if (totalPages <= 1) return null;
 
-    // Build page number array with ellipsis
     const buildPages = (): (number | "...")[] => {
         const pages: (number | "...")[] = [];
         const left = Math.max(2, currentPage - siblingCount);
@@ -39,7 +36,6 @@ export default function Pagination({
 
     return (
         <div className={rootCls}>
-            {/* Prev */}
             <button
                 className="pagination__btn pagination__arrow"
                 onClick={() => onPageChange(currentPage - 1)}
@@ -49,7 +45,6 @@ export default function Pagination({
                 <FaChevronLeft />
             </button>
 
-            {/* Page numbers */}
             {buildPages().map((p, idx) =>
                 p === "..." ? (
                     <span key={`ellipsis-${idx}`} className="pagination__ellipsis">
@@ -67,7 +62,6 @@ export default function Pagination({
                 )
             )}
 
-            {/* Next */}
             <button
                 className="pagination__btn pagination__arrow"
                 onClick={() => onPageChange(currentPage + 1)}

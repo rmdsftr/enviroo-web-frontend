@@ -16,19 +16,13 @@ import type { DistribusiSisaDetail, PenerimaSisa } from "../types/distribusi_sis
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatNominal } from "../utils/number.utils";
 
-/* ── Helpers ── */
-function fmtAmount(amount: number, satuan: string): string {
-    const num = amount.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
-/* ── Bank Card ── */
 function BankCard({ bank, satuan }: { bank: PenerimaSisa; satuan: string }) {
-    const fmt = (n: number) => fmtAmount(n, satuan);
+    const fmt = (n: number) => formatNominal(n, satuan);
     return (
         <div className="dpj-item-row" style={{ flexDirection: "column", alignItems: "stretch", gap: "10px" }}>
-            {/* Bank header */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <div className="dpj-item-icon">
                     <FaBuilding />
@@ -39,7 +33,6 @@ function BankCard({ bank, satuan }: { bank: PenerimaSisa; satuan: string }) {
                 </div>
             </div>
 
-            {/* Breakdown */}
             <div style={{ paddingLeft: "50px", display: "flex", flexDirection: "column", gap: "5px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <span className="dpj-item-detail">Porsi</span>
@@ -84,7 +77,6 @@ function BankCard({ bank, satuan }: { bank: PenerimaSisa; satuan: string }) {
     );
 }
 
-/* ── Component ── */
 export default function DistribusiSisaBagiHasilPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -121,14 +113,13 @@ export default function DistribusiSisaBagiHasilPage() {
             { label: "Distribusi Sisa" },
           ];
 
-    const fmt = (n: number) => detail ? fmtAmount(n, detail.satuan) : "";
+    const fmt = (n: number) => detail ? formatNominal(n, detail.satuan) : "";
 
     return (
         <>
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Distribusi Sisa Bagi Hasil</h1>
@@ -147,7 +138,6 @@ export default function DistribusiSisaBagiHasilPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
                             <div className="dp-overview-header">
                                 <div>
@@ -193,7 +183,6 @@ export default function DistribusiSisaBagiHasilPage() {
                             </div>
                         </div>
 
-                        {/* ── RIGHT: Penerima ── */}
                         <div className="dp-setoran-col">
 
                             <div className="dp-setoran-header">
@@ -207,10 +196,8 @@ export default function DistribusiSisaBagiHasilPage() {
                             </div>
 
                             <div className="dpj-items-list">
-                                {/* BSI */}
                                 <BankCard bank={detail.penerima_bsi} satuan={detail.satuan} />
 
-                                {/* BSU */}
                                 {detail.penerima_bsu.map((bsu) => (
                                     <BankCard key={bsu.penerima_sisa_id} bank={bsu} satuan={detail.satuan} />
                                 ))}

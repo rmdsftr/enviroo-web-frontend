@@ -1,19 +1,13 @@
-/* ══════════════════════════════════════════
-   Konfigurasi Distribusi Sisa Bagi Hasil
-   ══════════════════════════════════════════ */
-
 .kbh-section {
     padding: 0 24px 28px;
 }
 
-/* ── Section Divider ── */
 .kbh-section-divider {
     height: 1px;
     background: var(--c-border-soft, #eef4f1);
     margin: 0 0 4px;
 }
 
-/* ── Header ── */
 .kbh-header {
     display: flex;
     align-items: flex-start;
@@ -50,7 +44,6 @@
     max-width: 560px;
 }
 
-/* ── Error Banner ── */
 .kbh-error-banner {
     padding: 12px 16px;
     background: rgba(224, 82, 82, 0.08);
@@ -63,7 +56,6 @@
     margin-bottom: 16px;
 }
 
-/* ── Skeleton ── */
 .kbh-skeleton {
     background: var(--c-surface, #ffffff);
     border: 1.5px solid var(--c-border-soft, #e7edea);
@@ -91,7 +83,6 @@
     100% { transform: translateX(100%); }
 }
 
-/* ── Empty State ── */
 .kbh-empty {
     background: var(--c-surface, #ffffff);
     border: 1.5px dashed var(--c-border, #d6ded9);
@@ -133,7 +124,6 @@
     line-height: 1.6;
 }
 
-/* ── Config Card ── */
 .kbh-card {
     background: var(--c-surface, #ffffff);
     border: 1.5px solid var(--c-border-soft, #e7edea);
@@ -147,7 +137,6 @@
     overflow: hidden;
 }
 
-/* ── Card Top ── */
 .kbh-card-top {
     display: flex;
     align-items: flex-start;
@@ -188,7 +177,6 @@
     margin: 0;
 }
 
-/* ── Stacked Distribution Bar ── */
 .kbh-bar-wrap {
     display: flex;
     flex-direction: column;
@@ -258,7 +246,6 @@
 .kbh-bar-legend-dot--bsi    { background: var(--c-secondary, #013236); }
 .kbh-bar-legend-dot--transport { background: var(--c-accent, #94DF0C); }
 
-/* ── Stat Grid ── */
 .kbh-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -323,9 +310,6 @@
     line-height: 1.4;
 }
 
-/* ══════════════════════════════════════════
-   Form Modal
-   ══════════════════════════════════════════ */
 .kbh-modal-overlay {
     position: fixed;
     inset: 0;
@@ -471,7 +455,6 @@
     flex-shrink: 0;
 }
 
-/* ── Total Indicator ── */
 .kbh-total-row {
     display: flex;
     align-items: center;
@@ -513,7 +496,6 @@
     margin-left: 6px;
 }
 
-/* ── Modal Actions ── */
 .kbh-modal-actions {
     display: flex;
     gap: 10px;
@@ -521,7 +503,6 @@
     padding-top: 4px;
 }
 
-/* ── Animations ── */
 @keyframes kbhFadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -532,9 +513,6 @@
     100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ══════════════════════════════════════════
-   Responsive
-   ══════════════════════════════════════════ */
 @media (max-width: 900px) {
     .kbh-section {
         padding: 0 16px 24px;

@@ -3,10 +3,9 @@ import {
     FaChevronLeft, FaChevronRight, FaCalendarDay,
     FaTruckFast, FaPen, FaTrash,
 } from "react-icons/fa6";
-import type { JadwalItem } from "../services/jadwal.service";
+import type { JadwalItem } from "../types/jadwal.type";
 import "../styles/jadwal-bsu.css";
 
-/* ── Constants ── */
 const HARI_MAP: Record<string, string> = {
     Sunday: "minggu", Monday: "senin", Tuesday: "selasa",
     Wednesday: "rabu", Thursday: "kamis", Friday: "jumat", Saturday: "sabtu",
@@ -17,7 +16,6 @@ const HARI_DISPLAY: Record<string, string> = {
 };
 const CAL_HEADERS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 
-/* ── Helpers ── */
 function getMondayFirstCol(date: Date): number {
     const d = date.getDay();
     return d === 0 ? 6 : d - 1;
@@ -67,18 +65,15 @@ function getItemsForDate(date: Date, list: JadwalItem[]): JadwalItem[] {
         .sort((a, b) => formatTime(a.jam_mulai).localeCompare(formatTime(b.jam_mulai)));
 }
 
-/* ── Props ── */
 interface Props {
     jadwalList: JadwalItem[];
     loading?: boolean;
     onEdit?: (item: JadwalItem) => void;
     onDelete?: (jadwalId: string) => void;
-    /** Provide to show a bank label (e.g. target BSU name) on each chip/item */
     getBankLabel?: (item: JadwalItem) => string | undefined;
     onMonthChange?: (month: number, year: number) => void;
 }
 
-/* ── Component ── */
 export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit, onDelete, getBankLabel, onMonthChange }: Props) {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate]  = useState(new Date());
@@ -114,7 +109,6 @@ export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit
     return (
         <div className="jadwal-cal-card">
 
-            {/* ── Header ── */}
             <div className="jadwal-cal-header">
                 <div className="jadwal-cal-header-left">
                     <div className="jbsu-card-title-icon" style={{ background: "#0284c7", borderRadius: 10, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 15, flexShrink: 0 }}>
@@ -132,12 +126,10 @@ export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit
                 </div>
             </div>
 
-            {/* ── Day-of-week headers ── */}
             <div className="jadwal-cal-grid-header">
                 {CAL_HEADERS.map(d => <div key={d} className="jadwal-cal-dh">{d}</div>)}
             </div>
 
-            {/* ── Calendar body ── */}
             {loading ? (
                 <div className="jbsu-empty" style={{ padding: "48px 0" }}>
                     <span>Memuat jadwal...</span>
@@ -185,7 +177,6 @@ export default function JadwalPengangkutanCalendar({ jadwalList, loading, onEdit
                 </div>
             )}
 
-            {/* ── Selected-date detail strip ── */}
             <div className="jadwal-cal-detail-panel">
                 <div className="jadwal-cal-detail-header">
                     <FaCalendarDay className="jadwal-cal-detail-icon" />

@@ -3,6 +3,7 @@ import { FaRecycle, FaChevronDown } from "react-icons/fa6";
 import FilterPill, { type FilterOption } from "./filter-pill";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import { StatistikService, type StatistikSetoranItem } from "../services/statistik.service";
+import { formatDecimal } from "../utils/number.utils";
 import "../styles/setoran-dashboard.css";
 
 
@@ -23,9 +24,9 @@ const GROUP_OPTIONS: FilterOption[] = [
 ];
 
 const PALETTE = [
-    { fill: "#94DF0C", soft: "rgba(148,223,12,0.12)" },    // prioritas 1 — lime
-    { fill: "#013236", soft: "rgba(1,50,54,0.12)" },        // prioritas 2 — teal gelap
-    { fill: "#4EA771", soft: "rgba(78,167,113,0.12)" },     // midpoint — hijau natural
+    { fill: "#94DF0C", soft: "rgba(148,223,12,0.12)" },
+    { fill: "#013236", soft: "rgba(1,50,54,0.12)" },
+    { fill: "#4EA771", soft: "rgba(78,167,113,0.12)" },
     { fill: "#1B6E5A", soft: "rgba(27,110,90,0.12)" },
     { fill: "#025C5B", soft: "rgba(2,92,91,0.12)" },
     { fill: "#7DC468", soft: "rgba(125,196,104,0.12)" },
@@ -37,18 +38,12 @@ function colorAt(idx: number) {
     return PALETTE[idx % PALETTE.length];
 }
 
-// rank 0 (terbesar) = #013236, rank terakhir (terkecil) = #94DF0C
-// Berbasis rank bukan nilai → rentang warna selalu penuh meski itemnya dikit
 function colorForRank(rank: number, total: number): string {
     const t = total > 1 ? 1 - rank / (total - 1) : 1;
     const r = Math.round(148 + t * (1   - 148));
     const g = Math.round(223 + t * (50  - 223));
     const b = Math.round(12  + t * (54  - 12));
     return `rgb(${r},${g},${b})`;
-}
-
-function formatQty(n: number) {
-    return n.toLocaleString("id-ID", { maximumFractionDigits: 2 });
 }
 
 interface DonutSlice {
@@ -106,13 +101,13 @@ function PieCard({ title, satuan, slices }: { title: string; satuan: string; sli
         <div className="ssd-chart-card">
             <div className="ssd-chart-card-header">
                 <span className="ssd-chart-card-title">{title}</span>
-                <span className="ssd-chart-total-badge">{formatQty(total)} {satuan}</span>
+                <span className="ssd-chart-total-badge">{formatDecimal(total)} {satuan}</span>
             </div>
             <div className="ssd-pie-body">
                 <div className="ssd-pie-chart">
                     <DonutChart slices={slices} size={160} />
                     <div className="ssd-pie-center">
-                        <span className="ssd-pie-center-value">{formatQty(total)}</span>
+                        <span className="ssd-pie-center-value">{formatDecimal(total)}</span>
                         <span className="ssd-pie-center-label">{satuan}</span>
                     </div>
                 </div>
@@ -124,7 +119,7 @@ function PieCard({ title, satuan, slices }: { title: string; satuan: string; sli
                                 <span className="ssd-pie-legend-dot" style={{ background: s.color }} />
                                 <span className="ssd-pie-legend-label" title={s.label}>{s.label}</span>
                                 <span className="ssd-pie-legend-value">
-                                    {formatQty(s.value)} {satuan}
+                                    {formatDecimal(s.value)} {satuan}
                                     <small>{pct.toFixed(0)}%</small>
                                 </span>
                             </div>
@@ -157,7 +152,7 @@ function ChartCard({
                 <span className="ssd-chart-card-title">{title || "—"}</span>
                 {isSingleUnit && (
                     <span className="ssd-chart-total-badge">
-                        {formatQty(total)}{" "}{[...satuans][0]}
+                        {formatDecimal(total)}{" "}{[...satuans][0]}
                     </span>
                 )}
             </div>
@@ -181,7 +176,7 @@ function ChartCard({
                                     />
                                 </div>
                                 <span className="ssd-bar-value">
-                                    {formatQty(item.total_qty)}{" "}{item.satuan}
+                                    {formatDecimal(item.total_qty)}{" "}{item.satuan}
                                 </span>
                             </div>
                         );
@@ -195,7 +190,7 @@ function ChartCard({
                         return (
                             <div key={item.sampah_id} className="ssd-vbar-col">
                                 <span className="ssd-vbar-value">
-                                    {formatQty(item.total_qty)}
+                                    {formatDecimal(item.total_qty)}
                                     <small>{item.satuan}</small>
                                 </span>
                                 <div className="ssd-vbar-track">
@@ -268,7 +263,6 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
         return map;
     }, [data, groupBy]);
 
-    // Untuk pie chart per kategori: group satuan → kategori → total
     const piesPerSatuan = useMemo(() => {
         if (groupBy !== "kategori") return null;
         const bySatuan = new Map<string, Map<string, number>>();
@@ -277,7 +271,6 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
             const m = bySatuan.get(item.satuan)!;
             m.set(item.kategori, (m.get(item.kategori) || 0) + item.total_qty);
         });
-        // Index warna stabil per kategori (urutan kemunculan)
         const kategoriColorIdx = new Map<string, number>();
         let cIdx = 0;
         data.forEach(item => {
@@ -363,7 +356,7 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
                                     <div key={satuan} className="ssd-satuan-block">
                                         <button className="ssd-satuan-row" onClick={() => toggleSatuan(satuan)}>
                                             <span className="ssd-satuan-label">{satuan}</span>
-                                            <span className="ssd-satuan-total">{formatQty(total)} {satuan}</span>
+                                            <span className="ssd-satuan-total">{formatDecimal(total)} {satuan}</span>
                                             <FaChevronDown className={`ssd-satuan-chevron${isOpen ? " ssd-satuan-chevron--open" : ""}`} />
                                         </button>
                                         {isOpen && (

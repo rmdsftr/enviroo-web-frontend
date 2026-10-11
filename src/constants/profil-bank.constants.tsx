@@ -6,8 +6,7 @@ import type { BagiHasilBsuItem } from "../types/distribusi_sisa.type";
 import { type PengangkutanItem } from "../services/pengangkutan.service";
 import { FaEye } from "react-icons/fa6";
 import { formatTanggal } from "../utils/date.utils";
-
-// ── Utilities ──
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 
 export function getRoleLabel(role: string) {
     if (role.startsWith("admin_")) return "Admin";
@@ -35,8 +34,6 @@ export function StatusBadge({ status }: { status: StatusNasabah }) {
     return <TableBadge label={statusLabel[status]} active={status === "aktif"} />;
 }
 
-// ── BSU Columns ──
-
 export function getBsuColumns(): ColumnDef<BSUByBankId>[] {
     return [
         {
@@ -62,14 +59,14 @@ export function getBsuColumns(): ColumnDef<BSUByBankId>[] {
             header: "Jumlah Nasabah",
             align: "center",
             width: "140px",
-            render: (row) => <span style={{ fontWeight: 600 }}>{row.jumlah_nasabah}</span>,
+            render: (row) => <span style={{ fontWeight: 600 }}>{formatDecimal(row.jumlah_nasabah)}</span>,
         },
         {
             key: "staff",
             header: "Jumlah Staff",
             align: "center",
             width: "120px",
-            render: (row) => <span style={{ fontWeight: 600 }}>{row.jumlah_staff}</span>,
+            render: (row) => <span style={{ fontWeight: 600 }}>{formatDecimal(row.jumlah_staff)}</span>,
         },
         {
             key: "status",
@@ -79,8 +76,6 @@ export function getBsuColumns(): ColumnDef<BSUByBankId>[] {
         },
     ];
 }
-
-// ── Admin Columns ──
 
 export function getAdminColumns(): ColumnDef<AdminBankSampah>[] {
     return [
@@ -136,8 +131,6 @@ export function getAdminColumns(): ColumnDef<AdminBankSampah>[] {
     ];
 }
 
-// ── Nasabah Columns ──
-
 export function getNasabahColumns(): ColumnDef<NasabahBankSampah>[] {
     return [
         {
@@ -177,8 +170,6 @@ export function getNasabahColumns(): ColumnDef<NasabahBankSampah>[] {
         },
     ];
 }
-
-// ── Pengangkutan ──
 
 export const STATUS_PENGANGKUTAN: Record<string, { label: string; cls: string }> = {
     requested: { label: "Diminta",          cls: "mendatang"   },
@@ -229,8 +220,6 @@ export const ANGKUT_COLS: ColumnDef<PengangkutanItem>[] = [
     },
 ];
 
-// ── Bagi Hasil BSU ──
-
 export const BAGI_HASIL_BSU_COLS: ColumnDef<BagiHasilBsuItem>[] = [
     {
         key: "penerima_sisa_id",
@@ -247,10 +236,7 @@ export const BAGI_HASIL_BSU_COLS: ColumnDef<BagiHasilBsuItem>[] = [
         key: "total_diterima",
         header: "Total Diterima",
         width: "160px",
-        render: (row) => {
-            const num = row.nominal_diterima.toLocaleString("id-ID");
-            return row.satuan_nominal === "Rp" ? `Rp ${num}` : `${num} poin`;
-        },
+        render: (row) => formatNominal(row.nominal_diterima, row.satuan_nominal),
     },
     {
         key: "aksi",

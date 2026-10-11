@@ -94,7 +94,6 @@ export default function NavbarLayout() {
 
     return (
         <header className="nav">
-            {/* Left: search */}
             <div className="nav-left">
                 <div className="nav-search-wrapper" ref={searchRef}>
                     <SearchBar
@@ -137,7 +136,6 @@ export default function NavbarLayout() {
                 </div>
             </div>
 
-            {/* Right: notif + profile */}
             <div className="nav-right">
                 {isAdmin && (
                     <button

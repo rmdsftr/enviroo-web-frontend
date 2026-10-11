@@ -11,6 +11,7 @@ import PopupConfirmation from "../../layouts/popup-confirmation";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import { MasterService } from "../../services/master.service";
 import type { MasterSampah, StatistikSampahItem, SampahFavoritItem, KategoriSampahGroup } from "../../types/katalog.type";
+import { formatCompact, formatNominal } from "../../utils/number.utils";
 import "../../styles/manajemen-reward.css";
 import "../../styles/table.css";
 
@@ -155,7 +156,6 @@ export default function SampahPage() {
     return (
         <section className="mr-section">
 
-            {/* ── Header ── */}
             <div className="mr-header">
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Data Sampah</h2>
@@ -165,7 +165,6 @@ export default function SampahPage() {
                 </div>
             </div>
 
-            {/* ── Search + Tambah ── */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <SearchBar
                     placeholder="Cari nama sampah..."
@@ -184,7 +183,6 @@ export default function SampahPage() {
                 </Button>
             </div>
 
-            {/* ── Table ── */}
             <div className="table-wrapper">
                 <table className="table">
                     <thead>
@@ -245,7 +243,6 @@ export default function SampahPage() {
                 </table>
             </div>
 
-            {/* ── Pagination ── */}
             {totalPages > 1 && (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
                     <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
@@ -255,10 +252,8 @@ export default function SampahPage() {
                 </div>
             )}
 
-            {/* ── Divider ── */}
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
-            {/* ── Sampah per Kategori ── */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Sampah per Kategori</h2>
@@ -336,10 +331,8 @@ export default function SampahPage() {
                 </div>
             )}
 
-            {/* ── Divider ── */}
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
-            {/* ── Statistik Harga Sampah ── */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Statistik Harga Sampah</h2>
@@ -361,9 +354,7 @@ export default function SampahPage() {
             ) : (() => {
                 const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
                 const isUang = statsFilter === "Uang";
-                const fmt = (n: number) => isUang
-                    ? `Rp ${new Intl.NumberFormat("id-ID").format(Math.round(n))}`
-                    : `${new Intl.NumberFormat("id-ID").format(Math.round(n))} poin`;
+                const fmt = (n: number) => formatNominal(n, isUang ? "Rp" : "poin");
                 const sorted = [...stats]
                     .filter(s => s.jenis_reward === statsFilter)
                     .sort((a, b) => b.rata_rata_harga - a.rata_rata_harga);
@@ -382,7 +373,6 @@ export default function SampahPage() {
                 return (
                     <div style={{ background: "#fff", borderRadius: "16px", border: "1px solid #e8f0eb", padding: "24px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
-                        {/* Reward filter */}
                         <div>
                             <FilterPill
                                 options={[
@@ -394,7 +384,6 @@ export default function SampahPage() {
                             />
                         </div>
 
-                        {/* Summary mini-cards */}
                         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                             {[
                                 { label: "Total Jenis", value: `${sorted.length} item`, sub: `${active.length} memiliki harga`, color: "rgba(78,167,113,0.08)", border: "rgba(78,167,113,0.25)" },
@@ -410,7 +399,6 @@ export default function SampahPage() {
                             ))}
                         </div>
 
-                        {/* Horizontal bar list */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                             <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 130px", gap: "12px", alignItems: "center", paddingBottom: "8px", borderBottom: "1px solid #e8f0eb" }}>
                                 <span style={{ fontSize: "10.5px", color: "#a0b5a8", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.4px" }}>Nama Sampah</span>
@@ -455,10 +443,8 @@ export default function SampahPage() {
                 );
             })()}
 
-            {/* ── Divider ── */}
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
-            {/* ── Sampah Favorit Nasabah ── */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Sampah Favorit Nasabah</h2>
@@ -485,11 +471,6 @@ export default function SampahPage() {
                 const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
                 const getValue = (d: SampahFavoritItem) => d[favoritMetric];
                 const maxVal = Math.max(...favorit.map(getValue), 1);
-                const fmtCompact = (n: number) => {
-                    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}jt`;
-                    if (n >= 1_000)     return `${(n / 1_000).toFixed(0)}rb`;
-                    return n % 1 !== 0 ? n.toFixed(1) : String(n);
-                };
                 const metricLabel = favoritMetric === "total_qty" ? "qty" : favoritMetric === "jumlah_nasabah" ? "nasabah" : "setoran";
 
                 const W = 600, H = 280;
@@ -514,13 +495,11 @@ export default function SampahPage() {
                             />
                         </div>
                         <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }}>
-                            {/* Gridlines */}
                             {[0, 0.25, 0.5, 0.75, 1].map(t => {
                                 const y = padTop + chartH * (1 - t);
                                 return <line key={t} x1={padL} x2={W - padR} y1={y} y2={y} stroke="#e8f0eb" strokeWidth={1} />;
                             })}
 
-                            {/* Bars */}
                             {favorit.map((item, i) => {
                                 const val = getValue(item);
                                 const barH = Math.max((val / maxVal) * chartH, val > 0 ? 3 : 0);
@@ -531,17 +510,14 @@ export default function SampahPage() {
 
                                 return (
                                     <g key={item.sarok_id}>
-                                        {/* Bar */}
                                         <rect x={x} y={y} width={barW} height={barH} fill={color} rx={5} />
 
-                                                        {/* Value label above bar */}
                                         {val > 0 && (
                                             <text x={x + barW / 2} y={y - 5} textAnchor="middle" fontSize={6} fill={color} fontWeight={700} fontFamily="Poppins, sans-serif">
-                                                {fmtCompact(val)}
+                                                {formatCompact(val)}
                                             </text>
                                         )}
 
-                                        {/* X label: rotated */}
                                         <text
                                             x={labelX}
                                             y={padTop + chartH + 10}
@@ -554,7 +530,6 @@ export default function SampahPage() {
                                             {item.nama_sampah.length > 14 ? item.nama_sampah.slice(0, 13) + "…" : item.nama_sampah}
                                         </text>
 
-                                        {/* Satuan badge */}
                                         <text
                                             x={labelX}
                                             y={padTop + chartH + 10}
@@ -572,7 +547,6 @@ export default function SampahPage() {
                             })}
                         </svg>
 
-                        {/* Legend satuan */}
                         <div style={{ display: "flex", gap: "16px", justifyContent: "center", marginTop: "8px" }}>
                             {[["kg", "#013236"], ["pcs", "#94DF0C"], ["liter", "#4EA771"]].map(([sat, color]) => (
                                 <div key={sat} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -588,7 +562,6 @@ export default function SampahPage() {
                 );
             })()}
 
-            {/* ── Modal ── */}
             <SampahMasterModal
                 isOpen={modalOpen}
                 onClose={() => { setModalOpen(false); setEditTarget(null); }}
@@ -596,7 +569,6 @@ export default function SampahPage() {
                 initialData={editTarget}
             />
 
-            {/* ── Confirm Delete ── */}
             <PopupConfirmation
                 isOpen={!!deleteTarget}
                 type="danger"

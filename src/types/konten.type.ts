@@ -2,9 +2,9 @@ export interface KontenItem {
     KontenID: string;
     Judul: string;
     Deskripsi: string;
-    Body: string;        // JSON string of BodyBlock[]
+    Body: string;
     Thumbnail: string;
-    IsUploaded: boolean; // true = published, false = draft
+    IsUploaded: boolean;
     BankID?: string;
     AdminID: string;
     nama_admin: string;

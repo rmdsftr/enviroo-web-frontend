@@ -79,14 +79,12 @@ export default function ProfilBankPage() {
 
     const [activeTab, setActiveTab] = useState(isBsiUrl ? "Bank Sampah Unit" : "Nasabah");
 
-    // ── Popup states ──
     const [isActivationConfirmOpen, setIsActivationConfirmOpen] = useState(false);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [isInputKeteranganOpen, setIsInputKeteranganOpen] = useState(false);
     const [isPhotoOpen, setIsPhotoOpen] = useState(false);
     const [notif, setNotif] = useState<{ message: string; type: "success" | "error" | "warning" | "info"; navigate?: boolean } | null>(null);
 
-    // ── Handlers ──
     const handleAktivasiBank = async (keterangan: string) => {
         if (!bankProfile || !id) return;
         try {
@@ -168,7 +166,6 @@ export default function ProfilBankPage() {
                 />
             )}
 
-            {/* ── Profile Card ── */}
             <div className="profil-bank-card">
                 <div className="profil-bank-left">
                     <div className="profil-bank-photo-wrapper">
@@ -237,7 +234,6 @@ export default function ProfilBankPage() {
                 </div>
             </div>
 
-            {/* ── Tabs ── */}
             <Tabs
                 tabs={tabList}
                 activeTab={activeTab}
@@ -246,7 +242,6 @@ export default function ProfilBankPage() {
                 style={{ marginBottom: "24px" }}
             />
 
-            {/* ── Tab Content ── */}
             <div className="profil-bank-tab-content">
                 {activeTab === "Bank Sampah Unit" && (
                     <div className="nasabah-tab-content">
@@ -333,7 +328,6 @@ export default function ProfilBankPage() {
                 )}
             </div>
 
-            {/* ── Popups ── */}
             <PopupConfirmation
                 isOpen={isActivationConfirmOpen}
                 type={bankProfile.is_active ? "danger" : "warning"}

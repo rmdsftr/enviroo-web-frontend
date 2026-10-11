@@ -129,10 +129,8 @@ export default function BankSuperadminPage() {
                 />
             )}
 
-            {/* ── Breadcrumb ── */}
             <BreadcrumbLayout items={[{ label: "Bank Sampah" }]} />
 
-            {/* ── Page Header ── */}
             <div className="nasabah-hero" style={{marginTop:"-15px"}}>
                 <div className="nasabah-hero-left">
                     <h1 className="nasabah-hero-title">Manajemen Bank Sampah</h1>
@@ -154,7 +152,6 @@ export default function BankSuperadminPage() {
                 </div>
             </div>
 
-            {/* ── Statistik cards (clickable) ── */}
             <BankSampahStatistikLayout
                 {...stats}
                 onClickBSI={() => navigate("/superadmin/bank-sampah/bsi")}
@@ -164,14 +161,12 @@ export default function BankSuperadminPage() {
 
             <div className="bs-divider" />
 
-            {/* ── Hierarchy explanation ── */}
             <div className="bs-hierarchy-section">
                 <h2 className="bs-section-title">Tentang Hierarki Bank Sampah</h2>
 
                 <div className="bs-hierarchy-card">
                     <div className="bs-hierarchy-columns">
 
-                        {/* Kolom kiri: Hierarki 3 Tingkat */}
                         <div className="bs-hierarchy-col bs-hierarchy-col--tiga">
                             <div className="bs-hierarchy-head">
                                 <div className="bs-hierarchy-badge bs-hierarchy-badge--tiga">⛓</div>
@@ -207,7 +202,6 @@ export default function BankSuperadminPage() {
 
                         <div className="bs-hierarchy-divider" />
 
-                        {/* Kolom kanan: Hierarki 2 Tingkat */}
                         <div className="bs-hierarchy-col bs-hierarchy-col--dua">
                             <div className="bs-hierarchy-head">
                                 <div className="bs-hierarchy-badge bs-hierarchy-badge--dua">⛓</div>
@@ -242,7 +236,6 @@ export default function BankSuperadminPage() {
 
             <div className="bs-divider" />
 
-            {/* ── Peta Persebaran (Leaflet) ── */}
             <div className="bs-map-section">
                 <div className="bs-map-header">
                     <div className="bs-map-header-left">
@@ -296,7 +289,6 @@ export default function BankSuperadminPage() {
 
             <div className="bs-divider" />
 
-            {/* ── Statistik per Kecamatan ── */}
             <div className="bs-kec-section">
                 <div className="bs-kec-header">
                     <div className="bs-kec-header-left">

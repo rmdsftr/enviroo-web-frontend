@@ -35,24 +35,18 @@ export const KatalogService = {
         return res.data;
     },
 
-    // ── Read ───────────────────────────────────────────────────────────────
-
-    getKatalogSampahBank: async (bankId: string, page = 1): Promise<GetKatalogPaginatedResponse> => {
+    getKatalogSampahBank: async (bankId: string, page?: number): Promise<GetKatalogPaginatedResponse> => {
         const res = await api.get<GetKatalogPaginatedResponse>(`/katalog/get-sampah/${bankId}`, {
             params: { page },
         });
         return res.data;
     },
 
-    /** GET /katalog/get-detail/:sampah_id — returns detail + harga_per_level + history */
     getDetailSampah: async (sampahId: string): Promise<GetKatalogDetailResponse> => {
         const res = await api.get<GetKatalogDetailResponse>(`/katalog/get-detail/${sampahId}`);
         return res.data;
     },
 
-    // ── Write ──────────────────────────────────────────────────────────────
-
-    /** POST /katalog/add-sampah/:bank_id — multipart/form-data */
     addKatalog: async (bankId: string, data: AddKatalogRequest) => {
         const fd = new FormData();
         fd.append("nama_sampah", data.nama_sampah);
@@ -68,10 +62,10 @@ export const KatalogService = {
         return res.data;
     },
 
-    /** PATCH /katalog/edit-sampah/:sampah_id — multipart/form-data */
     editKatalog: async (sampahId: string, data: EditKatalogRequest) => {
         const fd = new FormData();
         if (data.syarat_pemilahan) fd.append("syarat_pemilahan", data.syarat_pemilahan);
+        if (typeof data.kategori_id === "number") fd.append("kategori_id", String(data.kategori_id));
         if (data.foto) fd.append("foto", data.foto);
         const res = await api.patch(`/katalog/edit-sampah/${sampahId}`, fd, {
             headers: { "Content-Type": "multipart/form-data" },
@@ -79,19 +73,16 @@ export const KatalogService = {
         return res.data;
     },
 
-    /** DELETE /katalog/delete-sampah/:sampah_id */
     deleteKatalogSampah: async (sampahId: string) => {
         const res = await api.delete(`/katalog/delete-sampah/${sampahId}`);
         return res.data;
     },
 
-    /** GET /laporan/katalog-sampah/:bank_id — returns Excel blob */
     exportKatalogSampah: async (bankId: string): Promise<Blob> => {
         const res = await api.get(`/laporan/katalog-sampah/${bankId}`, { responseType: "blob" });
         return res.data;
     },
 
-    /** GET /laporan/katalog-barang/:bank_id — returns Excel blob */
     exportKatalogBarang: async (bankId: string): Promise<Blob> => {
         const res = await api.get(`/laporan/katalog-barang/${bankId}`, { responseType: "blob" });
         return res.data;

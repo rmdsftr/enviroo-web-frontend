@@ -8,16 +8,16 @@ import { defaultMonthRange } from "../components/filter-range";
 import type {
     KategoriSampah as KategoriSampahT,
     KatalogSampah,
-    KatalogSampahMeta,
 } from "../types/katalog.type";
 import type { Reward } from "../types/reward.type";
 import type {
     KatalogBarangItem,
     RiwayatDistribusi,
     DistribusiBarangItem,
-    BarangMeta,
 } from "../types/barang.type";
 import type { UnitBSI } from "../types/bsi.type";
+
+const ITEMS_PER_PAGE = 12;
 
 export function useKatalogData() {
     const { user } = useAuth();
@@ -31,9 +31,7 @@ export function useKatalogData() {
     const [katalogList, setKatalogList] = useState<KatalogSampah[]>([]);
     const [barangList, setBarangList] = useState<KatalogBarangItem[]>([]);
     const [sampahPage, setSampahPage] = useState(1);
-    const [sampahMeta, setSampahMeta] = useState<KatalogSampahMeta | null>(null);
     const [barangPage, setBarangPage] = useState(1);
-    const [barangMeta, setBarangMeta] = useState<BarangMeta | null>(null);
     const [barangFilterBank, setBarangFilterBank] = useState<string>(user?.bank_id ?? "");
     const [bsuList, setBsuList] = useState<UnitBSI[]>([]);
     const [bsuRiwayat, setBsuRiwayat] = useState<RiwayatDistribusi[] | null>(null);
@@ -45,27 +43,23 @@ export function useKatalogData() {
     const [filterKategori, setFilterKategori] = useState<number | "all">("all");
     const [filterSatuan, setFilterSatuan] = useState<"all" | "kg" | "pcs" | "liter">("all");
     const [filterReward, setFilterReward] = useState<number | "all">("all");
+    const [sampahSearch, setSampahSearch] = useState("");
+    const [barangSearch, setBarangSearch] = useState("");
 
     const isViewingBSU = isAdminBsi && !!barangFilterBank && barangFilterBank !== user?.bank_id;
     const canEditBarang = canEdit && !isViewingBSU;
 
-    const fetchKatalog = useCallback((page = 1) => {
+    const fetchKatalog = useCallback(() => {
         if (!user?.bank_id) return;
-        KatalogService.getKatalogSampahBank(user.bank_id, page)
-            .then(res => {
-                setKatalogList(Array.isArray(res.data) ? res.data : []);
-                setSampahMeta(res.pagination ?? null);
-            })
+        KatalogService.getKatalogSampahBank(user.bank_id)
+            .then(res => setKatalogList(Array.isArray(res.data) ? res.data : []))
             .catch(err => console.error("Failed to fetch katalog bank", err));
     }, [user?.bank_id]);
 
-    const fetchBarang = useCallback((bankId: string, page = 1) => {
+    const fetchBarang = useCallback((bankId: string) => {
         if (!bankId) return;
-        BarangService.getBarangBank(bankId, page)
-            .then(res => {
-                setBarangList(res.data || []);
-                setBarangMeta(res.pagination ?? null);
-            })
+        BarangService.getBarangBank(bankId)
+            .then(res => setBarangList(res.data || []))
             .catch(err => console.error("Failed to fetch barang bank", err));
     }, []);
 
@@ -110,14 +104,45 @@ export function useKatalogData() {
         fetchBsuList();
     }, [fetchKatalog, fetchBarang, fetchBsuList, user?.bank_id]);
 
-    useEffect(() => { setSampahPage(1); }, [filterKategori, filterSatuan, filterReward]);
+    useEffect(() => { setSampahPage(1); }, [filterKategori, filterSatuan, filterReward, sampahSearch]);
+    useEffect(() => { setBarangPage(1); }, [barangSearch, barangFilterBank]);
 
-    const filteredSampah = useMemo(() =>
-        katalogList.filter(i =>
+    const filteredSampah = useMemo(() => {
+        const q = sampahSearch.trim().toLowerCase();
+        return katalogList.filter(i =>
             (filterKategori === "all" || i.kategori_id === filterKategori) &&
             (filterSatuan === "all" || i.satuan.toLowerCase() === filterSatuan) &&
-            (filterReward === "all" || i.reward_id === filterReward)
-        ), [katalogList, filterKategori, filterSatuan, filterReward]);
+            (filterReward === "all" || i.reward_id === filterReward) &&
+            (!q || i.sampah_id.toLowerCase().includes(q) || i.nama_sampah.toLowerCase().includes(q))
+        );
+    }, [katalogList, filterKategori, filterSatuan, filterReward, sampahSearch]);
+
+    const filteredBarang = useMemo(() => {
+        const q = barangSearch.trim().toLowerCase();
+        if (!q) return barangList;
+        return barangList.filter(i =>
+            i.produk_id.toLowerCase().includes(q) || i.nama_barang.toLowerCase().includes(q)
+        );
+    }, [barangList, barangSearch]);
+
+    const sampahTotalPages = Math.max(1, Math.ceil(filteredSampah.length / ITEMS_PER_PAGE));
+    const barangTotalPages = Math.max(1, Math.ceil(filteredBarang.length / ITEMS_PER_PAGE));
+
+    const pagedSampah = useMemo(
+        () => filteredSampah.slice((sampahPage - 1) * ITEMS_PER_PAGE, sampahPage * ITEMS_PER_PAGE),
+        [filteredSampah, sampahPage],
+    );
+    const pagedBarang = useMemo(
+        () => filteredBarang.slice((barangPage - 1) * ITEMS_PER_PAGE, barangPage * ITEMS_PER_PAGE),
+        [filteredBarang, barangPage],
+    );
+
+    useEffect(() => {
+        if (sampahPage > sampahTotalPages) setSampahPage(sampahTotalPages);
+    }, [sampahPage, sampahTotalPages]);
+    useEffect(() => {
+        if (barangPage > barangTotalPages) setBarangPage(barangTotalPages);
+    }, [barangPage, barangTotalPages]);
 
     const filteredDistribusi = useMemo(() => {
         const q = distribusiSearch.toLowerCase();
@@ -134,8 +159,8 @@ export function useKatalogData() {
         isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
         categories, rewards,
         katalogList, barangList,
-        sampahPage, setSampahPage, sampahMeta,
-        barangPage, setBarangPage, barangMeta,
+        sampahPage, setSampahPage, sampahTotalPages, pagedSampah,
+        barangPage, setBarangPage, barangTotalPages, pagedBarang,
         barangFilterBank, setBarangFilterBank,
         bsuList, bsuRiwayat, setBsuRiwayat,
         distribusiLoading,
@@ -145,7 +170,9 @@ export function useKatalogData() {
         filterKategori, setFilterKategori,
         filterSatuan, setFilterSatuan,
         filterReward, setFilterReward,
-        filteredSampah, filteredDistribusi,
+        sampahSearch, setSampahSearch,
+        barangSearch, setBarangSearch,
+        filteredSampah, filteredBarang, filteredDistribusi,
         fetchKatalog, fetchBarang,
     };
 }

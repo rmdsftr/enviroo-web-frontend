@@ -107,7 +107,6 @@ export default function RiwayatPage() {
     return (
         <div className="riwayat-page">
 
-            {/* Header */}
             <div className="riwayat-hero">
                 <div className="riwayat-hero-left">
                     <h1>Riwayat Transaksi</h1>
@@ -115,7 +114,6 @@ export default function RiwayatPage() {
                 </div>
             </div>
 
-            {/* Tabs */}
             <Tabs
                 tabs={tabs}
                 activeTab={activeTab}
@@ -123,7 +121,6 @@ export default function RiwayatPage() {
                 style={{ alignSelf: "flex-start" }}
             />
 
-            {/* ── Tab: Penimbangan ── */}
             {activeTab === "penimbangan" && (
                 <>
                     <div className="riwayat-filter-row">
@@ -164,7 +161,6 @@ export default function RiwayatPage() {
                 </>
             )}
 
-            {/* ── Tab: Pengangkutan ── */}
             {activeTab === "pengangkutan" && hasAngkut && (
                 <>
                     <div className="riwayat-filter-row">
@@ -193,7 +189,6 @@ export default function RiwayatPage() {
                 </>
             )}
 
-            {/* ── Tab: Penjualan ── */}
             {activeTab === "penjualan" && hasPenjualan && (
                 <>
                     <div className="riwayat-filter-row">
@@ -234,7 +229,6 @@ export default function RiwayatPage() {
                 </>
             )}
 
-            {/* ── Tab: Bagi Hasil (BSI / BSM) ── */}
             {activeTab === "bagi_hasil" && !isBsu && (
                 <>
                     <div className="riwayat-filter-row">
@@ -286,7 +280,6 @@ export default function RiwayatPage() {
                 </>
             )}
 
-            {/* ── Tab: Bagi Hasil (BSU) ── */}
             {activeTab === "bagi_hasil" && isBsu && (
                 <>
                     <div className="riwayat-filter-row">
@@ -315,7 +308,6 @@ export default function RiwayatPage() {
                 </>
             )}
 
-            {/* ── Tab: Penarikan ── */}
             {activeTab === "penarikan" && (
                 <>
                     <div className="riwayat-filter-row">

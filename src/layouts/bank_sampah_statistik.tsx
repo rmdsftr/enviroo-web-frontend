@@ -25,7 +25,6 @@ export default function BankSampahStatistikLayout({
 }: BankSampahStats) {
     return (
         <div className="bs-statistik-grid">
-            {/* Hierarki 3 Tingkat */}
             <div className="bs-stat-group">
                 <p className="bs-stat-group-label">
                     <span className="bs-stat-group-badge bs-stat-group-badge--tiga">3 Tingkat</span>
@@ -51,7 +50,6 @@ export default function BankSampahStatistikLayout({
                 </div>
             </div>
 
-            {/* Hierarki 2 Tingkat */}
             <div className="bs-stat-group">
                 <p className="bs-stat-group-label">
                     <span className="bs-stat-group-badge bs-stat-group-badge--dua">2 Tingkat</span>

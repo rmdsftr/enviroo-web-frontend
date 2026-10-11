@@ -1,6 +1,3 @@
-/* =========================================================
-   Stats Card Grid
-   ========================================================= */
 .statistik {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -8,7 +5,6 @@
     padding: 0 24px 20px 24px;
 }
 
-/* ── Stat Card Base ── */
 .stat-card {
     background: var(--c-surface);
     border-radius: var(--r-xl);
@@ -46,7 +42,6 @@
     transform: translateY(-1px) scale(0.99);
 }
 
-/* ── Icon ── */
 .stat-icon {
     width: 44px;
     height: 44px;
@@ -59,7 +54,6 @@
     transition: transform var(--t-base);
 }
 
-/* ── Body (number + label column) ── */
 .stat-body {
     display: flex;
     flex-direction: column;
@@ -109,7 +103,6 @@
     text-overflow: ellipsis;
 }
 
-/* ── Variant: default (Total) ── */
 .stat-card--default .stat-icon {
     background: var(--c-primary-100);
     color: var(--c-primary-700);
@@ -118,7 +111,6 @@
     color: var(--c-text-muted);
 }
 
-/* ── Variant: success (Aktif) ── */
 .stat-card--success .stat-icon {
     background: linear-gradient(135deg, var(--c-primary-100), var(--c-primary-50));
     color: var(--c-primary);
@@ -127,7 +119,6 @@
     color: var(--c-primary);
 }
 
-/* ── Variant: danger (Nonaktif) ── */
 .stat-card--danger .stat-icon {
     background: var(--c-danger-bg);
     color: var(--c-danger-600);
@@ -136,7 +127,6 @@
     color: var(--c-danger-600);
 }
 
-/* ── Variant: warning (Pending) ── */
 .stat-card--warning .stat-icon {
     background: var(--c-warning-bg);
     color: var(--c-warning-600);
@@ -145,7 +135,6 @@
     color: var(--c-warning-600);
 }
 
-/* ── Variant: teal (alternate brand) ── */
 .stat-card--teal .stat-icon {
     background: rgba(1, 50, 54, 0.08);
     color: var(--c-secondary);
@@ -154,7 +143,6 @@
     color: var(--c-secondary);
 }
 
-/* ── Responsive ── */
 @media (max-width: 1024px) {
     .statistik {
         grid-template-columns: repeat(2, 1fr);

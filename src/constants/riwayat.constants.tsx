@@ -6,9 +6,8 @@ import type { RiwayatBagiHasilItem } from "../services/bagi_hasil_penjualan.serv
 import type { PenarikanItem } from "../services/penarikan.service";
 import type { BagiHasilBsuItem } from "../types/distribusi_sisa.type";
 import { formatTanggalJam, formatTanggalDenganHari } from "../utils/date.utils";
+import { formatDecimal, formatNominal } from "../utils/number.utils";
 import { FaEye } from "react-icons/fa6";
-
-/* ── Status maps ─────────────────────────────────────── */
 
 export const STATUS_PENIMBANGAN: Record<string, { label: string; cls: string }> = {
     selesai:    { label: "Selesai",    cls: "selesai"    },
@@ -38,10 +37,8 @@ export const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = 
     canceled:        { label: "Dibatalkan",              cls: "dibatalkan" },
     rejected:        { label: "Ditolak",                 cls: "dibatalkan" },
     request_expired: { label: "Pengajuan Kadaluarsa",    cls: "dibatalkan" },
-    pickup_expired:  { label: "Penjemputan Kadaluarsa",  cls: "dibatalkan" },
+    pickup_expired:  { label: "Penjemputan \nKadaluarsa",  cls: "dibatalkan" },
 };
-
-/* ── Column definitions ──────────────────────────────── */
 
 export const PENIMBANGAN_COLUMNS: ColumnDef<PenimbanganItem>[] = [
     {
@@ -60,12 +57,14 @@ export const PENIMBANGAN_COLUMNS: ColumnDef<PenimbanganItem>[] = [
         key: "jumlah_setoran",
         header: "Jumlah Setoran",
         width: "140px",
-        render: (row) => `${row.jumlah_setoran} setoran`,
+        align: "center",
+        render: (row) => `${formatDecimal(row.jumlah_setoran)} setoran`,
     },
     {
         key: "status",
         header: "Status Penimbangan",
         width: "160px",
+        align: "center",
         render: (row) => {
             const s = STATUS_PENIMBANGAN[row.status_penimbangan];
             return (
@@ -84,6 +83,8 @@ export const PENIMBANGAN_COLUMNS: ColumnDef<PenimbanganItem>[] = [
     },
 ];
 
+const JENIS_SALDO: Record<string, string> = { uang: "Rupiah", barang: "Poin" };
+
 export const PENJUALAN_COLUMNS: ColumnDef<PenjualanExternalItem>[] = [
     {
         key: "penjualan_id",
@@ -95,23 +96,27 @@ export const PENJUALAN_COLUMNS: ColumnDef<PenjualanExternalItem>[] = [
         key: "tanggal",
         header: "Tanggal Penjualan",
         width: "180px",
+        align: "center",
         render: (row) => row.created_at ? formatTanggalJam(row.created_at) : "—",
     },
     {
-        key: "identitas_pembeli",
-        header: "Identitas Pembeli",
-        render: (row) => row.identitas_pembeli,
+        key: "nama_mitra",
+        header: "Nama Pengepul",
+        align: "center",
+        render: (row) => row.nama_mitra,
     },
     {
-        key: "nama_reward",
-        header: "Nama Reward",
+        key: "jenis_saldo",
+        header: "Jenis Saldo",
         width: "140px",
-        render: (row) => row.nama_reward,
+        align: "center",
+        render: (row) => JENIS_SALDO[row.nama_reward?.toLowerCase()] ?? row.nama_reward,
     },
     {
         key: "status_bagi_hasil",
         header: "Status Bagi Hasil",
         width: "150px",
+        align: "center", 
         render: (row) => {
             const s = STATUS_BAGI_HASIL[row.status_bagi_hasil];
             return (
@@ -147,10 +152,7 @@ export const BAGI_HASIL_BSU_COLUMNS: ColumnDef<BagiHasilBsuItem>[] = [
         key: "total_diterima",
         header: "Total Diterima",
         width: "160px",
-        render: (row) => {
-            const num = row.nominal_diterima.toLocaleString("id-ID");
-            return row.satuan_nominal === "Rp" ? `Rp ${num}` : `${num} poin`;
-        },
+        render: (row) => formatNominal(row.nominal_diterima, row.satuan_nominal),
     },
     {
         key: "aksi",
@@ -172,13 +174,15 @@ export const BAGI_HASIL_COLUMNS: ColumnDef<RiwayatBagiHasilItem>[] = [
         key: "tanggal",
         header: "Tanggal Bagi Hasil",
         width: "190px",
+        align: "center",
         render: (row) => formatTanggalJam(row.tanggal_bagi_hasil),
     },
     {
-        key: "nama_reward",
-        header: "Nama Reward",
+        key: "jenis_saldo",
+        header: "Jenis Saldo",
         width: "140px",
-        render: (row) => row.nama_reward,
+        align: "center",
+        render: (row) => JENIS_SALDO[row.nama_reward?.toLowerCase()] ?? row.nama_reward,
     },
     {
         key: "aksi",
@@ -203,20 +207,23 @@ export const PENARIKAN_COLUMNS: ColumnDef<PenarikanItem>[] = [
     },
     {
         key: "nama_reward",
-        header: "Nama Reward",
+        header: "Jenis Insentif",
         width: "140px",
+        align: "center",
         render: (row) => row.nama_reward,
     },
     {
         key: "tanggal",
         header: "Batas Konfirmasi",
         width: "190px",
+        align: "center",
         render: (row) => row.deadline_konfirmasi ? formatTanggalJam(row.deadline_konfirmasi) : "—",
     },
     {
         key: "status_penarikan",
         header: "Status Penarikan",
-        width: "190px",
+        width: "200px",
+        align: "center",
         render: (row) => {
             const s = STATUS_PENARIKAN[row.status_penarikan];
             return (
@@ -276,8 +283,6 @@ export function buildAngkutColumns(isBsu: boolean): ColumnDef<PengangkutanItem>[
         },
     ];
 }
-
-/* ── Tab configs ─────────────────────────────────────── */
 
 export const BSI_TABS = [
     { id: "penimbangan",  label: "Penimbangan"  },

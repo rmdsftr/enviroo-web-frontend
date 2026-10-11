@@ -2,16 +2,18 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from "
 import type { UserData, LoginRequest } from "../types/auth.type";
 import { AuthService } from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
-import type { CoreUser } from "../types/users.type";
+import type { CoreUser, ActiveAdmin } from "../types/users.type";
 import { UsersService } from "../services/users.service";
 
 interface AuthContextType {
   user: UserData | null;
   activeUser: CoreUser | null;
+  activeAdmin: ActiveAdmin | null;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   refreshUser: () => Promise<void>;
+  refreshActiveAdmin: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let interval: any;
 
     if (isAuthenticated) {
-      // Refresh token setiap 14 menit (karena access token backend 15 menit)
       interval = setInterval(async () => {
         try {
           await AuthService.refreshToken();
@@ -61,10 +62,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveUser(res.data)
   }
 
+  const [activeAdmin, setActiveAdmin] = useState<ActiveAdmin | null>(null);
+
+  const refreshActiveAdmin = async () => {
+    if (!user || user.role === "superadmin" || !user.identity_id) {
+      setActiveAdmin(null);
+      return;
+    }
+    try {
+      const res = await UsersService.getActiveAdmin(user.identity_id);
+      const data = res?.data;
+      if (data?.nama_bank) {
+        setActiveAdmin({
+          nama_bank: data.nama_bank,
+          jenis_bank: data.jenis_bank,
+          photo_url: data.photo_url || null,
+        });
+      }
+    } catch (err: unknown) {
+      console.error("Failed to fetch bank info:", err);
+    }
+  };
+
+  useEffect(() => {
+    refreshActiveAdmin();
+  }, [user]);
 
   const login = async (data: LoginRequest) => {
     const response = await AuthService.login(data);
-    const userData = response.data;
+    const userData: UserData = {
+      user_id: response.data.user_id,
+      nama: response.data.nama,
+      email: response.data.email,
+      role: response.data.role,
+      bank_id: response.data.bank_id,
+      identity_id: response.data.identity_id,
+    };
     const role = userData.role?.toLowerCase() || "";
 
     if (["superadmin", "admin_bsi", "admin_bsu", "admin_bsm"].includes(role)) {
@@ -96,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setActiveUser(null);
+    setActiveAdmin(null);
     localStorage.removeItem("userData");
     AuthService.logout().catch(console.error);
     navigate("/");
@@ -106,9 +140,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     logout,
     activeUser,
+    activeAdmin,
     refreshUser,
+    refreshActiveAdmin,
     isAuthenticated
-  }), [user, activeUser, isAuthenticated]);
+  }), [user, activeUser, activeAdmin, isAuthenticated]);
 
   return (
     <AuthContext.Provider value={authValue}>

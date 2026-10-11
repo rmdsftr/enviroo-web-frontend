@@ -16,14 +16,9 @@ import type { DistribusiSisaBsuDetail } from "../types/distribusi_sisa.type";
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
+import { formatNominal, formatQty } from "../utils/number.utils";
 
-/* ── Helpers ── */
-function fmtAmount(amount: number, satuan: string): string {
-    const num = amount.toLocaleString("id-ID");
-    return satuan === "Rp" ? `Rp ${num}` : `${num} ${satuan}`;
-}
 
-/* ── Component ── */
 export default function DistribusiSisaBsuPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
@@ -52,14 +47,13 @@ export default function DistribusiSisaBsuPage() {
         { label: "Detail Distribusi Sisa" },
     ];
 
-    const fmt = (n: number) => detail ? fmtAmount(n, detail.satuan_nominal) : "";
+    const fmt = (n: number) => detail ? formatNominal(n, detail.satuan_nominal) : "";
 
     return (
         <>
             <BreadcrumbLayout items={breadcrumbItems} />
 
             <div className="dp-page">
-                {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
                         <h1>Detail Distribusi Sisa</h1>
@@ -78,7 +72,6 @@ export default function DistribusiSisaBsuPage() {
                 {!loading && !error && detail && (
                     <div className="dp-card">
 
-                        {/* ── LEFT: Overview ── */}
                         <div className="dp-overview">
                             <div className="dp-overview-header">
                                 <div>
@@ -134,7 +127,6 @@ export default function DistribusiSisaBsuPage() {
                             </div>
                         </div>
 
-                        {/* ── RIGHT: Perhitungan Sisa ── */}
                         <div className="dp-setoran-col">
                             <div className="dp-setoran-header">
                                 <div>
@@ -164,7 +156,7 @@ export default function DistribusiSisaBsuPage() {
                                             </div>
                                             <div className="dpj-item-right">
                                                 <span className="dpj-item-subtotal">
-                                                    {item.qty_dipakai.toLocaleString("id-ID")} {item.satuan}
+                                                    {formatQty(item.qty_dipakai, item.satuan)}
                                                 </span>
                                             </div>
                                         </div>

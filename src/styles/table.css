@@ -1,6 +1,3 @@
-/* =========================================================
-   Table
-   ========================================================= */
 .table-wrapper {
     background: var(--c-surface);
     border-radius: var(--r-xl);
@@ -16,7 +13,6 @@
     font-family: var(--ff-sans);
 }
 
-/* ── Header ── */
 .table thead tr {
     background: var(--c-surface-soft);
     border-bottom: 1px solid var(--c-border);
@@ -33,7 +29,6 @@
     text-align: left;
 }
 
-/* ── Body rows ── */
 .table tbody tr {
     border-bottom: 1px solid var(--c-border-soft);
     transition: background-color var(--t-fast);
@@ -55,7 +50,6 @@
     vertical-align: middle;
 }
 
-/* ── Cell: ID / mono-style value ── */
 .table-id {
     font-size: 12px;
     font-weight: 600;
@@ -63,7 +57,6 @@
     letter-spacing: -0.1px;
 }
 
-/* Empty state */
 .table-empty {
     text-align: center !important;
     padding: 56px 16px !important;
@@ -71,7 +64,10 @@
     font-size: 13px;
 }
 
-/* ── Cell: Avatar ── */
+.table-empty:has(.empty-state) {
+    padding: 0 !important;
+}
+
 .table-avatar {
     width: 36px;
     height: 36px;
@@ -99,7 +95,6 @@
     color: #ffffff;
 }
 
-/* ── Cell: Name (clickable) ── */
 .table-name {
     font-weight: 600;
     color: var(--c-text);
@@ -115,7 +110,6 @@
     text-underline-offset: 3px;
 }
 
-/* ── Cell: Badge (status) ── */
 .table-badge {
     display: inline-flex;
     align-items: center;
@@ -154,7 +148,6 @@
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
 }
 
-/* ── Cell: Action button ── */
 .table-action-btn {
     width: 32px;
     height: 32px;
@@ -178,7 +171,6 @@
     transform: scale(1.06);
 }
 
-/* ── Responsive ── */
 @media (max-width: 640px) {
     .table-wrapper {
         overflow-x: auto;

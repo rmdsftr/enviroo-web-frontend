@@ -1,13 +1,10 @@
-/* Multi-select chips untuk tambah jadwal rutin (batch) */
 .jbatch-quickrow {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
     align-items: center;
-    /* margin-bottom: 3px; */
 }
 
-/* Preset "pilih" (Senin–Jumat, Pilih tiap hari) */
 .jbatch-quickbtn {
     font-family: inherit;
     font-size: 10px;
@@ -25,7 +22,6 @@
     border-color: #94a3b8;
 }
 
-/* "Kosongkan" = aksi hapus pilihan → sengaja dibedakan (link merah, di kanan) */
 .jbatch-clearbtn {
     font-family: inherit;
     font-size: 10px;

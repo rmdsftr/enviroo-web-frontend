@@ -16,11 +16,17 @@ export interface ActiveUserResponse{
     message: string;
 }
 
+export interface ActiveAdmin{
+    nama_bank : string;
+    jenis_bank : string;
+    photo_url : string | null;
+}
+
 export interface NonAdminUser {
-    UserID: string;
-    Nama: string;
-    Email: string;
-    PhotoURL: string;
+    user_id: string;
+    nama: string;
+    email: string;
+    photo_url: string;
 }
 
 export interface GetNonAdminUsersResponse {

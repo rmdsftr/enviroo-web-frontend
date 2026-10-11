@@ -8,12 +8,8 @@ import type { KonfigurasiSisaFormData } from "../modals/KonfigurasiSisaFormModal
 import PopupConfirmation from "./popup-confirmation";
 import PopupNotifikasi from "./popup-notifikasi";
 import Button from "../components/button";
+import { formatDecimal, formatPercent } from "../utils/number.utils";
 import "../styles/konfigurasi-bagi-hasil.css";
-
-function formatPorsi(n: number): string {
-    if (!isFinite(n)) return "0";
-    return new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(n);
-}
 
 export default function KonfigurasiBagiHasilSection() {
     const { user } = useAuth();
@@ -30,7 +26,6 @@ export default function KonfigurasiBagiHasilSection() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [popup, setPopup] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-    /* ── Fetch ── */
     const fetchConfig = useCallback(async () => {
         if (!bankId) {
             setError("Bank tidak teridentifikasi pada sesi Anda.");
@@ -58,7 +53,6 @@ export default function KonfigurasiBagiHasilSection() {
         fetchConfig();
     }, [fetchConfig]);
 
-    /* ── Handlers ── */
     const openAdd = () => {
         setIsEditMode(false);
         setFormOpen(true);
@@ -109,30 +103,29 @@ export default function KonfigurasiBagiHasilSection() {
         setFormOpen(true);
     };
 
-    /* ── Render Helpers ── */
     const renderBar = (cfg: KonfigurasiSisa) => (
         <div className="kbh-bar-wrap">
             <div className="kbh-bar">
                 <div
                     className="kbh-bar-segment kbh-bar-segment--bsu"
                     style={{ width: `${cfg.porsi_bsu}%` }}
-                    title={`BSU: ${cfg.porsi_bsu}%`}
+                    title={`BSU: ${formatPercent(cfg.porsi_bsu)}`}
                 >
-                    {cfg.porsi_bsu >= 12 ? `${formatPorsi(cfg.porsi_bsu)}%` : ""}
+                    {cfg.porsi_bsu >= 12 ? formatPercent(cfg.porsi_bsu) : ""}
                 </div>
                 <div
                     className="kbh-bar-segment kbh-bar-segment--bsi"
                     style={{ width: `${cfg.porsi_bsi}%` }}
-                    title={`BSI: ${cfg.porsi_bsi}%`}
+                    title={`BSI: ${formatPercent(cfg.porsi_bsi)}`}
                 >
-                    {cfg.porsi_bsi >= 12 ? `${formatPorsi(cfg.porsi_bsi)}%` : ""}
+                    {cfg.porsi_bsi >= 12 ? formatPercent(cfg.porsi_bsi) : ""}
                 </div>
                 <div
                     className="kbh-bar-segment kbh-bar-segment--transport"
                     style={{ width: `${cfg.porsi_transport}%` }}
-                    title={`Transport: ${cfg.porsi_transport}%`}
+                    title={`Transport: ${formatPercent(cfg.porsi_transport)}`}
                 >
-                    {cfg.porsi_transport >= 12 ? `${formatPorsi(cfg.porsi_transport)}%` : ""}
+                    {cfg.porsi_transport >= 12 ? formatPercent(cfg.porsi_transport) : ""}
                 </div>
             </div>
             <div className="kbh-bar-legend">
@@ -152,10 +145,8 @@ export default function KonfigurasiBagiHasilSection() {
         </div>
     );
 
-    /* ── Main Render ── */
     return (
         <section className="kbh-section">
-            {/* Header */}
             <div className="kbh-header">
                 <div className="kbh-header-left">
                     <h2 className="kbh-header-title">Distribusi Sisa Bagi Hasil</h2>
@@ -168,10 +159,8 @@ export default function KonfigurasiBagiHasilSection() {
 
             {error && <div className="kbh-error-banner">{error}</div>}
 
-            {/* Loading */}
             {isLoading && <div className="kbh-skeleton" />}
 
-            {/* Empty State */}
             {!isLoading && !error && !config && (
                 <div className="kbh-empty">
                     <div className="kbh-empty-icon">
@@ -188,7 +177,6 @@ export default function KonfigurasiBagiHasilSection() {
                 </div>
             )}
 
-            {/* Config Card */}
             {!isLoading && !error && config && (
                 <div className="kbh-card">
                     <div className="kbh-card-top">
@@ -199,7 +187,7 @@ export default function KonfigurasiBagiHasilSection() {
                             <div>
                                 <p className="kbh-card-label">Distribusi Porsi Bagi Hasil</p>
                                 <p className="kbh-card-sub">
-                                    Total: {formatPorsi(config.total_porsi)}% &bull; {config.nama_bank}
+                                    Total: {formatPercent(config.total_porsi)} &bull; {config.nama_bank}
                                 </p>
                             </div>
                         </div>
@@ -218,38 +206,35 @@ export default function KonfigurasiBagiHasilSection() {
                     {renderBar(config)}
 
                     <div className="kbh-stats-grid">
-                        {/* BSU */}
                         <div className="kbh-stat">
                             <div className="kbh-stat-top">
                                 <span className="kbh-stat-dot kbh-stat-dot--bsu" />
                                 <span className="kbh-stat-name">Bank Sampah Unit</span>
                             </div>
                             <div className="kbh-stat-value">
-                                {formatPorsi(config.porsi_bsu)}<span>%</span>
+                                {formatDecimal(config.porsi_bsu)}<span>%</span>
                             </div>
                             <p className="kbh-stat-desc">Porsi untuk BSU sebagai mitra pengelola sampah.</p>
                         </div>
 
-                        {/* BSI */}
                         <div className="kbh-stat">
                             <div className="kbh-stat-top">
                                 <span className="kbh-stat-dot kbh-stat-dot--bsi" />
                                 <span className="kbh-stat-name">Bank Sampah Induk</span>
                             </div>
                             <div className="kbh-stat-value">
-                                {formatPorsi(config.porsi_bsi)}<span>%</span>
+                                {formatDecimal(config.porsi_bsi)}<span>%</span>
                             </div>
                             <p className="kbh-stat-desc">Porsi untuk BSI sebagai pengelola dan koordinator.</p>
                         </div>
 
-                        {/* Transport */}
                         <div className="kbh-stat">
                             <div className="kbh-stat-top">
                                 <span className="kbh-stat-dot kbh-stat-dot--transport" />
                                 <span className="kbh-stat-name">Biaya Transport</span>
                             </div>
                             <div className="kbh-stat-value">
-                                {formatPorsi(config.porsi_transport)}<span>%</span>
+                                {formatDecimal(config.porsi_transport)}<span>%</span>
                             </div>
                             <p className="kbh-stat-desc">Porsi untuk menutup biaya operasional pengangkutan.</p>
                         </div>
@@ -257,7 +242,6 @@ export default function KonfigurasiBagiHasilSection() {
                 </div>
             )}
 
-            {/* Form Modal */}
             <KonfigurasiSisaFormModal
                 isOpen={formOpen}
                 isEdit={isEditMode}
@@ -266,7 +250,6 @@ export default function KonfigurasiBagiHasilSection() {
                 onSubmit={handleFormSubmit}
             />
 
-            {/* Confirm before save */}
             <PopupConfirmation
                 isOpen={confirmOpen}
                 type="warning"

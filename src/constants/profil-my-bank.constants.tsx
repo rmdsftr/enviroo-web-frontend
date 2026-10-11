@@ -5,10 +5,6 @@ import { FaGear, FaToggleOff, FaTrashCan } from "react-icons/fa6";
 import PopupMenu from "../components/popup-menu";
 import { formatTanggalJamBullet } from "../utils/date.utils";
 
-export function formatRupiah(angka: number) {
-    return angka.toLocaleString("id-ID");
-}
-
 export function getRoleLabel(role: string) {
     if (role.startsWith("admin_")) return "Admin";
     if (role.startsWith("petugas_")) return "Petugas";

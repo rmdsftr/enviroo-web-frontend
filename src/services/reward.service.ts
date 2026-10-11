@@ -11,7 +11,6 @@ import type {
 } from "../types/reward.type";
 
 export const RewardService = {
-    /* ── Master Reward (superadmin write, any-auth read) ─────────── */
     async getRewards(): Promise<{ message: string; data: Reward[] }> {
         const response = await api.get("/reward/get-all");
         return response.data;
@@ -32,7 +31,6 @@ export const RewardService = {
         return response.data;
     },
 
-    /* ── Nilai Reward per bank (BSI/BSM write, BSU read-only) ────── */
     async getNilaiReward(bankId: string): Promise<{ message: string; data: NilaiRewardBank[] }> {
         const response = await api.get(`/nilai-reward/get/${bankId}`);
         return response.data;
@@ -46,7 +44,7 @@ export const RewardService = {
     async addNilaiReward(
         bankId: string,
         data: AddNilaiRewardRequest,
-    ): Promise<{ message: string; data: NilaiRewardBank }> {
+    ): Promise<{ message: string; data: NilaiRewardBank[] }> {
         const response = await api.post(`/nilai-reward/add/${bankId}`, data);
         return response.data;
     },

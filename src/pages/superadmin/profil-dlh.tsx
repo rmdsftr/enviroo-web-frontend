@@ -30,15 +30,12 @@ export default function ProfilDlhPage() {
     const [list,    setList]    = useState<SuperadminItem[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // ── Modal tambah ──
     const [showAdd, setShowAdd]         = useState(false);
     const [form,    setForm]            = useState<AddSuperadminRequest>({ user_id: "", nama: "", email: "", no_whatsapp: "" });
     const [submitting, setSubmitting]   = useState(false);
 
-    // ── Nonaktifkan ──
     const [confirmTarget, setConfirmTarget] = useState<SuperadminItem | null>(null);
 
-    // ── Notif ──
     const [notif, setNotif] = useState<{ message: string; type: "success" | "error" | "warning" } | null>(null);
 
     const fetchList = useCallback(async () => {
@@ -164,7 +161,6 @@ export default function ProfilDlhPage() {
 
     return (
         <>
-            {/* Popups */}
             {notif && (
                 <PopupNotifikasi message={notif.message} type={notif.type} onClose={() => setNotif(null)} />
             )}
@@ -179,7 +175,6 @@ export default function ProfilDlhPage() {
                 onCancel={() => setConfirmTarget(null)}
             />
 
-            {/* ── Profil Card ── */}
             <div className="pmb-card">
                 <div className="pmb-card-left">
                     <div className="pmb-photo-wrapper" style={{ marginBottom: "8px" }}>
@@ -207,7 +202,6 @@ export default function ProfilDlhPage() {
                 </div>
             </div>
 
-            {/* ── Tabel Superadmin ── */}
             <div className="nasabah-tab-content">
                 <div className="bsu-table-section">
                     <div className="nasabah-toolbar" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", marginTop:"15px" }}>
@@ -229,7 +223,6 @@ export default function ProfilDlhPage() {
                 </div>
             </div>
 
-            {/* ── Modal Tambah Superadmin ── */}
             {showAdd && (
                 <div className="regis-modal-overlay" onClick={() => setShowAdd(false)}>
                     <div className="regis-modal" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
@@ -244,14 +237,14 @@ export default function ProfilDlhPage() {
                         <form onSubmit={handleAdd}>
                             <div className="regis-modal-body">
                                 <div className="regis-form-group">
-                                    <label className="regis-label">NIK <span className="required">*</span></label>
+                                    <label className="regis-label">ID Pengguna <span className="required">*</span></label>
                                     <Input
                                         className="regis-input-neutral"
                                         variant="solid"
                                         inputSize="large"
                                         fullWidth
-                                        placeholder="16 digit NIK"
-                                        maxLength={16}
+                                        placeholder="Masukkan ID Pengguna"
+                                        maxLength={25}
                                         value={form.user_id}
                                         onChange={(e) => setForm(f => ({ ...f, user_id: e.target.value }))}
                                         required

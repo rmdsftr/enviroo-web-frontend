@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import type { KonfigurasiSisa } from "../types/distribusi_sisa.type";
+import { formatDecimal, formatDecimalInput, formatPercent, parseDecimalInput, roundToPrecision, toDecimalInput } from "../utils/number.utils";
 import "../styles/konfigurasi-bagi-hasil.css";
 
 export interface KonfigurasiSisaFormData {
@@ -37,9 +38,9 @@ export default function KonfigurasiSisaFormModal({
         setError(null);
 
         if (isEdit && initialData) {
-            setPorsiBSU(String(initialData.porsi_bsu));
-            setPorsiBSI(String(initialData.porsi_bsi));
-            setPorsiTransport(String(initialData.porsi_transport));
+            setPorsiBSU(toDecimalInput(initialData.porsi_bsu));
+            setPorsiBSI(toDecimalInput(initialData.porsi_bsi));
+            setPorsiTransport(toDecimalInput(initialData.porsi_transport));
         } else {
             setPorsiBSU("");
             setPorsiBSI("");
@@ -49,30 +50,30 @@ export default function KonfigurasiSisaFormModal({
 
     if (!isOpen) return null;
 
-    const bsu = parseFloat(porsiBSU) || 0;
-    const bsi = parseFloat(porsiBSI) || 0;
-    const transport = parseFloat(porsiTransport) || 0;
+    const bsu = parseDecimalInput(porsiBSU) ?? 0;
+    const bsi = parseDecimalInput(porsiBSI) ?? 0;
+    const transport = parseDecimalInput(porsiTransport) ?? 0;
     const total = bsu + bsi + transport;
-    const isValidTotal = total >= 99.99 && total <= 100.01;
+    const isValidTotal = roundToPrecision(total) === 100;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
 
-        if (!isFinite(bsu) || bsu <= 0) {
+        if (bsu <= 0) {
             setError("Porsi BSU harus berupa angka lebih dari 0.");
             return;
         }
-        if (!isFinite(bsi) || bsi <= 0) {
+        if (bsi <= 0) {
             setError("Porsi BSI harus berupa angka lebih dari 0.");
             return;
         }
-        if (!isFinite(transport) || transport <= 0) {
+        if (transport <= 0) {
             setError("Porsi Transport harus berupa angka lebih dari 0.");
             return;
         }
         if (!isValidTotal) {
-            setError(`Total porsi harus berjumlah 100%. Saat ini: ${total.toFixed(2)}%`);
+            setError(`Total porsi harus berjumlah 100%. Saat ini: ${formatPercent(total)}`);
             return;
         }
 
@@ -110,7 +111,6 @@ export default function KonfigurasiSisaFormModal({
                     {error && <div className="kbh-form-error">{error}</div>}
 
                     <div className="kbh-form-fields">
-                        {/* Porsi BSU */}
                         <div className="kbh-form-field">
                             <label className="kbh-form-label">
                                 <span className="kbh-form-label-dot kbh-form-label-dot--bsu" />
@@ -118,20 +118,17 @@ export default function KonfigurasiSisaFormModal({
                             </label>
                             <div className="kbh-input-group">
                                 <input
-                                    type="number"
-                                    min="0.01"
-                                    max="99.98"
-                                    step="any"
+                                    type="text"
+                                    inputMode="decimal"
                                     placeholder="Contoh: 60"
                                     value={porsiBSU}
-                                    onChange={(e) => setPorsiBSU(e.target.value)}
+                                    onChange={(e) => setPorsiBSU(formatDecimalInput(e.target.value))}
                                     required
                                 />
                                 <span className="kbh-input-suffix">%</span>
                             </div>
                         </div>
 
-                        {/* Porsi BSI */}
                         <div className="kbh-form-field">
                             <label className="kbh-form-label">
                                 <span className="kbh-form-label-dot kbh-form-label-dot--bsi" />
@@ -139,20 +136,17 @@ export default function KonfigurasiSisaFormModal({
                             </label>
                             <div className="kbh-input-group">
                                 <input
-                                    type="number"
-                                    min="0.01"
-                                    max="99.98"
-                                    step="any"
+                                    type="text"
+                                    inputMode="decimal"
                                     placeholder="Contoh: 30"
                                     value={porsiBSI}
-                                    onChange={(e) => setPorsiBSI(e.target.value)}
+                                    onChange={(e) => setPorsiBSI(formatDecimalInput(e.target.value))}
                                     required
                                 />
                                 <span className="kbh-input-suffix">%</span>
                             </div>
                         </div>
 
-                        {/* Porsi Transport */}
                         <div className="kbh-form-field">
                             <label className="kbh-form-label">
                                 <span className="kbh-form-label-dot kbh-form-label-dot--transport" />
@@ -160,13 +154,11 @@ export default function KonfigurasiSisaFormModal({
                             </label>
                             <div className="kbh-input-group">
                                 <input
-                                    type="number"
-                                    min="0.01"
-                                    max="99.98"
-                                    step="any"
+                                    type="text"
+                                    inputMode="decimal"
                                     placeholder="Contoh: 10"
                                     value={porsiTransport}
-                                    onChange={(e) => setPorsiTransport(e.target.value)}
+                                    onChange={(e) => setPorsiTransport(formatDecimalInput(e.target.value))}
                                     required
                                 />
                                 <span className="kbh-input-suffix">%</span>
@@ -174,14 +166,13 @@ export default function KonfigurasiSisaFormModal({
                         </div>
                     </div>
 
-                    {/* Live Total Indicator */}
                     <div className={`kbh-total-row ${isValidTotal && total > 0 ? "kbh-total-row--valid" : "kbh-total-row--invalid"}`}>
                         <span className="kbh-total-label">Total Porsi</span>
                         <span>
-                            <span className="kbh-total-value">{total > 0 ? total.toFixed(2) : "0.00"}%</span>
+                            <span className="kbh-total-value">{formatDecimal(total)}%</span>
                             {total > 0 && !isValidTotal && (
                                 <span className="kbh-total-hint">
-                                    {total < 100 ? `(kurang ${(100 - total).toFixed(2)}%)` : `(lebih ${(total - 100).toFixed(2)}%)`}
+                                    {total < 100 ? `(kurang ${formatPercent(100 - total)})` : `(lebih ${formatPercent(total - 100)})`}
                                 </span>
                             )}
                             {isValidTotal && total > 0 && (

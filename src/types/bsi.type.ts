@@ -90,8 +90,10 @@ export interface BsiNasabahItem {
     nasabah_id: string;
     nama: string;
     email: string;
+    nik: string;
     foto: string;
     status: string;
+    nomor_rekening: string;
 }
 
 export interface GetNasabahBSIResponse {

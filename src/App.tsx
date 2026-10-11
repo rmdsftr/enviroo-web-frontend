@@ -49,19 +49,21 @@ import MutasiSaldoPage from './pages/mutasi-saldo';
 import ProfilPetugasPage from './pages/profil-petugas';
 import SaldoPage from './pages/saldo';
 import RegisNasabahPage from './pages/regis-nasabah';
+import AktivasiPage from './pages/aktivasi';
+import ManagePasswordPage from './pages/manage-password';
 
 function App() {
   return(
     <Routes>
       <Route path='/bank-sampah' element={<BankListPage type="bsu" />} />
-      <Route path='/nasabah' element={<NasabahPage />} />
       <Route path='/informasi' element={<InformasiPage />} />
       <Route path='/' element={<LoginPage />} />
+      <Route path='/aktivasi' element={<AktivasiPage/>}/>
+      <Route path='/manage-password' element={<ManagePasswordPage/>}/>
       <Route path='/notifikasi' element={<RootLayout />}>
           <Route index element={<NotifikasiPage />} />
       </Route>
       
-      {/* Protected Routes for Superadmin */}
       <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
         <Route path='/superadmin' element={<RootLayout />}>
           <Route index element={<DashboardSuperadminPage />} />
@@ -91,7 +93,6 @@ function App() {
         </Route>
       </Route>
 
-      {/* Protected Routes for Admin BSI */}
       <Route element={<ProtectedRoute allowedRoles={['admin_bsi']} />}>
         <Route path='/bsi' element={<RootLayout />}>
           <Route index element={<DashboardBsiPage />} />
@@ -124,7 +125,6 @@ function App() {
         </Route>
       </Route>
 
-      {/* Protected Routes for Admin BSU */}
       <Route element={<ProtectedRoute allowedRoles={['admin_bsu']} />}>
         <Route path='/bsu' element={<RootLayout />}>
           <Route index element={<DashboardBsuPage />} />
@@ -150,7 +150,6 @@ function App() {
         </Route>
       </Route>
 
-      {/* Protected Routes for Admin BSM */}
       <Route element={<ProtectedRoute allowedRoles={['admin_bsm']} />}>
         <Route path='/bsm' element={<RootLayout />}>
           <Route index element={<DashboardBsmPage />} />
@@ -161,7 +160,6 @@ function App() {
           <Route path='riwayat' element={<RiwayatPage />} />
           <Route path='riwayat/penimbangan/:id' element={<DetailPenimbanganPage />} />
           <Route path='riwayat/setoran/:id' element={<DetailPenyetoranPage />} />
-          <Route path='riwayat/pengangkutan/:id' element={<DetailPengangkutanPage />} />
           <Route path='riwayat/penjualan/:id' element={<DetailPenjualanPage />} />
           <Route path='riwayat/penarikan/:id' element={<DetailPenarikanPage />} />
           <Route path='bagi-hasil/:id' element={<BagiHasilPenjualanPage />} />
@@ -178,7 +176,6 @@ function App() {
         </Route>
       </Route>
 
-      {/* Global Authenticated Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path='/profil' element={<RootLayout />}>
           <Route index element={<ProfilPage />} />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ProfilService } from "../services/profil.service";
-import { AuthService } from "../services/auth.service";
 import {
     FaUser,
     FaEnvelope,
@@ -11,7 +11,7 @@ import {
     FaShieldHalved,
     FaPen,
     FaFingerprint,
-    FaChevronDown,
+    FaChevronRight,
     FaBuilding,
     FaCalendarDays,
     FaCircleInfo,
@@ -22,7 +22,6 @@ import Button from "../components/button";
 import { formatTanggalPanjang } from "../utils/date.utils";
 import CloseButton from "../components/close-button";
 import ViewPhoto from "../components/view-photo";
-import PopupNotifikasi from "../layouts/popup-notifikasi";
 import profileDefault from "../assets/profile.png";
 import "../styles/profil.css";
 
@@ -43,14 +42,12 @@ interface ProfilData {
     nama_bank_nasabah: string | null;
 }
 
-type SettingType = "password" | null;
-
 export default function ProfilPage() {
     const { refreshUser, user } = useAuth();
+    const navigate = useNavigate();
     const [profil, setProfil] = useState<ProfilData | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Edit modal
     const [showEditModal, setShowEditModal] = useState(false);
     const [showPhoto, setShowPhoto] = useState(false);
     const [editNama, setEditNama] = useState("");
@@ -61,15 +58,6 @@ export default function ProfilPage() {
     const [editLoading, setEditLoading] = useState(false);
     const [editError, setEditError] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // Dropdown form states
-    const [expandedSetting, setExpandedSetting] = useState<SettingType>(null);
-    const [formValue, setFormValue] = useState("");
-    const [formValueConfirm, setFormValueConfirm] = useState("");
-    const [formOldPassword, setFormOldPassword] = useState("");
-    const [formError, setFormError] = useState("");
-    const [formLoading, setFormLoading] = useState(false);
-    const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
     useEffect(() => {
         if (user?.identity_id) {
@@ -135,44 +123,6 @@ export default function ProfilPage() {
         }
     };
 
-    const toggleSetting = (type: SettingType) => {
-        if (expandedSetting === type) {
-            setExpandedSetting(null);
-        } else {
-            setExpandedSetting(type);
-        }
-        setFormValue("");
-        setFormValueConfirm("");
-        setFormOldPassword("");
-        setFormError("");
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setFormError("");
-        setFormLoading(true);
-
-        try {
-            if (expandedSetting === "password") {
-                if (!formOldPassword) { setFormError("Password lama wajib diisi."); return; }
-                if (!formValue || formValue.length < 8) { setFormError("Password baru minimal 8 karakter."); return; }
-                if (formValue !== formValueConfirm) { setFormError("Konfirmasi password tidak cocok."); return; }
-                await AuthService.changePassword({
-                    password_lama: formOldPassword,
-                    password_baru: formValue,
-                    konfirmasi_password_baru: formValueConfirm,
-                });
-                setPopupNotif({ message: "Password berhasil diperbarui.", type: "success" });
-                toggleSetting(null);
-            }
-        } catch (err: any) {
-            const msg = err.response?.data?.error || "Terjadi kesalahan, silakan coba lagi.";
-            setFormError(msg);
-        } finally {
-            setFormLoading(false);
-        }
-    };
-
     if (loading) {
         return (
             <div className="profil-page">
@@ -210,7 +160,6 @@ export default function ProfilPage() {
     return (
         <>
         <div className="profil-page">
-            {/* ── Section 1: Profile Card ── */}
             <div>
                 <br />
                 <h2 className="profil-section-title">
@@ -225,7 +174,6 @@ export default function ProfilPage() {
                         <FaPen />
                     </button>
 
-                    {/* Baris 1 — Identitas */}
                     <div className="profil-identity">
                         <div
                             className="profil-avatar"
@@ -248,7 +196,6 @@ export default function ProfilPage() {
                         </div>
                     </div>
 
-                    {/* Baris 2 — Detail Info */}
                     <div className="profil-detail-section">
                         <div className="profil-info-grid">
                             <div className="profil-info-row">
@@ -304,7 +251,6 @@ export default function ProfilPage() {
                 </div>
             </div>
 
-            {/* ── Nasabah Info Banner ── */}
             {profil.is_nasabah && (
                 <div className="profil-nasabah-banner">
                     <div className="profil-nasabah-icon">
@@ -318,16 +264,14 @@ export default function ProfilPage() {
                 </div>
             )}
 
-            {/* ── Section 2: Settings ── */}
             <div>
                 <h2 className="profil-section-title">
                     Pengaturan Akun
                 </h2>
                 <div className="profil-settings-card">
                     <div className="profil-settings-list">
-                        {/* Ubah Password */}
-                        <div className={`profil-settings-block${expandedSetting === "password" ? " expanded" : ""}`}>
-                            <div className="profil-settings-item" onClick={() => toggleSetting("password")}>
+                        <div className="profil-settings-block">
+                            <div className="profil-settings-item" onClick={() => navigate("/manage-password?from=profil")}>
                                 <div className="profil-settings-left">
                                     <div className="profil-settings-icon icon-password">
                                         <FaLock />
@@ -337,67 +281,13 @@ export default function ProfilPage() {
                                         <span className="profil-settings-desc">••••••••</span>
                                     </div>
                                 </div>
-                                <FaChevronDown className={`profil-settings-chevron${expandedSetting === "password" ? " rotated" : ""}`} />
+                                <FaChevronRight className="profil-settings-chevron" />
                             </div>
-                            {expandedSetting === "password" && (
-                                <form className="profil-dropdown-form" onSubmit={handleSubmit}>
-                                    {formError && <div className="profil-form-error">{formError}</div>}
-                                    <div className="profil-form-field">
-                                        <label className="profil-form-label">Password Lama</label>
-                                        <input
-                                            className="profil-form-input"
-                                            type="password"
-                                            placeholder="Masukkan password lama"
-                                            value={formOldPassword}
-                                            onChange={(e) => setFormOldPassword(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="profil-form-field">
-                                        <label className="profil-form-label">Password Baru</label>
-                                        <input
-                                            className="profil-form-input"
-                                            type="password"
-                                            placeholder="Minimal 8 karakter"
-                                            value={formValue}
-                                            onChange={(e) => setFormValue(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="profil-form-field">
-                                        <label className="profil-form-label">Konfirmasi Password Baru</label>
-                                        <input
-                                            className="profil-form-input"
-                                            type="password"
-                                            placeholder="Ulangi password baru"
-                                            value={formValueConfirm}
-                                            onChange={(e) => setFormValueConfirm(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="profil-form-actions">
-                                        <Button type="button" color="secondary" isRounded variant="ghost" size="small" onClick={() => toggleSetting(null)}>
-                                            Batal
-                                        </Button>
-                                        <Button type="submit" color="neon" isRounded variant="solid" size="small" disabled={formLoading}>
-                                            {formLoading ? "Menyimpan..." : "Simpan"}
-                                        </Button>
-                                    </div>
-                                </form>
-                            )}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-            {popupNotif && (
-                <PopupNotifikasi
-                    message={popupNotif.message}
-                    type={popupNotif.type}
-                    onClose={() => setPopupNotif(null)}
-                />
-            )}
 
             {showPhoto && profil.photo_url && (
                 <ViewPhoto
@@ -407,7 +297,6 @@ export default function ProfilPage() {
                 />
             )}
 
-            {/* ── Modal Edit Profil ── */}
             {showEditModal && (
                 <div className="profil-modal-overlay" onClick={() => setShowEditModal(false)}>
                     <div className="profil-modal" onClick={(e) => e.stopPropagation()}>
@@ -417,7 +306,6 @@ export default function ProfilPage() {
                         </div>
                         <form onSubmit={handleEditSubmit}>
                             <div className="profil-modal-body">
-                                {/* Avatar uploader */}
                                 <div className="profil-edit-avatar-section">
                                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                                         <div
@@ -461,7 +349,6 @@ export default function ProfilPage() {
                                     />
                                 </div>
 
-                                {/* Nama */}
                                 <div className="profil-form-field">
                                     <label className="profil-form-label">Nama</label>
                                     <input
@@ -474,7 +361,6 @@ export default function ProfilPage() {
                                     />
                                 </div>
 
-                                {/* WhatsApp */}
                                 <div className="profil-form-field">
                                     <label className="profil-form-label">No. WhatsApp</label>
                                     <input

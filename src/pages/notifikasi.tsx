@@ -8,7 +8,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { NotifikasiService, type NotifikasiItem, type NotifRefType } from "../services/notifikasi.service";
 import "../styles/notifikasi.css";
 
-/* ── Helpers ── */
 function formatRelativeTime(iso: string): string {
     const diff = Date.now() - new Date(iso).getTime();
     const min = Math.floor(diff / 60000);
@@ -21,7 +20,6 @@ function formatRelativeTime(iso: string): string {
     return `${day} hari lalu`;
 }
 
-/* ── ref_type → visual category ── */
 type VisualKat = "sistem" | "aktivitas" | "peringatan";
 
 function getKategori(refType: NotifRefType): VisualKat {
@@ -30,7 +28,6 @@ function getKategori(refType: NotifRefType): VisualKat {
     return "aktivitas";
 }
 
-/* ── Icon map by ref_type ── */
 const ICON_BY_REF: Partial<Record<NonNullable<NotifRefType>, React.ReactNode>> = {
     setoran:                 <FaArrowDown />,
     bagi_hasil:              <FaMoneyBillWave />,
@@ -67,7 +64,6 @@ const KATEGORI_LABEL: Record<VisualKat, string> = {
     peringatan: "peringatan",
 };
 
-/* ── Filter ── */
 type FilterType = "semua" | "belum_dibaca";
 
 const FILTERS: { key: FilterType; label: string }[] = [
@@ -77,7 +73,6 @@ const FILTERS: { key: FilterType; label: string }[] = [
 
 const LIMIT = 20;
 
-/* ── Page ── */
 export default function NotifikasiPage() {
     const { user } = useAuth();
     const [filter, setFilter] = useState<FilterType>("semua");
@@ -152,7 +147,6 @@ export default function NotifikasiPage() {
     return (
         <div className="notif-page">
 
-            {/* ── Header ── */}
             <div className="notif-header">
                 <div className="notif-header-left">
                     <p className="notif-title">Notifikasi</p>
@@ -162,7 +156,6 @@ export default function NotifikasiPage() {
                 </div>
             </div>
 
-            {/* ── Filter Chips + Tandai Semua ── */}
             <div className="notif-filters">
                 {FILTERS.map(f => (
                     <button
@@ -189,7 +182,6 @@ export default function NotifikasiPage() {
                 )}
             </div>
 
-            {/* ── List ── */}
             {loading ? (
                 <div className="notif-empty">Memuat notifikasi…</div>
             ) : (

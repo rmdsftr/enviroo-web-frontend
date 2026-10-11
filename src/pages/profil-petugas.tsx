@@ -196,7 +196,6 @@ export default function ProfilPetugasPage() {
                             </div>
                         )}
 
-                        {/* Identitas */}
                         <div className="profil-identity">
                             <div
                                 className="profil-avatar"
@@ -223,7 +222,6 @@ export default function ProfilPetugasPage() {
                             </div>
                         </div>
 
-                        {/* Detail Info */}
                         <div className="profil-detail-section">
                             <div className="profil-info-grid">
                                 <div className="profil-info-row">
@@ -257,7 +255,7 @@ export default function ProfilPetugasPage() {
                                 <div className="profil-info-row">
                                     <div className="profil-info-icon"><FaFingerprint /></div>
                                     <div className="profil-info-text">
-                                        <span className="profil-info-label">NIK</span>
+                                        <span className="profil-info-label">ID Pengguna</span>
                                         <span className="profil-info-value">{profil.user_id}</span>
                                     </div>
                                 </div>

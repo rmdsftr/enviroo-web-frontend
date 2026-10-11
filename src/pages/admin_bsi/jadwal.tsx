@@ -14,14 +14,14 @@ import CloseButton from "../../components/close-button";
 import Tabs from "../../components/tabs";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import PopupConfirmation from "../../layouts/popup-confirmation";
-import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
+import { JadwalService } from "../../services/jadwal.service";
+import type { JadwalItem } from "../../types/jadwal.type";
 import { BsiService } from "../../services/bsi.service";
 import JadwalBatchFields, { buildJadwalBatchItems } from "../../components/JadwalBatchFields";
 import "../../styles/jadwal-bsu.css";
 
 type ActiveTab = "penimbangan" | "pengangkutan";
 
-/* ── Constants ── */
 const HARI_OPTIONS = [
     { label: "Senin", value: "senin" }, { label: "Selasa", value: "selasa" },
     { label: "Rabu", value: "rabu" },   { label: "Kamis", value: "kamis" },
@@ -33,7 +33,6 @@ const MINGGU_OPTIONS = [
     { label: "Minggu ke-3", value: "3" }, { label: "Minggu ke-4", value: "4" },
     { label: "Minggu ke-5", value: "5" },
 ];
-/* ── Helpers ── */
 const formatTime = (timeStr: string) => {
     if (!timeStr) return "";
     const m = timeStr.match(/^(\d{2}:\d{2})(:\d{2})?(?:[+-]\d{2}:\d{2}|Z)?$/);
@@ -52,23 +51,17 @@ const getLocalISODate = (d: Date) => {
     return `${y}-${mo}-${dy}`;
 };
 
-/* ============================================================
-   COMPONENT
-   ============================================================ */
 export default function JadwalBsiPage() {
     const { user } = useAuth();
 
-    /* Tab */
     const [activeTab, setActiveTab] = useState<ActiveTab>("penimbangan");
 
-    /* API data */
     const [penimbanganList, setPenimbanganList] = useState<JadwalItem[]>([]);
     const [pengangkutanList, setPengangkutanList] = useState<JadwalItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [bsuOptions, setBsuOptions] = useState<{ label: string; value: string }[]>([]);
     const [calMonth, setCalMonth] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
 
-    /* Modal */
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalJenis, setModalJenis] = useState<"penimbangan" | "pengangkutan">("penimbangan");
     const [editJadwalId, setEditJadwalId] = useState<string | null>(null);
@@ -76,7 +69,6 @@ export default function JadwalBsiPage() {
     const [deleteJadwalId, setDeleteJadwalId] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    /* Form */
     const [formType, setFormType] = useState<"rutin" | "spesial">("rutin");
     const [formHari, setFormHari] = useState("");
     const [formMingguKe, setFormMingguKe] = useState("");
@@ -87,11 +79,9 @@ export default function JadwalBsiPage() {
     const [formTargetBankId, setFormTargetBankId] = useState("");
     const [formError, setFormError] = useState("");
 
-    /* Form batch (tambah jadwal rutin banyak sekaligus) */
     const [formHariList, setFormHariList] = useState<string[]>([]);
     const [formMingguList, setFormMingguList] = useState<string[]>([]);
 
-    /* ── Fetch ── */
     const fetchJadwal = useCallback(async (month: number, year: number) => {
         if (!user?.bank_id) return;
         try {
@@ -121,7 +111,6 @@ export default function JadwalBsiPage() {
         fetchBsus();
     }, [user?.bank_id]);
 
-    /* ── Modal handlers ── */
     const handleOpenModal = (jenis: "penimbangan" | "pengangkutan", item?: JadwalItem) => {
         setModalJenis(jenis);
         setFormError("");
@@ -154,7 +143,6 @@ export default function JadwalBsiPage() {
         if (formType === "spesial" && !formTanggal) { setFormError("Tanggal wajib diisi untuk jadwal spesial"); return; }
         if (modalJenis === "pengangkutan" && !formTargetBankId) { setFormError("Target BSU wajib dipilih"); return; }
 
-        /* ── Batch: hanya untuk tambah jadwal PENIMBANGAN rutin ── */
         if (modalJenis === "penimbangan" && !editJadwalId && formType === "rutin") {
             if (formHariList.length === 0)   { setNotif({ show: true, message: "Pilih minimal satu hari", type: "error" }); return; }
             if (formMingguList.length === 0) { setNotif({ show: true, message: "Pilih minggu, atau centang 'Setiap minggu'", type: "error" }); return; }
@@ -216,9 +204,6 @@ export default function JadwalBsiPage() {
         }
     };
 
-    /* ============================================================
-       RENDER
-       ============================================================ */
     return (
         <div className="jbsu">
 
@@ -233,7 +218,6 @@ export default function JadwalBsiPage() {
                 onConfirm={confirmDelete} onCancel={() => setDeleteJadwalId(null)}
             />
 
-            {/* ── Header ── */}
             <div className="jbsu-header">
                 <div className="jbsu-header-left">
                     <h1>Manajemen Jadwal</h1>
@@ -251,7 +235,6 @@ export default function JadwalBsiPage() {
                 )}
             </div>
 
-            {/* ── Tabs ── */}
             <Tabs
                 tabs={[
                     { id: "penimbangan", label: "Jadwal Penimbangan" },
@@ -262,9 +245,6 @@ export default function JadwalBsiPage() {
                 style={{ alignSelf: "flex-start" }}
             />
 
-            {/* ══════════════════════════════════════════
-               TAB: JADWAL PENIMBANGAN
-               ══════════════════════════════════════════ */}
             {activeTab === "penimbangan" && (
                 <JadwalPenimbanganCalendar
                     jadwalList={penimbanganList}
@@ -275,9 +255,6 @@ export default function JadwalBsiPage() {
                 />
             )}
 
-            {/* ══════════════════════════════════════════
-               TAB: JADWAL PENGANGKUTAN
-               ══════════════════════════════════════════ */}
             {activeTab === "pengangkutan" && (
                 <JadwalPengangkutanCalendar
                     jadwalList={pengangkutanList}
@@ -289,7 +266,6 @@ export default function JadwalBsiPage() {
                 />
             )}
 
-            {/* ── Modal ── */}
             {isModalOpen && createPortal(
                 <div className="jmodal-overlay" onClick={handleCloseModal}>
                     <div className="jmodal-box" onClick={e => e.stopPropagation()}>
@@ -319,14 +295,12 @@ export default function JadwalBsiPage() {
                         <div className="jmodal-form">
                             {formType === "rutin" ? (
                                 (modalJenis === "penimbangan" && !editJadwalId) ? (
-                                    /* Tambah penimbangan: multi-select (batch) */
                                     <JadwalBatchFields
                                         hariLabel="Hari Penimbangan"
                                         hariList={formHariList} setHariList={setFormHariList}
                                         mingguList={formMingguList} setMingguList={setFormMingguList}
                                     />
                                 ) : (
-                                    /* Pengangkutan add, atau edit apa pun: dropdown tunggal */
                                     <>
                                         <div className="jmodal-field">
                                             <label className="jmodal-label">Hari</label>
