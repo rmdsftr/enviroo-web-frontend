@@ -8,8 +8,6 @@ import type {
     GetJadwalMasterPenimbanganResponse,
     JadwalPenimbanganOccurrence,
     JadwalMasterPenimbangan,
-    GetAllJadwalPenimbanganResponse,
-    GetAllJadwalPengangkutanResponse,
 } from "../types/jadwal.type";
 
 export const JadwalService = {

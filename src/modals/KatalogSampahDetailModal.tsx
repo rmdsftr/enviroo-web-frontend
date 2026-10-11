@@ -80,7 +80,7 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                                 ) : (
                                     detail.harga_per_level?.map(h => (
                                         <div className="kd-stat-row" style={{ fontSize: '12.5px' }} key={h.level_user}>
-                                            <span className="kd-stat-label" style={{ textTransform: 'capitalize' }}>{h.level_user}</span>
+                                            <span className="kd-stat-label" style={{ textTransform: 'capitalize' }}>{h.level_user === 'eksternal' ? 'Pengepul' : h.level_user}</span>
                                             <div className="katalog-price-tag price-poin" style={{ margin: 0, padding: '4px 10px', fontSize: '12px' }}>
                                                 <FaCoins />{formatNominal(h.harga, h.satuan_reward)}/{item.satuan}
                                             </div>
@@ -113,7 +113,7 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                                                         <div className="kd-timeline-dot" style={{ top: 4, width: '8px', height: '8px', left: '-23px' }} />
                                                         <span className="kd-timeline-date" style={{ fontSize: '10.5px' }}>{formatTanggalJam(rw.changed_at)}</span>
                                                         <div className="kd-timeline-content" style={{ padding: '10px 12px' }}>
-                                                            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--k-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{rw.level_user}</div>
+                                                            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--k-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{rw.level_user === 'eksternal' ? 'Pengepul' : rw.level_user}</div>
                                                             <div className="kd-timeline-price" style={{ fontSize: '12.5px' }}>
                                                                 <s>{formatNominal(rw.harga_lama, satuanReward)}</s>
                                                                 {formatNominal(rw.harga_baru, satuanReward)}

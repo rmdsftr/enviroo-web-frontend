@@ -43,7 +43,7 @@ export function JadwalPenimbanganFormModal({ initialSeed, isSubmitting, onSubmit
                 if (!formMingguKe) { setFormError("Minggu ke wajib dipilih"); return; }
             } else {
                 if (!formTanggal)            { setFormError("Tanggal wajib diisi"); return; }
-                if (!formNamaSpesial.trim()) { setFormError("Nama jadwal spesial wajib diisi"); return; }
+                if (!formNamaSpesial.trim()) { setFormError("Nama jadwal khusus wajib diisi"); return; }
             }
         }
 
@@ -77,7 +77,7 @@ export function JadwalPenimbanganFormModal({ initialSeed, isSubmitting, onSubmit
                     <button className={`jmodal-type-btn ${formType === "spesial" ? "active" : ""}`}
                         onClick={() => { if (!isEdit) { setFormType("spesial"); setFormError(""); } }}
                         disabled={isEdit} style={{ cursor: isEdit ? "not-allowed" : "pointer" }}>
-                        <FaCalendarPlus style={{ marginRight: 6 }} /> Jadwal Spesial
+                        <FaCalendarPlus style={{ marginRight: 6 }} /> Jadwal Khusus
                     </button>
                 </div>
                 <div className="jmodal-form">
@@ -107,7 +107,7 @@ export function JadwalPenimbanganFormModal({ initialSeed, isSubmitting, onSubmit
                                 <Input type="date" value={formTanggal} onChange={e => setFormTanggal(e.target.value)} fullWidth />
                             </div>
                             <div className="jmodal-field">
-                                <label className="jmodal-label">Nama Jadwal Spesial</label>
+                                <label className="jmodal-label">Nama Jadwal</label>
                                 <Input type="text" placeholder="Contoh: Penimbangan Hari Bumi" value={formNamaSpesial} onChange={e => setFormNamaSpesial(e.target.value)} fullWidth />
                             </div>
                         </>

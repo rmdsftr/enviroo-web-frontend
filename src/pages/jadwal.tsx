@@ -1,11 +1,6 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { FaCalendarDay, FaCalendarWeek, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import Tabs from "../components/tabs";
-import { JadwalService } from "../services/jadwal.service";
-import type {
-    SuperadminJadwalBank,
-    SuperadminPengangkutanBsi,
-} from "../types/jadwal.type";
 import "../styles/jadwal.css";
 
 type TabType   = "penimbangan" | "pengangkutan";
@@ -75,121 +70,17 @@ function getItemsForDate(date: Date, items: SuperadminJadwalItem[]): SuperadminJ
         .sort((a, b) => a.jam_mulai.localeCompare(b.jam_mulai));
 }
 
-function normalizePenimbangan(
-    data: { bsi: SuperadminJadwalBank[]; bsm: SuperadminJadwalBank[]; bsu: SuperadminJadwalBank[] }
-): SuperadminJadwalItem[] {
-    const result: SuperadminJadwalItem[] = [];
-    const bankTypes: BankType[] = ["bsi", "bsm", "bsu"];
-    for (const bankType of bankTypes) {
-        for (const bank of data[bankType] ?? []) {
-            for (const j of bank.rutin) {
-                result.push({
-                    jadwal_id:      j.jadwal_id,
-                    chip_label:     bank.nama_bank,
-                    chip_class:     `bt-${bankType}`,
-                    detail_primary: bank.nama_bank,
-                    bank_type:      bankType,
-                    is_rutin:       true,
-                    hari:           j.hari ?? "",
-                    minggu_ke:      j.minggu_ke ?? 0,
-                    jam_mulai:      j.jam_mulai,
-                    jam_selesai:    j.jam_selesai,
-                    tanggal:        "",
-                    nama_jadwal_spesial: "",
-                });
-            }
-            for (const j of bank.tidak_rutin) {
-                result.push({
-                    jadwal_id:      j.jadwal_id,
-                    chip_label:     bank.nama_bank,
-                    chip_class:     `bt-${bankType}`,
-                    detail_primary: bank.nama_bank,
-                    bank_type:      bankType,
-                    is_rutin:       false,
-                    hari:           "",
-                    minggu_ke:      0,
-                    jam_mulai:      j.jam_mulai,
-                    jam_selesai:    j.jam_selesai,
-                    tanggal:        j.tanggal ?? "",
-                    nama_jadwal_spesial: j.nama_jadwal_spesial ?? "",
-                });
-            }
-        }
-    }
-    return result;
-}
-
-function normalizeAngkutan(data: SuperadminPengangkutanBsi[]): SuperadminJadwalItem[] {
-    const result: SuperadminJadwalItem[] = [];
-    for (const bsi of data ?? []) {
-        for (const rute of bsi.rute_bsu ?? []) {
-            for (const j of rute.rutin) {
-                result.push({
-                    jadwal_id:        j.jadwal_id,
-                    chip_label:       bsi.nama_bsi,
-                    chip_class:       "bt-angkut",
-                    detail_primary:   bsi.nama_bsi,
-                    detail_secondary: rute.nama_bsu,
-                    is_rutin:         true,
-                    hari:             j.hari ?? "",
-                    minggu_ke:        j.minggu_ke ?? 0,
-                    jam_mulai:        j.jam_mulai,
-                    jam_selesai:      j.jam_selesai,
-                    tanggal:          "",
-                    nama_jadwal_spesial: "",
-                });
-            }
-            for (const j of rute.tidak_rutin) {
-                result.push({
-                    jadwal_id:        j.jadwal_id,
-                    chip_label:       bsi.nama_bsi,
-                    chip_class:       "bt-angkut",
-                    detail_primary:   bsi.nama_bsi,
-                    detail_secondary: rute.nama_bsu,
-                    is_rutin:         false,
-                    hari:             "",
-                    minggu_ke:        0,
-                    jam_mulai:        j.jam_mulai,
-                    jam_selesai:      j.jam_selesai,
-                    tanggal:          j.tanggal ?? "",
-                    nama_jadwal_spesial: j.nama_jadwal_spesial ?? "",
-                });
-            }
-        }
-    }
-    return result;
-}
-
 export default function JadwalPage() {
     const [activeTab, setActiveTab] = useState<TabType>("penimbangan");
-    const [penimbanganList, setPenimbanganList] = useState<SuperadminJadwalItem[]>([]);
-    const [pengangkutanList, setPengangkutanList] = useState<SuperadminJadwalItem[]>([]);
-    const [loading, setLoading]   = useState(true);
-    const [error, setError]       = useState<string | null>(null);
+    const [penimbanganList] = useState<SuperadminJadwalItem[]>([]);
+    const [pengangkutanList] = useState<SuperadminJadwalItem[]>([]);
+    const [loading] = useState(false);
+    const [error] = useState<string | null>(null);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const prevM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1));
     const nextM = () => setCurrentMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1));
-
-    const fetchAll = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const [res1, res2] = await Promise.all([
-                JadwalService.getAllJadwalPenimbangan(),
-                JadwalService.getAllJadwalPengangkutan(),
-            ]);
-            setPenimbanganList(normalizePenimbangan(res1.data));
-            setPengangkutanList(normalizeAngkutan(res2.data));
-        } catch {
-            setError("Gagal memuat data jadwal. Pastikan server backend aktif.");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => { fetchAll(); }, [fetchAll]);
 
     const activeList = activeTab === "penimbangan" ? penimbanganList : pengangkutanList;
 
