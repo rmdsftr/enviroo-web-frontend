@@ -67,6 +67,50 @@ export interface GetJadwalResponse {
     };
 }
 
+/** GET /jadwal/penimbangan/:bank_id?month=&year= — khusus BSM, sudah di-expand jadi tanggal konkret per bulan */
+export interface JadwalPenimbanganOccurrence {
+    jadwal_id: string;
+    tanggal: string;
+    jam_mulai: string;
+    jam_selesai: string;
+    nama_jadwal: string;
+    is_rutin: boolean;
+    is_active: boolean;
+    status_jadwal: "selesai" | "dibatalkan" | "pending" | "upcoming" | string;
+}
+
+interface GetJadwalPenimbanganBankResponse {
+    data: JadwalPenimbanganOccurrence[];
+}
+
+/** GET /jadwal/master-penimbangan/:bank_id?month=&year= — data mentah (rule), buat card "Pengaturan Jadwal" */
+export interface JadwalMasterRutinItem {
+    jadwal_id: string;
+    hari: string;
+    minggu_ke: number;
+    jam_mulai: string;
+    jam_selesai: string;
+    is_active: boolean;
+}
+
+export interface JadwalMasterKhususItem {
+    jadwal_id: string;
+    nama_jadwal: string;
+    tanggal: string;
+    jam_mulai: string;
+    jam_selesai: string;
+    is_active: boolean;
+}
+
+export interface JadwalMasterPenimbangan {
+    rutin: JadwalMasterRutinItem[];
+    khusus: JadwalMasterKhususItem[];
+}
+
+interface GetJadwalMasterPenimbanganResponse {
+    data: JadwalMasterPenimbangan;
+}
+
 /* ── Superadmin: get-all ── */
 export interface SuperadminJadwalRawItem {
     jadwal_id: string;
@@ -120,6 +164,22 @@ export const JadwalService = {
             params: { month, year },
         });
         return response.data;
+    },
+
+    /** Khusus halaman jadwal admin_bsm — sudah expanded per tanggal konkret + status_jadwal */
+    async getJadwalPenimbanganBank(bankId: string, month: number, year: number): Promise<JadwalPenimbanganOccurrence[]> {
+        const response = await api.get<GetJadwalPenimbanganBankResponse>(`/jadwal/penimbangan/${bankId}`, {
+            params: { month, year },
+        });
+        return response.data.data;
+    },
+
+    /** Data rule mentah (bukan expanded) buat card "Pengaturan Jadwal" — sumber tombol edit/hapus */
+    async getJadwalMasterPenimbangan(bankId: string, month: number, year: number): Promise<JadwalMasterPenimbangan> {
+        const response = await api.get<GetJadwalMasterPenimbanganResponse>(`/jadwal/master-penimbangan/${bankId}`, {
+            params: { month, year },
+        });
+        return response.data.data;
     },
 
     async addJadwal(bankId: string, data: AddJadwalPenimbanganRequest) {

@@ -36,7 +36,7 @@ import {
 } from "react-icons/fa6";
 import { type RiwayatSetoranNasabahItem } from "../services/setoran.service";
 import { type RiwayatBagiHasilNasabahItem } from "../services/bagi_hasil_penjualan.service";
-import { type PenarikanItem } from "../services/penarikan.service";
+import { type PenarikanNasabahItem } from "../services/penarikan.service";
 
 export default function ProfilNasabahPage() {
     const { id } = useParams<{ id: string }>();
@@ -79,7 +79,7 @@ export default function ProfilNasabahPage() {
                     setPopupNotif({ message: "Data admin tidak ditemukan. Silakan login kembali.", type: "warning" });
                     return;
                 }
-                const res = await AuthService.generateReactivateAkun(nasabah.user_id, user.identity_id, "nasabah");
+                const res = await AuthService.generateReactivateAkun(nasabah.user_id, user.identity_id, "nasabah", nasabah.nasabah_id);
                 setReactivateData(res.data);
                 setIsReactivateModalOpen(true);
                 setNasabah((prev) => prev ? { ...prev, status_nasabah: "pending" } : null);
@@ -296,7 +296,7 @@ export default function ProfilNasabahPage() {
                     </div>
                     {penarikanLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
-                        : <Table<PenarikanItem>
+                        : <Table<PenarikanNasabahItem>
                             columns={PENARIKAN_COLUMNS}
                             data={filteredPenarikan}
                             rowKey={(row) => row.penarikan_id}

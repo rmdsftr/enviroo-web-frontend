@@ -1,14 +1,14 @@
 import { createPortal } from "react-dom";
-import type { KatalogSembakoItem, RiwayatDistribusi } from "../types/sembako.type";
+import type { KatalogBarangItem, RiwayatDistribusi } from "../types/barang.type";
 import { FaCoins, FaBasketShopping, FaTrash, FaPen } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import { formatTanggal, formatTanggalJam } from "../utils/date.utils";
 
 interface Props {
-    item: KatalogSembakoItem;
+    item: KatalogBarangItem;
     bsuRiwayat: RiwayatDistribusi[] | null;
-    canEditSembako: boolean;
+    canEditBarang: boolean;
     isAdminBsi: boolean;
     isAdminBsm: boolean;
     filterBankName?: string;
@@ -18,7 +18,7 @@ interface Props {
     onEdit: () => void;
 }
 
-export function KatalogSembakoDetailModal({ item, bsuRiwayat, canEditSembako, isAdminBsi, isAdminBsm, filterBankName, isViewingBSU, onClose, onDelete, onEdit }: Props) {
+export function KatalogBarangDetailModal({ item, bsuRiwayat, canEditBarang, isAdminBsi, isAdminBsm, filterBankName, isViewingBSU, onClose, onDelete, onEdit }: Props) {
     return createPortal(
         <div className="katalog-modal-overlay" onClick={onClose}>
             <div
@@ -28,11 +28,11 @@ export function KatalogSembakoDetailModal({ item, bsuRiwayat, canEditSembako, is
             >
                 <div className="km-header">
                     <div>
-                        <h3 className="km-title" style={{ fontSize: '16px' }}>Detail Katalog Sembako</h3>
+                        <h3 className="km-title" style={{ fontSize: '16px' }}>Detail Katalog Barang</h3>
                         <p className="km-subtitle" style={{ fontSize: '11px' }}>
                             {isViewingBSU
                                 ? `Katalog distribusi milik ${filterBankName ?? ""}`
-                                : "Informasi lengkap item sembako."}
+                                : "Informasi lengkap item barang."}
                         </p>
                     </div>
                     <CloseButton onClick={onClose} style={{ width: '28px', height: '28px', fontSize: '16px' }} />
@@ -88,7 +88,7 @@ export function KatalogSembakoDetailModal({ item, bsuRiwayat, canEditSembako, is
                                                 const aksiColor = isBsiOwnView ? '#F43F5E' : '#22C55E';
                                                 const aksiLabel = isBsiOwnView ? 'dikirim' : 'diterima';
                                                 return (
-                                                    <div className="kd-timeline-item" key={rw.disbako_id}>
+                                                    <div className="kd-timeline-item" key={rw.disba_id}>
                                                         <div className="kd-timeline-dot" style={{ top: 8, width: '8px', height: '8px', left: '-23px' }} />
                                                         <span className="kd-timeline-date" style={{ fontSize: '10.5px' }}>
                                                             {formatTanggalJam(rw.tanggal_kirim)}
@@ -117,7 +117,7 @@ export function KatalogSembakoDetailModal({ item, bsuRiwayat, canEditSembako, is
                         )}
                     </div>
 
-                    {canEditSembako && (
+                    {canEditBarang && (
                         <div className="km-footer">
                             <Button type="button" color="danger" variant="outline" isRounded size="small" icon={<FaTrash />} onClick={onDelete}>
                                 Hapus

@@ -27,7 +27,7 @@ import OpenKontenPage from './pages/open_konten';
 import RewardPage from './pages/superadmin/reward';
 import LokasiPage from './pages/superadmin/lokasi';
 import SampahPage from './pages/superadmin/sampah';
-import SembakoPage from './pages/superadmin/sembako';
+import BarangPage from './pages/superadmin/barang';
 import SuperadminPenggunaPage from './pages/superadmin/pengguna';
 import ProfilDlhPage from './pages/superadmin/profil-dlh';
 import ProfilUserPage from './pages/profil-user';
@@ -42,7 +42,7 @@ import DistribusiSisaBagiHasilPage from './pages/distribusi-sisa-bagi-hasil';
 import DistribusiSisaBsuPage from './pages/distribusi-sisa-bsu';
 import DetailBagiHasilPage from './pages/detail-bagi-hasil';
 import DetailPenarikanPage from './pages/detail-penarikan';
-import DetailDistribusiSembakoPage from './pages/detail-distribusi-sembako';
+import DetailDistribusiBarangPage from './pages/detail-distribusi-barang';
 import PenerimaBagiHasilPage from './pages/penerima-bagi-hasil';
 import ProfilMyBankPage from './pages/profil-my-bank';
 import MutasiSaldoPage from './pages/mutasi-saldo';
@@ -80,7 +80,7 @@ function App() {
           <Route path='nasabah/:id' element={<ProfilNasabahPage />} />
           <Route path='jadwal' element={<JadwalPage />} />
           <Route path='katalog' element={<SampahPage />} />
-          <Route path='sembako' element={<SembakoPage />} />
+          <Route path='barang' element={<BarangPage />} />
           <Route path='reward' element={<RewardPage />} />
           <Route path='lokasi' element={<LokasiPage />} />
           <Route path='profil-dlh' element={<ProfilDlhPage />} />
@@ -114,7 +114,7 @@ function App() {
           <Route path='bagi-hasil/penerima/:id' element={<PenerimaBagiHasilPage />} />
           <Route path='distribusi-sisa/:id' element={<DistribusiSisaBagiHasilPage />} />
           <Route path='distribusi-sisa-bsu/:id' element={<DistribusiSisaBsuPage />} />
-          <Route path='distribusi-sembako/:id' element={<DetailDistribusiSembakoPage />} />
+          <Route path='distribusi-barang/:id' element={<DetailDistribusiBarangPage />} />
           <Route path='riwayat/bagi-hasil/:id' element={<DetailBagiHasilPage />} />
           <Route path='konten/new' element={<UnggahKontenPage />} />
           <Route path='konten/edit/:id' element={<UnggahKontenPage />} />
@@ -140,7 +140,7 @@ function App() {
           <Route path='riwayat/bagi-hasil/:id' element={<DetailBagiHasilPage />} />
           <Route path='nasabah/:id' element={<ProfilNasabahPage />} />
           <Route path='distribusi-sisa/:id' element={<DistribusiSisaBsuPage />} />
-          <Route path='distribusi-sembako/:id' element={<DetailDistribusiSembakoPage />} />
+          <Route path='distribusi-barang/:id' element={<DetailDistribusiBarangPage />} />
           <Route path='penjualan' element={<PenjualanPage />} />
           <Route path='saldo' element={<SaldoPage />} />
           <Route path='konten' element={<InformasiPage />} />

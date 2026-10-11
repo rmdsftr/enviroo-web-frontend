@@ -1,6 +1,8 @@
 import type { Reward } from "./reward.type";
+import type { MasterBarang } from "./barang.type";
 
 export type { Reward };
+export type { MasterBarang };
 
 export interface KategoriSampah {
     KategoriID: number;
@@ -64,7 +66,7 @@ export interface StatistikSampahItem {
     sarok_id: number;
     nama_sampah: string;
     satuan: string;
-    jenis_reward: "Uang" | "Sembako";
+    jenis_reward: "Uang" | "Barang";
     satuan_reward: "Rp" | "poin";
     rata_rata_harga: number;
     jumlah_katalog: number;
@@ -75,7 +77,7 @@ export interface StatistikSampahResponse {
     data: StatistikSampahItem[];
 }
 
-export interface SembakoFavoritItem {
+export interface BarangFavoritItem {
     barang_id: number;
     nama_barang: string;
     total_qty: number;
@@ -84,30 +86,25 @@ export interface SembakoFavoritItem {
     jumlah_tukar: number;
 }
 
-export interface SembakoFavoritResponse {
+export interface BarangFavoritResponse {
     message: string;
-    data: SembakoFavoritItem[];
+    data: BarangFavoritItem[];
 }
 
-export interface StatistikSembakoItem {
+export interface StatistikBarangItem {
     barang_id: number;
     nama_barang: string;
     rata_rata_poin: number;
     jumlah_katalog: number;
 }
 
-export interface StatistikSembakoResponse {
+export interface StatistikBarangResponse {
     message: string;
-    data: StatistikSembakoItem[];
+    data: StatistikBarangItem[];
 }
 
-export interface MasterSembako {
-    BarangID: number;
-    NamaBarang: string;
-}
-
-export interface MasterSembakoPaginatedResponse {
-    data: MasterSembako[];
+export interface MasterBarangPaginatedResponse {
+    data: MasterBarang[];
     total: number;
     page: number;
     limit: number;

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { ProfilService } from "../services/profil.service";
 import { SetoranService, type RiwayatSetoranNasabahItem } from "../services/setoran.service";
 import { BagiHasilService, type RiwayatBagiHasilNasabahItem } from "../services/bagi_hasil_penjualan.service";
-import { PenarikanService, type PenarikanItem } from "../services/penarikan.service";
+import { PenarikanService, type PenarikanNasabahItem } from "../services/penarikan.service";
 import { defaultMonthRange } from "../components/filter-range";
 import type { ProfilNasabah, SaldoNasabah } from "../types/profil.type";
 
@@ -27,7 +27,7 @@ export function useProfilNasabahData(id: string | undefined) {
     const [bagiHasilTo, setBagiHasilTo] = useState(() => defaultMonthRange().to);
 
     // ── Penarikan ──
-    const [penarikanList, setPenarikanList] = useState<PenarikanItem[]>([]);
+    const [penarikanList, setPenarikanList] = useState<PenarikanNasabahItem[]>([]);
     const [penarikanLoading, setPenarikanLoading] = useState(false);
     const [penarikanSearch, setPenarikanSearch] = useState("");
     const [penarikanFrom, setPenarikanFrom] = useState(() => defaultMonthRange().from);
@@ -115,6 +115,7 @@ export function useProfilNasabahData(id: string | undefined) {
     const filteredPenarikan = useMemo(() => {
         const q = penarikanSearch.toLowerCase();
         return penarikanList.filter((item) => {
+            if (!item.created_at) return false;
             const month = item.created_at.substring(0, 7);
             if (month < penarikanFrom || month > penarikanTo) return false;
             if (q) return item.penarikan_id.toLowerCase().includes(q) || item.nama_reward.toLowerCase().includes(q);

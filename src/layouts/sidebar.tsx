@@ -48,7 +48,7 @@ export const SUPERADMIN_MENU: SidebarEntry[] = [
         { icon: FaRecycle,         menu: "Bank Sampah", id: "superadmin/bank-sampah" },
         { icon: FaUsers,           menu: "Pengguna",    id: "superadmin/nasabah"     },
         { icon: FaBoxOpen,         menu: "Sampah",      id: "superadmin/katalog"     },
-        { icon: FaBasketShopping,  menu: "Sembako",     id: "superadmin/sembako"     },
+        { icon: FaBasketShopping,  menu: "Barang",      id: "superadmin/barang"      },
     ]},
     { groupLabel: "Konfigurasi", items: [
         { icon: FaGear,        menu: "Operasional", id: "superadmin/reward"  },

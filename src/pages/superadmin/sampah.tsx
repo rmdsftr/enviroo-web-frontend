@@ -26,7 +26,7 @@ export default function SampahPage() {
 
     const [stats, setStats]             = useState<StatistikSampahItem[]>([]);
     const [statsLoading, setStatsLoading] = useState(true);
-    const [statsFilter, setStatsFilter] = useState<"Uang" | "Sembako">("Uang");
+    const [statsFilter, setStatsFilter] = useState<"Uang" | "Barang">("Uang");
     const [statsFrom, setStatsFrom] = useState(() => defaultMonthRange().from);
     const [statsTo, setStatsTo]     = useState(() => defaultMonthRange().to);
 
@@ -375,7 +375,7 @@ export default function SampahPage() {
 
                 if (sorted.length === 0) return (
                     <div style={{ textAlign: "center", padding: "40px 0", color: "var(--c-text-muted)", fontSize: "13px" }}>
-                        Belum ada data statistik untuk reward {isUang ? "uang" : "sembako"}.
+                        Belum ada data statistik untuk reward {isUang ? "uang" : "barang"}.
                     </div>
                 );
 
@@ -387,10 +387,10 @@ export default function SampahPage() {
                             <FilterPill
                                 options={[
                                     { label: "Uang (Rp)", value: "Uang" },
-                                    { label: "Sembako (poin)", value: "Sembako" },
+                                    { label: "Barang (poin)", value: "Barang" },
                                 ]}
                                 activeValue={statsFilter}
-                                onChange={(v) => { setStatsFilter(v as "Uang" | "Sembako"); setStatsExpanded(false); }}
+                                onChange={(v) => { setStatsFilter(v as "Uang" | "Barang"); setStatsExpanded(false); }}
                             />
                         </div>
 

@@ -295,12 +295,12 @@ export default function DashboardSuperadminPage() {
     const currentYear = new Date().getFullYear();
     const [trenData, setTrenData] = useState<TrenPenjualanBulan[]>([]);
     const [trenYear, setTrenYear] = useState(currentYear);
-    const [trenMetric, setTrenMetric] = useState<"uang" | "sembako">("uang");
+    const [trenMetric, setTrenMetric] = useState<"uang" | "barang">("uang");
 
     const [rankingData, setRankingData] = useState<RankingBankItem[]>([]);
     const [rankingYear, setRankingYear] = useState(currentYear);
     const [rankingLimit, setRankingLimit] = useState(10);
-    const [rankingMetric, setRankingMetric] = useState<"TotalUang" | "TotalSembako" | "JumlahPenjualan">("TotalUang");
+    const [rankingMetric, setRankingMetric] = useState<"TotalUang" | "TotalBarang" | "JumlahPenjualan">("TotalUang");
 
     const [volumeData, setVolumeData] = useState<VolumeSampahItem[]>([]);
     const [volumeYear, setVolumeYear] = useState(currentYear);
@@ -608,10 +608,10 @@ export default function DashboardSuperadminPage() {
                         <FilterPill
                             options={[
                                 { label: "Nilai Uang", value: "uang" },
-                                { label: "Sembako",    value: "sembako" },
+                                { label: "Barang",     value: "barang" },
                             ]}
                             activeValue={trenMetric}
-                            onChange={(v) => setTrenMetric(v as "uang" | "sembako")}
+                            onChange={(v) => setTrenMetric(v as "uang" | "barang")}
                         />
                         <Dropdown
                             options={[currentYear - 1, currentYear].map(y => ({ label: String(y), value: y }))}
@@ -722,7 +722,7 @@ export default function DashboardSuperadminPage() {
                         <FilterPill
                             options={[
                                 { label: "Nilai Uang", value: "TotalUang"       },
-                                { label: "Sembako",    value: "TotalSembako"    },
+                                { label: "Barang",     value: "TotalBarang"     },
                                 { label: "Penjualan",  value: "JumlahPenjualan" },
                             ]}
                             activeValue={rankingMetric}
@@ -764,8 +764,8 @@ export default function DashboardSuperadminPage() {
                     const formatVal = (item: RankingBankItem) => {
                         if (rankingMetric === "TotalUang")
                             return `Rp ${fmtCompact(item.TotalUang ?? 0)}`;
-                        if (rankingMetric === "TotalSembako")
-                            return `${(item.TotalSembako ?? 0).toLocaleString("id-ID")} poin`;
+                        if (rankingMetric === "TotalBarang")
+                            return `${(item.TotalBarang ?? 0).toLocaleString("id-ID")} poin`;
                         return `${item.JumlahPenjualan ?? 0} transaksi`;
                     };
 

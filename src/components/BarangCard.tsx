@@ -1,7 +1,7 @@
 import { FaCoins, FaBoxOpen, FaBasketShopping } from "react-icons/fa6";
-import type { KatalogSembakoItem } from "../types/sembako.type";
+import type { KatalogBarangItem } from "../types/barang.type";
 
-export function SembakoCard({ item, onClick }: { item: KatalogSembakoItem; onClick?: () => void }) {
+export function BarangCard({ item, onClick }: { item: KatalogBarangItem; onClick?: () => void }) {
     return (
         <div className="katalog-card" onClick={onClick}>
             <div className="katalog-card-img" style={{ background: "linear-gradient(135deg, rgba(148, 223, 12, 0.15) 0%, rgba(1, 50, 54, 0.05) 100%)", overflow: "hidden" }}>

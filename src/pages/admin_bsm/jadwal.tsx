@@ -11,9 +11,10 @@ import Input from "../../components/input";
 import CloseButton from "../../components/close-button";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import PopupConfirmation from "../../layouts/popup-confirmation";
-import JadwalPenimbanganCalendar from "../../layouts/jadwal-penimbangan-calendar";
+import JadwalPenimbanganCalendarBsm from "../../layouts/jadwal-penimbangan-calendar-bsm";
+import PengaturanJadwalPenimbangan, { type JadwalEditSeed } from "../../layouts/pengaturan-jadwal-penimbangan";
 import JadwalBatchFields, { buildJadwalBatchItems } from "../../components/JadwalBatchFields";
-import { JadwalService, type JadwalItem } from "../../services/jadwal.service";
+import { JadwalService, type JadwalPenimbanganOccurrence, type JadwalMasterPenimbangan } from "../../services/jadwal.service";
 import "../../styles/jadwal-bsu.css";
 import { formatTime } from "../../layouts/jadwal-penimbangan-calendar";
 
@@ -36,12 +37,15 @@ const MINGGU_OPTIONS = [
 export default function JadwalBsmPage() {
     const { user } = useAuth();
 
-    const [penimbanganList, setPenimbanganList] = useState<JadwalItem[]>([]);
+    const [penimbanganList, setPenimbanganList] = useState<JadwalPenimbanganOccurrence[]>([]);
     const [loading, setLoading]                = useState(true);
+    const [masterJadwal, setMasterJadwal]      = useState<JadwalMasterPenimbangan>({ rutin: [], khusus: [] });
+    const [masterLoading, setMasterLoading]    = useState(true);
     const [calMonth, setCalMonth]              = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
     const [isModalOpen, setIsModalOpen]        = useState(false);
     const [isSubmitting, setIsSubmitting]      = useState(false);
     const [editJadwalId, setEditJadwalId]      = useState<string | null>(null);
+    const [editOriginal, setEditOriginal]      = useState<JadwalEditSeed | null>(null);
     const [deleteJadwalId, setDeleteJadwalId]  = useState<string | null>(null);
     const [notif, setNotif] = useState<{ show: boolean; message: string; type: "success" | "error" }>({ show: false, message: "", type: "success" });
 
@@ -53,6 +57,7 @@ export default function JadwalBsmPage() {
     const [formNamaSpesial,  setFormNamaSpesial]  = useState("");
     const [formJamMulai,     setFormJamMulai]     = useState("");
     const [formJamSelesai,   setFormJamSelesai]   = useState("");
+    const [formIsActive,     setFormIsActive]     = useState(true);
     const [formError,        setFormError]        = useState("");
 
     /* Form batch (tambah jadwal rutin banyak sekaligus) */
@@ -64,28 +69,46 @@ export default function JadwalBsmPage() {
         if (!user?.bank_id) return;
         try {
             setLoading(true);
-            const res = await JadwalService.getJadwalBank(user.bank_id, month, year);
-            setPenimbanganList(res.data.penimbangan || []);
+            const data = await JadwalService.getJadwalPenimbanganBank(user.bank_id, month, year);
+            setPenimbanganList(data || []);
         } catch { console.error("Gagal memuat jadwal"); }
         finally { setLoading(false); }
     }, [user?.bank_id]);
 
-    useEffect(() => { fetchJadwal(calMonth.month, calMonth.year); }, [calMonth, fetchJadwal]);
+    const fetchMasterJadwal = useCallback(async (month: number, year: number) => {
+        if (!user?.bank_id) return;
+        try {
+            setMasterLoading(true);
+            const data = await JadwalService.getJadwalMasterPenimbangan(user.bank_id, month, year);
+            setMasterJadwal(data || { rutin: [], khusus: [] });
+        } catch { console.error("Gagal memuat pengaturan jadwal"); }
+        finally { setMasterLoading(false); }
+    }, [user?.bank_id]);
+
+    const refetchAll = useCallback((month: number, year: number) => {
+        fetchJadwal(month, year);
+        fetchMasterJadwal(month, year);
+    }, [fetchJadwal, fetchMasterJadwal]);
+
+    useEffect(() => { refetchAll(calMonth.month, calMonth.year); }, [calMonth, refetchAll]);
 
     /* ── Modal ── */
     const resetForm = () => {
         setFormType("rutin"); setFormHari(""); setFormMingguKe(""); setFormTanggal("");
-        setFormNamaSpesial(""); setFormJamMulai(""); setFormJamSelesai(""); setFormError(""); setEditJadwalId(null);
+        setFormNamaSpesial(""); setFormJamMulai(""); setFormJamSelesai(""); setFormIsActive(true);
+        setFormError(""); setEditJadwalId(null); setEditOriginal(null);
         setFormHariList([]); setFormMingguList([]);
     };
-    const handleOpenModal = (jadwal?: JadwalItem) => {
+    const handleOpenModal = (jadwal?: JadwalEditSeed) => {
         if (jadwal) {
             setEditJadwalId(jadwal.jadwal_id);
+            setEditOriginal(jadwal);
             setFormType(jadwal.is_rutin ? "rutin" : "spesial");
             setFormHari(jadwal.hari); setFormMingguKe(jadwal.minggu_ke.toString());
             setFormTanggal(jadwal.tanggal ? jadwal.tanggal.split("T")[0] : "");
             setFormNamaSpesial(jadwal.nama_jadwal_spesial || "");
             setFormJamMulai(formatTime(jadwal.jam_mulai)); setFormJamSelesai(formatTime(jadwal.jam_selesai));
+            setFormIsActive(jadwal.is_active);
             setFormError("");
         } else { resetForm(); }
         setIsModalOpen(true);
@@ -107,24 +130,47 @@ export default function JadwalBsmPage() {
             }
             setFormError(""); setIsSubmitting(true);
             try {
-                const payload = {
-                    hari: formType === "rutin" ? formHari : "",
-                    minggu_ke: formType === "rutin" ? parseInt(formMingguKe) : 0,
-                    jam_mulai: formJamMulai, jam_selesai: formJamSelesai,
-                    jenis_jadwal: "penimbangan" as const,
-                    is_active: true, is_rutin: formType === "rutin",
-                    tanggal: formType === "spesial" ? formTanggal : "",
-                    nama_jadwal_spesial: formType === "spesial" ? formNamaSpesial.trim() : "",
-                    admin_id: user.identity_id,
-                };
                 if (editJadwalId) {
+                    /* Partial update — field hari/minggu_ke/jam_mulai/jam_selesai/tanggal cuma
+                       dikirim kalau beneran berubah dari nilai awal. Backend nge-block field itu
+                       (409) kalau jadwalnya udah punya histori penimbangan; tapi is_active &
+                       nama_jadwal_spesial tetap boleh diubah kapan aja — jadi jalur "nonaktifkan
+                       aja" ga boleh ikut ke-block gara-gara field waktu ikut kekirim padahal ga diubah. */
+                    const payload: Record<string, string | number | boolean> = {
+                        is_active: formIsActive,
+                        admin_id: user.identity_id,
+                    };
+                    if (formType === "spesial") {
+                        payload.nama_jadwal_spesial = formNamaSpesial.trim();
+                    }
+                    const orig = editOriginal;
+                    if (formType === "rutin") {
+                        if (!orig || orig.hari !== formHari) payload.hari = formHari;
+                        if (!orig || orig.minggu_ke !== parseInt(formMingguKe)) payload.minggu_ke = parseInt(formMingguKe);
+                        if (!orig || formatTime(orig.jam_mulai) !== formJamMulai) payload.jam_mulai = formJamMulai;
+                        if (!orig || formatTime(orig.jam_selesai) !== formJamSelesai) payload.jam_selesai = formJamSelesai;
+                    } else {
+                        if (!orig || orig.tanggal !== formTanggal) payload.tanggal = formTanggal;
+                        if (!orig || formatTime(orig.jam_mulai) !== formJamMulai) payload.jam_mulai = formJamMulai;
+                        if (!orig || formatTime(orig.jam_selesai) !== formJamSelesai) payload.jam_selesai = formJamSelesai;
+                    }
                     await JadwalService.updateJadwal(editJadwalId, payload);
                     setNotif({ show: true, message: "Jadwal berhasil diperbarui!", type: "success" });
                 } else {
+                    const payload = {
+                        hari: formType === "rutin" ? formHari : "",
+                        minggu_ke: formType === "rutin" ? parseInt(formMingguKe) : 0,
+                        jam_mulai: formJamMulai, jam_selesai: formJamSelesai,
+                        jenis_jadwal: "penimbangan" as const,
+                        is_active: true, is_rutin: formType === "rutin",
+                        tanggal: formType === "spesial" ? formTanggal : "",
+                        nama_jadwal_spesial: formType === "spesial" ? formNamaSpesial.trim() : "",
+                        admin_id: user.identity_id,
+                    };
                     await JadwalService.addJadwal(user.bank_id, payload);
                     setNotif({ show: true, message: "Jadwal berhasil ditambahkan!", type: "success" });
                 }
-                handleCloseModal(); fetchJadwal(calMonth.month, calMonth.year);
+                handleCloseModal(); refetchAll(calMonth.month, calMonth.year);
             } catch (err: any) {
                 setNotif({ show: true, message: err?.response?.data?.error || "Gagal menyimpan jadwal", type: "error" });
             } finally { setIsSubmitting(false); }
@@ -155,8 +201,10 @@ export default function JadwalBsmPage() {
         try {
             await JadwalService.deleteJadwal(deleteJadwalId);
             setNotif({ show: true, message: "Jadwal berhasil dihapus!", type: "success" });
-            fetchJadwal(calMonth.month, calMonth.year);
-        } catch { setNotif({ show: true, message: "Gagal menghapus jadwal", type: "error" }); }
+            refetchAll(calMonth.month, calMonth.year);
+        } catch (err: any) {
+            setNotif({ show: true, message: err?.response?.data?.error || "Gagal menghapus jadwal", type: "error" });
+        }
         finally { setDeleteJadwalId(null); }
     };
 
@@ -178,12 +226,18 @@ export default function JadwalBsmPage() {
             </div>
 
             {/* ── Calendar Matrix ── */}
-            <JadwalPenimbanganCalendar
+            <JadwalPenimbanganCalendarBsm
                 jadwalList={penimbanganList}
                 loading={loading}
+                onMonthChange={(m, y) => setCalMonth({ month: m, year: y })}
+            />
+
+            {/* ── Pengaturan Jadwal (edit & hapus jadwal rutin/khusus) ── */}
+            <PengaturanJadwalPenimbangan
+                data={masterJadwal}
+                loading={masterLoading}
                 onEdit={handleOpenModal}
                 onDelete={setDeleteJadwalId}
-                onMonthChange={(m, y) => setCalMonth({ month: m, year: y })}
             />
 
             {/* ── Modal Tambah / Edit ── */}
@@ -253,6 +307,20 @@ export default function JadwalBsmPage() {
                                     <Input type="time" value={formJamSelesai} onChange={e => setFormJamSelesai(e.target.value)} fullWidth />
                                 </div>
                             </div>
+                            {editJadwalId && (
+                                <div className="jmodal-field">
+                                    <label className="jmodal-label">Status Jadwal</label>
+                                    <label className="jm-toggle">
+                                        <input
+                                            type="checkbox"
+                                            checked={formIsActive}
+                                            onChange={e => setFormIsActive(e.target.checked)}
+                                        />
+                                        <span className="jm-toggle-track"><span className="jm-toggle-thumb" /></span>
+                                        <span className="jm-toggle-text">{formIsActive ? "Aktif" : "Nonaktif"}</span>
+                                    </label>
+                                </div>
+                            )}
                             {formError && <p className="jmodal-error">{formError}</p>}
                             <div className="jmodal-actions">
                                 <Button variant="ghost" color="primary" isRounded onClick={handleCloseModal} disabled={isSubmitting}>Batal</Button>

@@ -61,15 +61,15 @@ export const mockPenjualanSampahItems: PenjualanSampahItem[] = [
     { sampah_id: "s-016", nama_sampah: "Kabel Listrik Bekas",       satuan: "kg",  kategori: "Logam",      jenis_reward: "uang",    total_qty:  48.0,  total_nilai:   720_000, satuan_nilai: "Rp" },
     { sampah_id: "s-017", nama_sampah: "Aki Bekas",                 satuan: "pcs", kategori: "Elektronik", jenis_reward: "uang",    total_qty:  64.0,  total_nilai: 1_280_000, satuan_nilai: "Rp" },
 
-    // ── Reward Sembako (satuan_nilai: "poin") ─────────────────────────────────
-    { sampah_id: "s-018", nama_sampah: "Sampah Organik Dapur",      satuan: "kg",  kategori: "Organik",    jenis_reward: "sembako", total_qty: 1240.0, total_nilai:  6_200,    satuan_nilai: "poin" },
-    { sampah_id: "s-019", nama_sampah: "Daun & Ranting Kering",     satuan: "kg",  kategori: "Organik",    jenis_reward: "sembako", total_qty:  875.0, total_nilai:  3_500,    satuan_nilai: "poin" },
-    { sampah_id: "s-020", nama_sampah: "Styrofoam",                 satuan: "kg",  kategori: "Plastik",    jenis_reward: "sembako", total_qty:  320.0, total_nilai:  1_600,    satuan_nilai: "poin" },
-    { sampah_id: "s-021", nama_sampah: "Pakaian Bekas Layak Pakai", satuan: "pcs", kategori: "Tekstil",    jenis_reward: "sembako", total_qty:  540.0, total_nilai:  5_400,    satuan_nilai: "poin" },
-    { sampah_id: "s-022", nama_sampah: "Kain Perca",                satuan: "kg",  kategori: "Tekstil",    jenis_reward: "sembako", total_qty:  198.0, total_nilai:  1_980,    satuan_nilai: "poin" },
-    { sampah_id: "s-023", nama_sampah: "Baterai Bekas",             satuan: "pcs", kategori: "Elektronik", jenis_reward: "sembako", total_qty: 2100.0, total_nilai:  4_200,    satuan_nilai: "poin" },
-    { sampah_id: "s-024", nama_sampah: "Lampu Bekas (CFL/LED)",     satuan: "pcs", kategori: "Elektronik", jenis_reward: "sembako", total_qty:  480.0, total_nilai:  2_400,    satuan_nilai: "poin" },
-    { sampah_id: "s-025", nama_sampah: "Kardus Tipis / Kotak Susu", satuan: "kg",  kategori: "Kertas",     jenis_reward: "sembako", total_qty:  290.0, total_nilai:  1_450,    satuan_nilai: "poin" },
+    // ── Reward Barang (satuan_nilai: "poin") ─────────────────────────────────
+    { sampah_id: "s-018", nama_sampah: "Sampah Organik Dapur",      satuan: "kg",  kategori: "Organik",    jenis_reward: "barang", total_qty: 1240.0, total_nilai:  6_200,    satuan_nilai: "poin" },
+    { sampah_id: "s-019", nama_sampah: "Daun & Ranting Kering",     satuan: "kg",  kategori: "Organik",    jenis_reward: "barang", total_qty:  875.0, total_nilai:  3_500,    satuan_nilai: "poin" },
+    { sampah_id: "s-020", nama_sampah: "Styrofoam",                 satuan: "kg",  kategori: "Plastik",    jenis_reward: "barang", total_qty:  320.0, total_nilai:  1_600,    satuan_nilai: "poin" },
+    { sampah_id: "s-021", nama_sampah: "Pakaian Bekas Layak Pakai", satuan: "pcs", kategori: "Tekstil",    jenis_reward: "barang", total_qty:  540.0, total_nilai:  5_400,    satuan_nilai: "poin" },
+    { sampah_id: "s-022", nama_sampah: "Kain Perca",                satuan: "kg",  kategori: "Tekstil",    jenis_reward: "barang", total_qty:  198.0, total_nilai:  1_980,    satuan_nilai: "poin" },
+    { sampah_id: "s-023", nama_sampah: "Baterai Bekas",             satuan: "pcs", kategori: "Elektronik", jenis_reward: "barang", total_qty: 2100.0, total_nilai:  4_200,    satuan_nilai: "poin" },
+    { sampah_id: "s-024", nama_sampah: "Lampu Bekas (CFL/LED)",     satuan: "pcs", kategori: "Elektronik", jenis_reward: "barang", total_qty:  480.0, total_nilai:  2_400,    satuan_nilai: "poin" },
+    { sampah_id: "s-025", nama_sampah: "Kardus Tipis / Kotak Susu", satuan: "kg",  kategori: "Kertas",     jenis_reward: "barang", total_qty:  290.0, total_nilai:  1_450,    satuan_nilai: "poin" },
 ];
 
 export function getMockPenjualanSampah(): PenjualanSampahResponse {
@@ -82,7 +82,7 @@ export function getMockPenjualanSampah(): PenjualanSampahResponse {
 // ─────────────────────────────────────────────────────────────────────────────
 // Statistik Setoran Sampah
 // ─────────────────────────────────────────────────────────────────────────────
-// 10 kategori × campuran satuan (kg/pcs/liter) × campuran reward (uang/sembako)
+// 10 kategori × campuran satuan (kg/pcs/liter) × campuran reward (uang/barang)
 // Tujuan: stress-test semua view grafik (Per Kategori / Per Jenis Reward / Per Satuan)
 
 export const mockSetoranSampahItems: StatistikSetoranItem[] = [
@@ -97,7 +97,7 @@ export const mockSetoranSampahItems: StatistikSetoranItem[] = [
     { sampah_id: "ss-006", nama_sampah: "Botol PET Warna",           satuan: "kg",    kategori: "Plastik",    jenis_reward: "uang",    total_qty: 298.5  },
     { sampah_id: "ss-007", nama_sampah: "Plastik HDPE (Ember/Pipa)", satuan: "kg",    kategori: "Plastik",    jenis_reward: "uang",    total_qty: 184.0  },
     { sampah_id: "ss-008", nama_sampah: "Kantong Kresek Campur",     satuan: "kg",    kategori: "Plastik",    jenis_reward: "uang",    total_qty:  96.0  },
-    { sampah_id: "ss-009", nama_sampah: "Styrofoam",                 satuan: "kg",    kategori: "Plastik",    jenis_reward: "sembako", total_qty:  43.5  },
+    { sampah_id: "ss-009", nama_sampah: "Styrofoam",                 satuan: "kg",    kategori: "Plastik",    jenis_reward: "barang", total_qty:  43.5  },
 
     // ── Logam (kg · uang) ────────────────────────────────────────────────────
     { sampah_id: "ss-010", nama_sampah: "Besi / Baja Bekas",         satuan: "kg",    kategori: "Logam",      jenis_reward: "uang",    total_qty: 512.0  },
@@ -110,31 +110,31 @@ export const mockSetoranSampahItems: StatistikSetoranItem[] = [
     { sampah_id: "ss-015", nama_sampah: "Botol Kaca Warna",          satuan: "pcs",   kategori: "Kaca",       jenis_reward: "uang",    total_qty: 430.0  },
     { sampah_id: "ss-016", nama_sampah: "Kaca Jendela Pecah",        satuan: "pcs",   kategori: "Kaca",       jenis_reward: "uang",    total_qty: 185.0  },
 
-    // ── Organik (kg · sembako) ───────────────────────────────────────────────
-    { sampah_id: "ss-017", nama_sampah: "Sampah Organik Dapur",      satuan: "kg",    kategori: "Organik",    jenis_reward: "sembako", total_qty: 1240.0 },
-    { sampah_id: "ss-018", nama_sampah: "Daun & Ranting Kering",     satuan: "kg",    kategori: "Organik",    jenis_reward: "sembako", total_qty:  875.0 },
+    // ── Organik (kg · barang) ───────────────────────────────────────────────
+    { sampah_id: "ss-017", nama_sampah: "Sampah Organik Dapur",      satuan: "kg",    kategori: "Organik",    jenis_reward: "barang", total_qty: 1240.0 },
+    { sampah_id: "ss-018", nama_sampah: "Daun & Ranting Kering",     satuan: "kg",    kategori: "Organik",    jenis_reward: "barang", total_qty:  875.0 },
 
     // ── Elektronik (pcs · campuran) ──────────────────────────────────────────
     { sampah_id: "ss-019", nama_sampah: "Aki Bekas",                 satuan: "pcs",   kategori: "Elektronik", jenis_reward: "uang",    total_qty:  64.0  },
-    { sampah_id: "ss-020", nama_sampah: "Baterai Bekas",             satuan: "pcs",   kategori: "Elektronik", jenis_reward: "sembako", total_qty: 2100.0 },
-    { sampah_id: "ss-021", nama_sampah: "Lampu Bekas (CFL/LED)",     satuan: "pcs",   kategori: "Elektronik", jenis_reward: "sembako", total_qty:  480.0 },
+    { sampah_id: "ss-020", nama_sampah: "Baterai Bekas",             satuan: "pcs",   kategori: "Elektronik", jenis_reward: "barang", total_qty: 2100.0 },
+    { sampah_id: "ss-021", nama_sampah: "Lampu Bekas (CFL/LED)",     satuan: "pcs",   kategori: "Elektronik", jenis_reward: "barang", total_qty:  480.0 },
     { sampah_id: "ss-022", nama_sampah: "Elektronik Kecil (PCB)",    satuan: "kg",    kategori: "Elektronik", jenis_reward: "uang",    total_qty:  22.8  },
 
-    // ── Tekstil (kg · sembako) ───────────────────────────────────────────────
-    { sampah_id: "ss-023", nama_sampah: "Pakaian Bekas Layak Pakai", satuan: "kg",    kategori: "Tekstil",    jenis_reward: "sembako", total_qty: 198.0  },
-    { sampah_id: "ss-024", nama_sampah: "Kain Perca",                satuan: "kg",    kategori: "Tekstil",    jenis_reward: "sembako", total_qty:  87.5  },
+    // ── Tekstil (kg · barang) ───────────────────────────────────────────────
+    { sampah_id: "ss-023", nama_sampah: "Pakaian Bekas Layak Pakai", satuan: "kg",    kategori: "Tekstil",    jenis_reward: "barang", total_qty: 198.0  },
+    { sampah_id: "ss-024", nama_sampah: "Kain Perca",                satuan: "kg",    kategori: "Tekstil",    jenis_reward: "barang", total_qty:  87.5  },
 
     // ── Minyak (liter · uang) ────────────────────────────────────────────────
     { sampah_id: "ss-025", nama_sampah: "Minyak Jelantah",           satuan: "liter", kategori: "Minyak",     jenis_reward: "uang",    total_qty: 310.0  },
     { sampah_id: "ss-026", nama_sampah: "Oli Bekas",                 satuan: "liter", kategori: "Minyak",     jenis_reward: "uang",    total_qty:  92.0  },
 
-    // ── Karet (kg · sembako) ─────────────────────────────────────────────────
-    { sampah_id: "ss-027", nama_sampah: "Ban Bekas Potongan",        satuan: "kg",    kategori: "Karet",      jenis_reward: "sembako", total_qty: 320.0  },
-    { sampah_id: "ss-028", nama_sampah: "Sandal / Sepatu Rusak",     satuan: "kg",    kategori: "Karet",      jenis_reward: "sembako", total_qty:  74.0  },
+    // ── Karet (kg · barang) ─────────────────────────────────────────────────
+    { sampah_id: "ss-027", nama_sampah: "Ban Bekas Potongan",        satuan: "kg",    kategori: "Karet",      jenis_reward: "barang", total_qty: 320.0  },
+    { sampah_id: "ss-028", nama_sampah: "Sandal / Sepatu Rusak",     satuan: "kg",    kategori: "Karet",      jenis_reward: "barang", total_qty:  74.0  },
 
-    // ── Kayu (kg · sembako) ──────────────────────────────────────────────────
-    { sampah_id: "ss-029", nama_sampah: "Kayu / Triplek Bekas",      satuan: "kg",    kategori: "Kayu",       jenis_reward: "sembako", total_qty: 450.0  },
-    { sampah_id: "ss-030", nama_sampah: "Palet Kayu Rusak",          satuan: "kg",    kategori: "Kayu",       jenis_reward: "sembako", total_qty: 210.0  },
+    // ── Kayu (kg · barang) ──────────────────────────────────────────────────
+    { sampah_id: "ss-029", nama_sampah: "Kayu / Triplek Bekas",      satuan: "kg",    kategori: "Kayu",       jenis_reward: "barang", total_qty: 450.0  },
+    { sampah_id: "ss-030", nama_sampah: "Palet Kayu Rusak",          satuan: "kg",    kategori: "Kayu",       jenis_reward: "barang", total_qty: 210.0  },
 ];
 
 export function getMockSetoranSampah(): StatistikSetoranResponse {

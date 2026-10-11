@@ -21,17 +21,17 @@ export interface UpdateRewardRequest {
 
 /* ── Nilai Reward (per-bank conversion) ─────────────────────────────── */
 export interface NilaiRewardBank {
-    NilaiRewardID: string;
-    BankID: string;
-    RewardID: number;
-    LevelUser: string;
-    PersenBagiHasil: number;
-    CreatedAt: string;
-    UpdatedAt: string;
-    CreatedBy?: string | null;
-    UpdatedBy?: string | null;
-    IsActive: boolean;
-    Reward?: Reward;
+    nilai_reward_id: string;
+    bank_id: string;
+    reward_id: number;
+    level_user: string;
+    persen_bagi_hasil: number;
+    created_at: string;
+    updated_at: string;
+    created_by?: string | null;
+    updated_by?: string | null;
+    is_active: boolean;
+    reward?: Reward;
 }
 
 export interface RewardPersentase {

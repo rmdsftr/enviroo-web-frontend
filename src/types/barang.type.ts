@@ -1,14 +1,14 @@
-export interface MasterSembako {
+export interface MasterBarang {
     BarangID: number;
     NamaBarang: string;
 }
 
-export interface MasterSembakoResponse {
-    data: MasterSembako[];
+export interface MasterBarangResponse {
+    data: MasterBarang[];
 }
 
-export interface KatalogSembakoItem {
-    sembako_id: string;
+export interface KatalogBarangItem {
+    produk_id: string;
     bank_id: string | null;
     barang_id: number;
     nama_barang: string;
@@ -21,41 +21,41 @@ export interface KatalogSembakoItem {
     updated_by: string | null;
 }
 
-export interface GetSembakoResponse {
-    data: KatalogSembakoItem[];
+export interface GetBarangResponse {
+    data: KatalogBarangItem[];
     message: string;
 }
 
-export interface SembakoMeta {
+export interface BarangMeta {
     page: number;
     limit: number;
     total: number;
     total_pages: number;
 }
 
-export interface GetSembakoPaginatedResponse {
-    data: KatalogSembakoItem[];
+export interface GetBarangPaginatedResponse {
+    data: KatalogBarangItem[];
     message: string;
-    pagination: SembakoMeta;
+    pagination: BarangMeta;
 }
 
 export interface RiwayatDistribusi {
-    disbako_id: string;
+    disba_id: string;
     tanggal_kirim: string;
     item: number;
     stok_sebelum: number;
     stok_sesudah: number;
 }
 
-export interface GetDetailSembakoBSUResponse {
+export interface GetDetailBarangBSUResponse {
     data: {
         riwayat_distribusi: RiwayatDistribusi[];
     };
     message: string;
 }
 
-export interface DistribusiSembakoItem {
-    disbako_id: string;
+export interface DistribusiBarangItem {
+    disba_id: string;
     bsi_id: string;
     nama_bsi: string;
     bsu_id: string;
@@ -68,13 +68,13 @@ export interface DistribusiSembakoItem {
     status_distribusi: "pending" | "selesai" | "gagal";
 }
 
-export interface ListDistribusiSembakoResponse {
-    data: DistribusiSembakoItem[];
+export interface ListDistribusiBarangResponse {
+    data: DistribusiBarangItem[];
     message: string;
 }
 
-export interface DistribusiSembakoHeader {
-    disbako_id: string;
+export interface DistribusiBarangHeader {
+    disba_id: string;
     bsi_id: string;
     nama_bsi: string;
     bsu_id: string;
@@ -87,8 +87,8 @@ export interface DistribusiSembakoHeader {
     status_distribusi: "pending" | "selesai" | "gagal";
 }
 
-export interface DistribusiSembakoDetailItem {
-    sembako_id: string;
+export interface DistribusiBarangDetailItem {
+    produk_id: string;
     nama_barang: string;
     photo_url: string | null;
     nilai_poin: number;
@@ -100,12 +100,12 @@ export interface DistribusiSembakoDetailItem {
     stok_bsu_sesudah: number;
 }
 
-export interface DistribusiSembakoDetailData {
-    header: DistribusiSembakoHeader;
-    items: DistribusiSembakoDetailItem[];
+export interface DistribusiBarangDetailData {
+    header: DistribusiBarangHeader;
+    items: DistribusiBarangDetailItem[];
 }
 
-export interface GetDetailDistribusiSembakoResponse {
-    data: DistribusiSembakoDetailData;
+export interface GetDetailDistribusiBarangResponse {
+    data: DistribusiBarangDetailData;
     message: string;
 }

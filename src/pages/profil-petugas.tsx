@@ -94,7 +94,7 @@ export default function ProfilPetugasPage() {
                     setPopupNotif({ message: "Data admin tidak ditemukan. Silakan login kembali.", type: "warning" });
                     return;
                 }
-                const res = await AuthService.generateReactivateAkun(profil.user_id, user.identity_id, "admin");
+                const res = await AuthService.generateReactivateAkun(profil.user_id, user.identity_id, "admin", profil.petugas_id);
                 setReactivateData(res.data);
                 setIsReactivateModalOpen(true);
                 setStatusPetugas("pending");

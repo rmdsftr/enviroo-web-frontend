@@ -91,9 +91,9 @@ export const KatalogService = {
         return res.data;
     },
 
-    /** GET /laporan/katalog-sembako/:bank_id — returns Excel blob */
-    exportKatalogSembako: async (bankId: string): Promise<Blob> => {
-        const res = await api.get(`/laporan/katalog-sembako/${bankId}`, { responseType: "blob" });
+    /** GET /laporan/katalog-barang/:bank_id — returns Excel blob */
+    exportKatalogBarang: async (bankId: string): Promise<Blob> => {
+        const res = await api.get(`/laporan/katalog-barang/${bankId}`, { responseType: "blob" });
         return res.data;
     },
 };

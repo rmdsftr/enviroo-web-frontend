@@ -788,6 +788,64 @@
     border-color: transparent !important;
 }
 
+/* ── Modern toggle switch (aktif/nonaktif jadwal) ── */
+.jm-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.jm-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.jm-toggle-track {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: #d1d9d4;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.jm-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(1, 50, 54, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.jm-toggle input:checked + .jm-toggle-track {
+    background: #4EA771;
+}
+
+.jm-toggle input:checked + .jm-toggle-track .jm-toggle-thumb {
+    transform: translateX(18px);
+}
+
+.jm-toggle input:focus-visible + .jm-toggle-track {
+    outline: 2px solid #4EA771;
+    outline-offset: 2px;
+}
+
+.jm-toggle-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #013236;
+}
+
 .jmodal-actions {
     display: flex;
     justify-content: flex-end;
@@ -1682,6 +1740,55 @@
     flex-shrink: 0;
     margin-left: auto;
 }
+
+/* ── BSM: pengelompokan jadwal rutin per Minggu ke-N ── */
+.pjp-week-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pjp-week-group + .pjp-week-group {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(1, 50, 54, 0.10);
+}
+
+.pjp-week-heading {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4EA771;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin: 0 0 2px;
+}
+
+/* ── BSM: status badge di kanan card (ganti tombol edit/delete) ── */
+.jadwal-cal-detail-status {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ── BSM: card "mati" — jadwal nonaktif / sudah lewat / dibatalkan ── */
+.jadwal-cal-detail-item.dead {
+    background: rgba(1, 50, 54, 0.03);
+    border-color: rgba(1, 50, 54, 0.08);
+    opacity: 0.6;
+}
+
+.jadwal-cal-detail-item.dead .jadwal-cal-detail-time,
+.jadwal-cal-detail-item.dead .jadwal-cal-detail-name {
+    color: #7a9e8a;
+}
+
+.jadwal-cal-chip.dead {
+    background: rgba(1, 50, 54, 0.05) !important;
+    opacity: 0.55;
+}
+
+.jadwal-cal-chip.dead .jadwal-cal-chip-dot  { background: #94a3b8 !important; }
+.jadwal-cal-chip.dead .jadwal-cal-chip-text { color: #7a9e8a !important; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

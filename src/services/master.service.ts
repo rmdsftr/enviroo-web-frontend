@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { MasterSampah, MasterSampahPaginatedResponse, SatuanEnum, StatistikSampahResponse, SampahFavoritResponse, SampahPerKategoriResponse, MasterSembako, MasterSembakoPaginatedResponse, StatistikSembakoResponse, SembakoFavoritResponse } from "../types/katalog.type";
+import type { MasterSampah, MasterSampahPaginatedResponse, SatuanEnum, StatistikSampahResponse, SampahFavoritResponse, SampahPerKategoriResponse, MasterBarang, MasterBarangPaginatedResponse, StatistikBarangResponse, BarangFavoritResponse } from "../types/katalog.type";
 
 export const MasterService = {
     getSampah: async (params?: { q?: string; page?: number; limit?: number }): Promise<MasterSampahPaginatedResponse> => {
@@ -62,38 +62,38 @@ export const MasterService = {
         return res.data;
     },
 
-    getSembako: async (params?: { q?: string; page?: number; limit?: number }): Promise<MasterSembakoPaginatedResponse> => {
-        const res = await api.get<MasterSembakoPaginatedResponse>("/master/sembako", { params });
+    getBarang: async (params?: { q?: string; page?: number; limit?: number }): Promise<MasterBarangPaginatedResponse> => {
+        const res = await api.get<MasterBarangPaginatedResponse>("/master/barang", { params });
         return res.data;
     },
 
-    createSembako: async (data: { nama_barang: string }): Promise<{ message: string; data: MasterSembako }> => {
-        const res = await api.post("/master/sembako", data);
+    createBarang: async (data: { nama_barang: string }): Promise<{ message: string; data: MasterBarang }> => {
+        const res = await api.post("/master/barang", data);
         return res.data;
     },
 
-    updateSembako: async (barangId: number, data: { nama_barang: string }): Promise<{ message: string; data: MasterSembako }> => {
-        const res = await api.patch(`/master/sembako/${barangId}`, data);
+    updateBarang: async (barangId: number, data: { nama_barang: string }): Promise<{ message: string; data: MasterBarang }> => {
+        const res = await api.patch(`/master/barang/${barangId}`, data);
         return res.data;
     },
 
-    deleteSembako: async (barangId: number): Promise<{ message: string }> => {
-        const res = await api.delete(`/master/sembako/${barangId}`);
+    deleteBarang: async (barangId: number): Promise<{ message: string }> => {
+        const res = await api.delete(`/master/barang/${barangId}`);
         return res.data;
     },
 
-    getStatistikSembako: async (): Promise<StatistikSembakoResponse> => {
-        const res = await api.get<StatistikSembakoResponse>("/master/sembako/statistik");
+    getStatistikBarang: async (): Promise<StatistikBarangResponse> => {
+        const res = await api.get<StatistikBarangResponse>("/master/barang/statistik");
         return res.data;
     },
 
-    getFavoritSembako: async (
+    getFavoritBarang: async (
         limit = 10,
         bulanMulai?: number,
         tahunMulai?: number,
         bulanSelesai?: number,
         tahunSelesai?: number,
-    ): Promise<SembakoFavoritResponse> => {
+    ): Promise<BarangFavoritResponse> => {
         const params: Record<string, number> = { limit };
         if (bulanMulai !== undefined && tahunMulai !== undefined) {
             params.bulan_mulai   = bulanMulai;
@@ -101,7 +101,7 @@ export const MasterService = {
             params.bulan_selesai = bulanSelesai ?? bulanMulai;
             params.tahun_selesai = tahunSelesai ?? tahunMulai;
         }
-        const res = await api.get<SembakoFavoritResponse>("/master/sembako/favorit", { params });
+        const res = await api.get<BarangFavoritResponse>("/master/barang/favorit", { params });
         return res.data;
     },
 };

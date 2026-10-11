@@ -95,7 +95,7 @@ export default function ProfilMyBankPage() {
         }
     };
 
-    const handleToggleAktivasiStaff = async (userId: string, currentStatus: string) => {
+    const handleToggleAktivasiStaff = async (userId: string, currentStatus: string, adminId: string) => {
         const isActive = currentStatus === "aktif";
         try {
             if (isActive) {
@@ -109,7 +109,7 @@ export default function ProfilMyBankPage() {
                     showNotif("Data admin pengautentikasi tidak ditemukan.", "error");
                     return;
                 }
-                const res = await AuthService.generateReactivateAkun(userId, user.identity_id, "admin");
+                const res = await AuthService.generateReactivateAkun(userId, user.identity_id, "admin", adminId);
                 setReactivateData(res.data);
                 setIsReactivateModalOpen(true);
                 setAdminList((prev) =>

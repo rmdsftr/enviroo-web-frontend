@@ -32,7 +32,7 @@ export function getRoleOptions(role: string): { label: string; value: string }[]
 
 export function buildAdminColumns(
     currentAdminId: string,
-    onToggle: (userId: string, currentStatus: string) => void,
+    onToggle: (userId: string, currentStatus: string, adminId: string) => void,
     onDelete: (adminId: string) => void,
 ): ColumnDef<AdminBankSampah>[] {
     return [
@@ -108,7 +108,7 @@ export function buildAdminColumns(
                             {
                                 label: row.status_admin === "aktif" ? "Nonaktifkan Akun Staff" : "Generate Aktivasi Akun Staff",
                                 icon: <FaToggleOff />,
-                                onClick: () => onToggle(row.user_id, row.status_admin),
+                                onClick: () => onToggle(row.user_id, row.status_admin, row.admin_id),
                             },
                             {
                                 label: "Hapus Staff",

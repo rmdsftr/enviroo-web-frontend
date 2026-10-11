@@ -1,5 +1,9 @@
 import { api } from "./api";
 
+export type StatusPenarikan =
+    | "pending" | "canceled" | "request_expired" | "rejected" | "approved" | "pickup_expired" | "completed";
+
+/** Item dari GET /penarikan/list-bank/:bank_id */
 export interface PenarikanItem {
     penarikan_id: string;
     nasabah_id: string;
@@ -10,19 +14,31 @@ export interface PenarikanItem {
     nama_reward: string;
     nominal_penarikan: number;
     satuan_penarikan: "Rp" | "poin";
-    status_penarikan: "pending" | "berhasil" | "kadaluarsa" | "dibatalkan";
-    kadaluarsa_at: string;
+    status_penarikan: StatusPenarikan;
+    deadline_konfirmasi: string | null;
+    deadline_jemput: string | null;
     bukti_foto: string | null;
+}
+
+/** Item dari GET /penarikan/list/:nasabah_id — shape lebih ringkas */
+export interface PenarikanNasabahItem {
+    penarikan_id: string;
     created_at: string;
-    updated_at: string;
+    status_penarikan: StatusPenarikan;
+    nominal_penarikan: number;
+    satuan_penarikan: "Rp" | "poin";
+    reward_id: number;
+    nama_reward: string;
 }
 
 interface PenarikanListResponse {
+    message: string;
     data: PenarikanItem[];
-    total: number;
-    page: number;
-    limit: number;
-    total_pages: number;
+}
+
+interface PenarikanNasabahListResponse {
+    message: string;
+    data: PenarikanNasabahItem[];
 }
 
 export interface PenarikanQueryParams {
@@ -34,17 +50,43 @@ export interface PenarikanQueryParams {
     end_date?: string;
 }
 
-export interface DetailSembako {
-    sembako_id: string;
-    nama_sembako: string;
+export interface DetailBarang {
+    produk_id: string;
+    nama_barang: string;
     photo_url: string | null;
     qty: number;
     nilai_poin: number;
     subtotal_poin: number;
 }
 
-export interface PenarikanDetail extends PenarikanItem {
-    detail_sembako?: DetailSembako[];
+export interface PenarikanDetailHeader {
+    penarikan_id: string;
+    nasabah_id: string;
+    nama_nasabah: string;
+    bank_id: string;
+    nama_bank: string;
+    reward_id: number;
+    nama_reward: string;
+    nominal_penarikan: number;
+    satuan_penarikan: "Rp" | "poin";
+    status_penarikan: StatusPenarikan;
+    deadline_konfirmasi: string | null;
+    deadline_jemput: string | null;
+    bukti_foto: string | null;
+}
+
+export interface RiwayatPenarikanEntry {
+    riwayat_penarikan_id: string;
+    status_penarikan: StatusPenarikan;
+    catatan: string | null;
+    created_by: string;
+    created_at: string;
+}
+
+export interface PenarikanDetail {
+    header: PenarikanDetailHeader;
+    riwayat: RiwayatPenarikanEntry[];
+    detail_penarikan: DetailBarang[];
 }
 
 export const PenarikanService = {
@@ -58,8 +100,8 @@ export const PenarikanService = {
         return response.data;
     },
 
-    async getListByNasabah(nasabahId: string): Promise<PenarikanItem[]> {
-        const response = await api.get<PenarikanListResponse>(`/penarikan/list/${nasabahId}`);
+    async getListByNasabah(nasabahId: string): Promise<PenarikanNasabahItem[]> {
+        const response = await api.get<PenarikanNasabahListResponse>(`/penarikan/list/${nasabahId}`);
         return response.data.data;
     },
 

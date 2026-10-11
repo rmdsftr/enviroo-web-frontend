@@ -5,7 +5,6 @@ export interface RiwayatSetoranNasabahItem {
     nama_petugas: string;
     transaksi_timestamp: string;
     total_item: number;
-    status_setoran: string;
 }
 
 export interface SetoranDetailItem {

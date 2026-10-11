@@ -3,42 +3,42 @@ import { FaPlus, FaPenToSquare, FaTrashCan } from "react-icons/fa6";
 import Button from "../../components/button";
 import SearchBar from "../../components/search";
 import Pagination from "../../components/pagination";
-import SembakoMasterModal from "../../modals/SembakoMasterModal";
-import type { SembakoMasterFormData } from "../../modals/SembakoMasterModal";
+import BarangMasterModal from "../../modals/BarangMasterModal";
+import type { BarangMasterFormData } from "../../modals/BarangMasterModal";
 import PopupConfirmation from "../../layouts/popup-confirmation";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import { MasterService } from "../../services/master.service";
 import FilterPill from "../../components/filter-pill";
 import FilterRange, { defaultMonthRange } from "../../components/filter-range";
-import type { MasterSembako, StatistikSembakoItem, SembakoFavoritItem } from "../../types/katalog.type";
+import type { MasterBarang, StatistikBarangItem, BarangFavoritItem } from "../../types/katalog.type";
 import "../../styles/manajemen-reward.css";
 import "../../styles/table.css";
 
 const LIMIT = 20;
-const SEMBAKO_COLOR = "#94DF0C";
+const BARANG_COLOR = "#94DF0C";
 
-export default function SembakoPage() {
-    const [items, setItems]           = useState<MasterSembako[]>([]);
+export default function BarangPage() {
+    const [items, setItems]           = useState<MasterBarang[]>([]);
     const [isLoading, setIsLoading]   = useState(true);
     const [search, setSearch]         = useState("");
     const [page, setPage]             = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
 
-    const [stats, setStats]             = useState<StatistikSembakoItem[]>([]);
+    const [stats, setStats]             = useState<StatistikBarangItem[]>([]);
     const [statsLoading, setStatsLoading] = useState(true);
     const [statsExpanded, setStatsExpanded] = useState(false);
     const STATS_PREVIEW = 8;
 
-    const [favorit, setFavorit]               = useState<SembakoFavoritItem[]>([]);
+    const [favorit, setFavorit]               = useState<BarangFavoritItem[]>([]);
     const [favoritLoading, setFavoritLoading] = useState(true);
     const [favoritMetric, setFavoritMetric]   = useState<"total_qty" | "total_poin" | "jumlah_nasabah" | "jumlah_tukar">("total_qty");
     const [favoritFrom, setFavoritFrom] = useState(() => defaultMonthRange().from);
     const [favoritTo, setFavoritTo]     = useState(() => defaultMonthRange().to);
 
     const [modalOpen, setModalOpen]       = useState(false);
-    const [editTarget, setEditTarget]     = useState<MasterSembako | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<MasterSembako | null>(null);
+    const [editTarget, setEditTarget]     = useState<MasterBarang | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<MasterBarang | null>(null);
     const [isDeleting, setIsDeleting]     = useState(false);
 
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -47,12 +47,12 @@ export default function SembakoPage() {
     const fetchItems = useCallback(async (q: string, p: number) => {
         setIsLoading(true);
         try {
-            const res = await MasterService.getSembako({ q: q || undefined, page: p, limit: LIMIT });
+            const res = await MasterService.getBarang({ q: q || undefined, page: p, limit: LIMIT });
             setItems(res.data ?? []);
             setTotalItems(res.total ?? 0);
             setTotalPages(Math.max(1, Math.ceil((res.total ?? 0) / LIMIT)));
         } catch {
-            showNotif("Gagal memuat data master sembako.", "error");
+            showNotif("Gagal memuat data master barang.", "error");
         } finally {
             setIsLoading(false);
         }
@@ -65,10 +65,10 @@ export default function SembakoPage() {
     const fetchStats = useCallback(async () => {
         setStatsLoading(true);
         try {
-            const res = await MasterService.getStatistikSembako();
+            const res = await MasterService.getStatistikBarang();
             setStats(res.data ?? []);
         } catch {
-            showNotif("Gagal memuat statistik sembako.", "error");
+            showNotif("Gagal memuat statistik barang.", "error");
         } finally {
             setStatsLoading(false);
         }
@@ -81,10 +81,10 @@ export default function SembakoPage() {
         try {
             const [fy, fm] = from.split("-").map(Number);
             const [ty, tm] = to.split("-").map(Number);
-            const res = await MasterService.getFavoritSembako(10, fm, fy, tm, ty);
+            const res = await MasterService.getFavoritBarang(10, fm, fy, tm, ty);
             setFavorit(res.data ?? []);
         } catch {
-            showNotif("Gagal memuat data sembako favorit.", "error");
+            showNotif("Gagal memuat data barang favorit.", "error");
         } finally {
             setFavoritLoading(false);
         }
@@ -92,13 +92,13 @@ export default function SembakoPage() {
 
     useEffect(() => { fetchFavorit(favoritFrom, favoritTo); }, [fetchFavorit, favoritFrom, favoritTo]);
 
-    const handleSubmit = async (data: SembakoMasterFormData) => {
+    const handleSubmit = async (data: BarangMasterFormData) => {
         if (editTarget) {
-            await MasterService.updateSembako(editTarget.BarangID, data);
-            showNotif("Item sembako berhasil diperbarui.", "success");
+            await MasterService.updateBarang(editTarget.BarangID, data);
+            showNotif("Item barang berhasil diperbarui.", "success");
         } else {
-            await MasterService.createSembako(data);
-            showNotif("Item sembako berhasil ditambahkan.", "success");
+            await MasterService.createBarang(data);
+            showNotif("Item barang berhasil ditambahkan.", "success");
         }
         setModalOpen(false);
         setEditTarget(null);
@@ -109,12 +109,12 @@ export default function SembakoPage() {
         if (!deleteTarget) return;
         setIsDeleting(true);
         try {
-            await MasterService.deleteSembako(deleteTarget.BarangID);
-            showNotif("Item sembako berhasil dihapus.", "success");
+            await MasterService.deleteBarang(deleteTarget.BarangID);
+            showNotif("Item barang berhasil dihapus.", "success");
             setDeleteTarget(null);
             fetchItems(search, page);
         } catch (err: any) {
-            showNotif(err?.response?.data?.error || "Gagal menghapus item sembako.", "error");
+            showNotif(err?.response?.data?.error || "Gagal menghapus item barang.", "error");
         } finally {
             setIsDeleting(false);
         }
@@ -126,9 +126,9 @@ export default function SembakoPage() {
             {/* ── Header ── */}
             <div className="mr-header">
                 <div className="mr-header-left">
-                    <h2 className="mr-header-title">Data Sembako</h2>
+                    <h2 className="mr-header-title">Data Barang</h2>
                     <p className="mr-header-desc">
-                        Kelola master item sembako dan pantau rata-rata nilai poin penukaran di seluruh bank sampah.
+                        Kelola master item barang dan pantau rata-rata nilai poin penukaran di seluruh bank sampah.
                     </p>
                 </div>
             </div>
@@ -148,7 +148,7 @@ export default function SembakoPage() {
                     icon={<FaPlus />}
                     onClick={() => { setEditTarget(null); setModalOpen(true); }}
                 >
-                    Tambah Item Sembako
+                    Tambah Item Barang
                 </Button>
             </div>
 
@@ -168,7 +168,7 @@ export default function SembakoPage() {
                             <tr><td colSpan={4} className="table-empty">Memuat data...</td></tr>
                         ) : items.length === 0 ? (
                             <tr><td colSpan={4} className="table-empty">
-                                {search ? `Tidak ada hasil untuk "${search}".` : "Belum ada data master sembako."}
+                                {search ? `Tidak ada hasil untuk "${search}".` : "Belum ada data master barang."}
                             </td></tr>
                         ) : (
                             items.map((item, idx) => (
@@ -217,11 +217,11 @@ export default function SembakoPage() {
             {/* ── Divider ── */}
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
-            {/* ── Statistik Nilai Poin Sembako ── */}
+            {/* ── Statistik Nilai Poin Barang ── */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
-                    <h2 className="mr-header-title">Statistik Nilai Poin Sembako</h2>
-                    <p className="mr-header-desc">Rata-rata nilai poin penukaran per jenis sembako berdasarkan katalog seluruh bank sampah.</p>
+                    <h2 className="mr-header-title">Statistik Nilai Poin Barang</h2>
+                    <p className="mr-header-desc">Rata-rata nilai poin penukaran per jenis barang berdasarkan katalog seluruh bank sampah.</p>
                 </div>
             </div>
 
@@ -240,7 +240,7 @@ export default function SembakoPage() {
 
                 if (sorted.length === 0) return (
                     <div style={{ textAlign: "center", padding: "40px 0", color: "var(--c-text-muted)", fontSize: "13px" }}>
-                        Belum ada data statistik sembako.
+                        Belum ada data statistik barang.
                     </div>
                 );
 
@@ -250,9 +250,9 @@ export default function SembakoPage() {
                         {/* Summary mini-cards */}
                         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                             {[
-                                { label: "Total Jenis", value: `${sorted.length} item`, sub: `${active.length} memiliki nilai poin`, color: `${SEMBAKO_COLOR}14`, border: `${SEMBAKO_COLOR}40` },
+                                { label: "Total Jenis", value: `${sorted.length} item`, sub: `${active.length} memiliki nilai poin`, color: `${BARANG_COLOR}14`, border: `${BARANG_COLOR}40` },
                                 { label: "Rata-rata Poin", value: avgPoin > 0 ? fmt(avgPoin) : "—", sub: "dari semua jenis aktif", color: "rgba(1,50,54,0.05)", border: "rgba(1,50,54,0.12)" },
-                                { label: "Poin Tertinggi", value: maxItem ? fmt(maxItem.rata_rata_poin) : "—", sub: maxItem ? maxItem.nama_barang : "—", color: `${SEMBAKO_COLOR}14`, border: `${SEMBAKO_COLOR}40` },
+                                { label: "Poin Tertinggi", value: maxItem ? fmt(maxItem.rata_rata_poin) : "—", sub: maxItem ? maxItem.nama_barang : "—", color: `${BARANG_COLOR}14`, border: `${BARANG_COLOR}40` },
                                 { label: "Poin Terendah", value: minItem ? fmt(minItem.rata_rata_poin) : "—", sub: minItem ? minItem.nama_barang : "—", color: "rgba(1,50,54,0.05)", border: "rgba(1,50,54,0.12)" },
                             ].map(card => (
                                 <div key={card.label} style={{ background: card.color, border: `1.5px solid ${card.border}`, borderRadius: "12px", padding: "12px 16px", display: "flex", flexDirection: "column", gap: "3px", minWidth: "150px", flex: 1 }}>
@@ -278,7 +278,7 @@ export default function SembakoPage() {
                                             {item.nama_barang}
                                         </span>
                                         <div style={{ height: "20px", borderRadius: "6px", background: "#e8f0eb", overflow: "hidden" }}>
-                                            <div style={{ height: "100%", width: `${pct}%`, borderRadius: "6px", background: SEMBAKO_COLOR, transition: "width 0.4s ease" }} />
+                                            <div style={{ height: "100%", width: `${pct}%`, borderRadius: "6px", background: BARANG_COLOR, transition: "width 0.4s ease" }} />
                                         </div>
                                         <span style={{ fontSize: "13px", fontWeight: 700, color: item.rata_rata_poin > 0 ? "#013236" : "#a0b5a8", textAlign: "right", whiteSpace: "nowrap" }}>
                                             {item.rata_rata_poin > 0 ? fmt(item.rata_rata_poin) : "—"}
@@ -309,11 +309,11 @@ export default function SembakoPage() {
             {/* ── Divider ── */}
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
-            {/* ── Sembako Favorit Nasabah ── */}
+            {/* ── Barang Favorit Nasabah ── */}
             <div className="mr-header" style={{ paddingTop: 0 }}>
                 <div className="mr-header-left">
-                    <h2 className="mr-header-title">Sembako Favorit Nasabah</h2>
-                    <p className="mr-header-desc">Top 10 jenis sembako paling banyak ditukarkan oleh nasabah.</p>
+                    <h2 className="mr-header-title">Barang Favorit Nasabah</h2>
+                    <p className="mr-header-desc">Top 10 jenis barang paling banyak ditukarkan oleh nasabah.</p>
                 </div>
                 <div style={{ alignSelf: "flex-end" }}>
                     <FilterRange
@@ -330,10 +330,10 @@ export default function SembakoPage() {
                 </div>
             ) : favorit.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 0", color: "var(--c-text-muted)", fontSize: "13px" }}>
-                    Belum ada data sembako favorit.
+                    Belum ada data barang favorit.
                 </div>
             ) : (() => {
-                const getValue = (d: SembakoFavoritItem): number => d[favoritMetric];
+                const getValue = (d: BarangFavoritItem): number => d[favoritMetric];
                 const maxVal = Math.max(...favorit.map(getValue), 1);
                 const fmtCompact = (n: number) => {
                     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}jt`;
@@ -380,10 +380,10 @@ export default function SembakoPage() {
 
                                 return (
                                     <g key={item.barang_id}>
-                                        <rect x={x} y={y} width={barW} height={barH} fill={SEMBAKO_COLOR} rx={5} />
+                                        <rect x={x} y={y} width={barW} height={barH} fill={BARANG_COLOR} rx={5} />
 
                                         {val > 0 && (
-                                            <text x={x + barW / 2} y={y - 5} textAnchor="middle" fontSize={6} fill={SEMBAKO_COLOR} fontWeight={700} fontFamily="Poppins, sans-serif">
+                                            <text x={x + barW / 2} y={y - 5} textAnchor="middle" fontSize={6} fill={BARANG_COLOR} fontWeight={700} fontFamily="Poppins, sans-serif">
                                                 {fmtCompact(val)}
                                             </text>
                                         )}
@@ -408,7 +408,7 @@ export default function SembakoPage() {
             })()}
 
             {/* ── Modal ── */}
-            <SembakoMasterModal
+            <BarangMasterModal
                 isOpen={modalOpen}
                 onClose={() => { setModalOpen(false); setEditTarget(null); }}
                 onSubmit={handleSubmit}
@@ -419,7 +419,7 @@ export default function SembakoPage() {
             <PopupConfirmation
                 isOpen={!!deleteTarget}
                 type="danger"
-                title="Hapus Item Sembako?"
+                title="Hapus Item Barang?"
                 message={`"${deleteTarget?.NamaBarang || ""}" akan dihapus dari master data. Item yang sudah digunakan dalam katalog tidak dapat dihapus.`}
                 confirmText={isDeleting ? "Menghapus..." : "Ya, Hapus"}
                 cancelText="Batal"

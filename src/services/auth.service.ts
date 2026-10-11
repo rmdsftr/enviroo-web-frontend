@@ -22,8 +22,8 @@ export const AuthService = {
         return response.data;
     },
 
-    async generateReactivateAkun(user_id: string, admin_id: string, role: string): Promise<ReactivateNasabahResponse> {
-        const response = await api.post<ReactivateNasabahResponse>("/auth/generate-reactivate-akun", { user_id, admin_id, role });
+    async generateReactivateAkun(user_id: string, admin_id: string, role: string, role_id: string): Promise<ReactivateNasabahResponse> {
+        const response = await api.post<ReactivateNasabahResponse>("/auth/generate-reactivate-akun", { user_id, admin_id, role, role_id });
         return response.data;
     },
 

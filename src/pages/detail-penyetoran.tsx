@@ -13,13 +13,6 @@ import ViewPhoto from "../components/view-photo";
 import "../styles/detail-penyetoran.css";
 import { formatTanggalPanjang, formatJam } from "../utils/date.utils";
 
-/* ── Status map ── */
-const STATUS_MAP: Record<string, { label: string; cls: string }> = {
-    berhasil: { label: "Berhasil", cls: "berhasil" },
-    gagal:    { label: "Gagal",    cls: "gagal"    },
-    pending:  { label: "Pending",  cls: "pending"  },
-};
-
 /* ── Helpers ── */
 function getInitials(name: string): string {
     return name
@@ -69,10 +62,6 @@ export default function DetailPenyetoranPage() {
         { label: "Detail Setoran" },
     ];
 
-    const statusConf = detail
-        ? (STATUS_MAP[detail.header.status_setoran] ?? { label: detail.header.status_setoran, cls: "" })
-        : null;
-
     return (
         <>
             <BreadcrumbLayout items={breadcrumbItems} />
@@ -104,13 +93,6 @@ export default function DetailPenyetoranPage() {
                                     <p className="dps-overview-subtitle">{detail.header.setoran_id}</p>
                                 </div>
                             </div>
-
-                            {statusConf && (
-                                <span className={`dps-status-pill ${statusConf.cls}`}>
-                                    <span className="dps-status-dot" />
-                                    {statusConf.label}
-                                </span>
-                            )}
 
                             <div className="dps-divider" />
 

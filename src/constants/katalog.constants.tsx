@@ -1,5 +1,5 @@
 import { type ColumnDef, TableActionBtn } from "../components/table";
-import type { DistribusiSembakoItem } from "../types/sembako.type";
+import type { DistribusiBarangItem } from "../types/barang.type";
 import { FaEye } from "react-icons/fa6";
 import { formatTanggal } from "../utils/date.utils";
 
@@ -16,12 +16,12 @@ export const STATUS_DISTRIBUSI: Record<string, { label: string; cls: string }> =
     gagal:   { label: "Gagal",   cls: "dibatalkan" },
 };
 
-export function buildDistribusiColumns(isBsi: boolean): ColumnDef<DistribusiSembakoItem>[] {
+export function buildDistribusiColumns(isBsi: boolean): ColumnDef<DistribusiBarangItem>[] {
     return [
         {
-            key: "disbako_id",
+            key: "disba_id",
             header: "ID Distribusi",
-            render: (row) => <span className="table-id">{row.disbako_id}</span>,
+            render: (row) => <span className="table-id">{row.disba_id}</span>,
         },
         {
             key: "pihak",

@@ -5,8 +5,10 @@ import {
     FaClock,
     FaCircleCheck,
     FaUser,
+    FaBuilding,
     FaBoxOpen,
     FaFileExport,
+    FaTriangleExclamation,
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
@@ -14,19 +16,13 @@ import PopupNotifikasi from "../layouts/popup-notifikasi";
 import Button from "../components/button";
 import { PenimbanganService, type PenimbanganDetail, type SetoranItem } from "../services/penimbangan.service";
 import "../styles/detail-penimbangan.css";
-import { formatTanggalPanjang, formatJam } from "../utils/date.utils";
+import { formatTanggalDenganHari, formatJam } from "../utils/date.utils";
 
 /* ── Status maps ── */
 const STATUS_MAP: Record<string, { label: string; cls: string }> = {
     selesai:    { label: "Selesai",      cls: "selesai"    },
     aktif:      { label: "Berlangsung",  cls: "aktif"      },
     dibatalkan: { label: "Dibatalkan",   cls: "dibatalkan" },
-};
-
-const SETORAN_STATUS_MAP: Record<string, { label: string; cls: string }> = {
-    berhasil: { label: "Berhasil", cls: "berhasil" },
-    gagal:    { label: "Gagal",    cls: "gagal"    },
-    pending:  { label: "Pending",  cls: "pending"  },
 };
 
 /* ── Helpers ── */
@@ -164,15 +160,42 @@ export default function DetailPenimbanganPage() {
                                 </span>
                             )}
 
+                            {detail.status_penimbangan === "dibatalkan" && detail.alasan_pembatalan && (
+                                <div style={{
+                                    marginTop: "10px",
+                                    display: "flex",
+                                    alignItems: "flex-start",
+                                    gap: "8px",
+                                    background: "rgba(239, 68, 68, 0.08)",
+                                    border: "1px solid rgba(239, 68, 68, 0.18)",
+                                    borderRadius: "10px",
+                                    padding: "10px 14px",
+                                }}>
+                                    <FaTriangleExclamation style={{ color: "#ef4444", fontSize: "12px", marginTop: "2px", flexShrink: 0 }} />
+                                    <div style={{ fontFamily: "'Poppins', sans-serif", fontSize: "12px", color: "#b04040" }}>
+                                        <strong style={{ display: "block", marginBottom: "2px" }}>Alasan Pembatalan</strong>
+                                        {detail.alasan_pembatalan}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="dp-divider" />
 
                             {/* Info Rows */}
                             <div className="dp-info-list">
                                 <div className="dp-info-row">
+                                    <div className="dp-info-icon-wrap"><FaBuilding /></div>
+                                    <div className="dp-info-text">
+                                        <span className="dp-info-label">Bank Sampah</span>
+                                        <span className="dp-info-value">{detail.nama_bank}</span>
+                                    </div>
+                                </div>
+
+                                <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaCalendarDays /></div>
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Tanggal</span>
-                                        <span className="dp-info-value">{detail.started_at ? formatTanggalPanjang(detail.started_at) : "—"}</span>
+                                        <span className="dp-info-value">{detail.tanggal_sesi ? formatTanggalDenganHari(detail.tanggal_sesi) : "—"}</span>
                                     </div>
                                 </div>
 
@@ -196,7 +219,7 @@ export default function DetailPenimbanganPage() {
                                     <div className="dp-info-icon-wrap"><FaUser /></div>
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Dibuka Oleh</span>
-                                        <span className="dp-info-value">{detail.started_by}</span>
+                                        <span className="dp-info-value">{detail.started_by || "—"}</span>
                                     </div>
                                 </div>
 
@@ -244,10 +267,6 @@ export default function DetailPenimbanganPage() {
                             ) : (
                                 <div className="dp-setoran-list">
                                     {detail.list_setoran.map((setoran) => {
-                                        const st = SETORAN_STATUS_MAP[setoran.status_setoran] ?? {
-                                            label: setoran.status_setoran,
-                                            cls: "",
-                                        };
                                         return (
                                             <div
                                                 key={setoran.setoran_id}
@@ -276,9 +295,6 @@ export default function DetailPenimbanganPage() {
                                                 <div className="dp-setoran-right">
                                                     <span className="dp-setoran-items">
                                                         {setoran.total_item} item
-                                                    </span>
-                                                    <span className={`dp-setoran-status-pill ${st.cls}`}>
-                                                        {st.label}
                                                     </span>
                                                 </div>
                                             </div>

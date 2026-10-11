@@ -111,7 +111,7 @@ export default function ManajemenRewardSection() {
         setDetailData(null);
         setIsDetailLoading(true);
         try {
-            const res = await RewardService.getDetailNilaiReward(nr.NilaiRewardID);
+            const res = await RewardService.getDetailNilaiReward(nr.nilai_reward_id);
             setDetailData(res.data);
         } catch (err: any) {
             setPopup({ message: err?.response?.data?.error || "Gagal memuat detail reward.", type: "error" });
@@ -125,13 +125,13 @@ export default function ManajemenRewardSection() {
         if (readOnly) return;
         setPickedReward(masterReward);
 
-        const configs = nilaiRewards.filter(nr => nr.RewardID === masterReward.RewardID);
+        const configs = nilaiRewards.filter(nr => nr.reward_id === masterReward.RewardID);
         if (configs.length > 0) {
             setIsEditMode(true);
             setInitialData({
                 persentase: configs.map(c => ({
-                    level_user: c.LevelUser,
-                    persen_bagi_hasil: c.PersenBagiHasil
+                    level_user: c.level_user,
+                    persen_bagi_hasil: c.persen_bagi_hasil
                 }))
             });
         } else {
@@ -166,7 +166,7 @@ export default function ManajemenRewardSection() {
         if (!deleteTarget) return;
         setIsDeleting(true);
         try {
-            await RewardService.deleteNilaiReward(deleteTarget.NilaiRewardID);
+            await RewardService.deleteNilaiReward(deleteTarget.nilai_reward_id);
             setPopup({ message: "Reward berhasil dihapus.", type: "success" });
             setDeleteTarget(null);
             fetchNilaiRewards();
@@ -226,7 +226,7 @@ export default function ManajemenRewardSection() {
                             const satuan = r.Satuan || "-";
                             const variant = rewardVariant(nama);
                             
-                            const configs = nilaiRewards.filter(nr => nr.RewardID === r.RewardID);
+                            const configs = nilaiRewards.filter(nr => nr.reward_id === r.RewardID);
                             const isConfigured = configs.length > 0;
                             const mainConfig = isConfigured ? configs[0] : null;
 
@@ -300,7 +300,7 @@ export default function ManajemenRewardSection() {
                     <div className="mr-modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
                         <div className="mr-modal-header">
                             <div>
-                                <h3 className="mr-modal-title">Detail Reward: {detailTarget.Reward?.NamaReward || "Reward"}</h3>
+                                <h3 className="mr-modal-title">Detail Reward: {detailTarget.reward?.NamaReward || "Reward"}</h3>
                                 <p className="mr-modal-sub">Informasi konfigurasi dan riwayat perubahan nilai reward.</p>
                             </div>
                             <CloseButton onClick={() => setDetailTarget(null)} />
@@ -374,7 +374,7 @@ export default function ManajemenRewardSection() {
                 isOpen={!!deleteTarget}
                 type="danger"
                 title="Hapus Nilai Reward?"
-                message={`Nilai konversi untuk "${deleteTarget?.Reward?.NamaReward || "reward ini"}" akan dihapus beserta seluruh riwayatnya. Lanjutkan?`}
+                message={`Nilai konversi untuk "${deleteTarget?.reward?.NamaReward || "reward ini"}" akan dihapus beserta seluruh riwayatnya. Lanjutkan?`}
                 confirmText={isDeleting ? "Menghapus..." : "Ya, Hapus"}
                 cancelText="Batal"
                 onConfirm={handleDelete}

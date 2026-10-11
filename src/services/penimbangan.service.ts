@@ -1,15 +1,11 @@
 import { api } from "./api";
 
+/** Item dari GET /penimbangan/get/:bank_id — riwayat sesi (aktif/pending sengaja di-exclude backend) */
 export interface PenimbanganItem {
     penimbangan_id: string;
-    jadwal_id: string;
-    bank_id: string;
-    started_by: string;
-    started_at: string;
-    ended_by: string | null;
-    ended_at: string | null;
-    status_penimbangan: "selesai" | "aktif" | "dibatalkan";
-    nama_admin: string;
+    tanggal_sesi: string;
+    status_penimbangan: "selesai" | "dibatalkan";
+    jumlah_setoran: number;
 }
 
 export interface SetoranItem {
@@ -19,17 +15,20 @@ export interface SetoranItem {
     nama_nasabah: string;
     transaksi_timestamp: string;
     total_item: number;
-    total_poin: number;
-    status_setoran: string;
 }
 
 export interface PenimbanganDetail {
     penimbangan_id: string;
-    started_at: string;
+    nama_bank: string;
+    /** tanggal sesi — selalu terisi, pakai ini buat nampilin tanggal (bukan started_at, itu nullable) */
+    tanggal_sesi: string;
+    started_at: string | null;
     ended_at: string | null;
+    /** bisa string kosong "" kalau sesi belum pernah dimulai/ditutup (di-COALESCE backend) */
     started_by: string;
-    ended_by: string | null;
+    ended_by: string;
     status_penimbangan: string;
+    alasan_pembatalan: string | null;
     list_setoran: SetoranItem[];
 }
 

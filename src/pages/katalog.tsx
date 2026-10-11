@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { KatalogService } from "../services/katalog.service";
-import { SembakoService } from "../services/sembako.service";
+import { BarangService } from "../services/barang.service";
 import type { KatalogSampah, KatalogDetail } from "../types/katalog.type";
-import type { KatalogSembakoItem } from "../types/sembako.type";
+import type { KatalogBarangItem } from "../types/barang.type";
 import Pagination from "../components/pagination";
 import { FaBoxOpen, FaBasketShopping, FaPlus, FaFileExport } from "react-icons/fa6";
 import Button from "../components/button";
@@ -15,11 +15,11 @@ import Table from "../components/table";
 import FilterRange from "../components/filter-range";
 import SearchBar from "../components/search";
 import { SampahCard } from "../components/SampahCard";
-import { SembakoCard } from "../components/SembakoCard";
+import { BarangCard } from "../components/BarangCard";
 import { KatalogSampahFormModal, type SampahFormData } from "../modals/KatalogSampahFormModal";
 import { KatalogSampahDetailModal } from "../modals/KatalogSampahDetailModal";
-import { KatalogSembakoFormModal, type SembakoFormData } from "../modals/KatalogSembakoFormModal";
-import { KatalogSembakoDetailModal } from "../modals/KatalogSembakoDetailModal";
+import { KatalogBarangFormModal, type BarangFormData } from "../modals/KatalogBarangFormModal";
+import { KatalogBarangDetailModal } from "../modals/KatalogBarangDetailModal";
 import { useKatalogData } from "../hooks/useKatalogData";
 import { SATUAN_OPTIONS, buildDistribusiColumns } from "../constants/katalog.constants";
 import { getApiError } from "../utils/error.utils";
@@ -30,12 +30,12 @@ export default function KatalogPage() {
     const navigate = useNavigate();
     const {
         user,
-        isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditSembako,
+        isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
         categories, rewards,
-        katalogList, sembakoList,
+        katalogList, barangList,
         sampahPage, setSampahPage, sampahMeta,
-        sembakoPage, setSembakoPage, sembakoMeta,
-        sembakoFilterBank, setSembakoFilterBank,
+        barangPage, setBarangPage, barangMeta,
+        barangFilterBank, setBarangFilterBank,
         bsuList, bsuRiwayat, setBsuRiwayat,
         distribusiLoading, distribusiFrom, setDistribusiFrom, distribusiTo, setDistribusiTo,
         distribusiSearch, setDistribusiSearch,
@@ -43,7 +43,7 @@ export default function KatalogPage() {
         filterSatuan, setFilterSatuan,
         filterReward, setFilterReward,
         filteredSampah, filteredDistribusi,
-        fetchKatalog, fetchSembako,
+        fetchKatalog, fetchBarang,
     } = useKatalogData();
 
     const [notif, setNotif] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
@@ -52,11 +52,11 @@ export default function KatalogPage() {
     const showConfirm = (title: string, message: string, onConfirm: () => void) => setConfirmState({ isOpen: true, title, message, onConfirm });
     const closeConfirm = () => setConfirmState(null);
 
-    const [activeTab, setActiveTab] = useState<"sampah" | "sembako">("sampah");
-    const [formMode, setFormMode] = useState<"add" | "edit-item" | "add-sembako" | "edit-sembako" | null>(null);
+    const [activeTab, setActiveTab] = useState<"sampah" | "barang">("sampah");
+    const [formMode, setFormMode] = useState<"add" | "edit-item" | "add-barang" | "edit-barang" | null>(null);
     const [selectedItem, setSelectedItem] = useState<KatalogSampah | null>(null);
     const [selectedItemDetail, setSelectedItemDetail] = useState<KatalogDetail | null>(null);
-    const [selectedSembako, setSelectedSembako] = useState<KatalogSembakoItem | null>(null);
+    const [selectedBarang, setSelectedBarang] = useState<KatalogBarangItem | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
@@ -66,13 +66,13 @@ export default function KatalogPage() {
         try {
             const blob = activeTab === "sampah"
                 ? await KatalogService.exportKatalogSampah(user.bank_id)
-                : await KatalogService.exportKatalogSembako(user.bank_id);
+                : await KatalogService.exportKatalogBarang(user.bank_id);
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
             a.download = activeTab === "sampah"
                 ? `katalog-sampah-${user.bank_id}.xlsx`
-                : `katalog-sembako-${user.bank_id}.xlsx`;
+                : `katalog-barang-${user.bank_id}.xlsx`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -146,24 +146,24 @@ export default function KatalogPage() {
         );
     };
 
-    const handleViewSembakoDetail = async (item: KatalogSembakoItem) => {
-        setSelectedSembako(item);
+    const handleViewBarangDetail = async (item: KatalogBarangItem) => {
+        setSelectedBarang(item);
         setBsuRiwayat(null);
         if (isAdminBsm) return;
         try {
-            const res = await SembakoService.getDetailSembakoBSU(item.sembako_id, sembakoFilterBank);
+            const res = await BarangService.getDetailBarangBSU(item.produk_id, barangFilterBank);
             setBsuRiwayat(res.data?.riwayat_distribusi ?? []);
         } catch {
             setBsuRiwayat([]);
         }
     };
 
-    const handleSembakoSubmit = async (data: SembakoFormData) => {
+    const handleBarangSubmit = async (data: BarangFormData) => {
         if (!user?.bank_id) { showNotif("Bank ID tidak ditemukan.", "error"); return; }
         setIsSubmitting(true);
         try {
-            if (formMode === "add-sembako") {
-                await SembakoService.addSembako(user.bank_id, {
+            if (formMode === "add-barang") {
+                await BarangService.addBarang(user.bank_id, {
                     nama_barang: data.nama_barang,
                     barang_id: data.barang_id,
                     nilai_poin: data.nilai_poin,
@@ -171,9 +171,9 @@ export default function KatalogPage() {
                     created_by: user.identity_id || undefined,
                     foto: data.foto,
                 });
-                showNotif("Sembako berhasil ditambahkan!");
-            } else if (formMode === "edit-sembako" && selectedSembako) {
-                await SembakoService.editSembako(selectedSembako.sembako_id, {
+                showNotif("Barang berhasil ditambahkan!");
+            } else if (formMode === "edit-barang" && selectedBarang) {
+                await BarangService.editBarang(selectedBarang.produk_id, {
                     nama_barang: data.nama_barang || undefined,
                     nilai_poin: data.nilai_poin,
                     tambah_stok: data.tambah_stok,
@@ -181,11 +181,11 @@ export default function KatalogPage() {
                     updated_by: user.identity_id || undefined,
                     foto: data.foto,
                 });
-                showNotif("Sembako berhasil diperbarui!");
-                setSelectedSembako(null);
+                showNotif("Barang berhasil diperbarui!");
+                setSelectedBarang(null);
             }
             setFormMode(null);
-            fetchSembako(sembakoFilterBank, sembakoPage);
+            fetchBarang(barangFilterBank, barangPage);
         } catch (error) {
             showNotif(getApiError(error, "Gagal menyimpan perubahan."), "error");
         } finally {
@@ -193,23 +193,23 @@ export default function KatalogPage() {
         }
     };
 
-    const handleDeleteSembako = () => {
-        if (!selectedSembako) return;
+    const handleDeleteBarang = () => {
+        if (!selectedBarang) return;
         showConfirm(
-            "Hapus Item Sembako",
-            `Yakin ingin menghapus "${selectedSembako.nama_barang}"? Tindakan ini tidak bisa dibatalkan.`,
+            "Hapus Item Barang",
+            `Yakin ingin menghapus "${selectedBarang.nama_barang}"? Tindakan ini tidak bisa dibatalkan.`,
             async () => {
                 closeConfirm();
                 try {
-                    await SembakoService.deleteSembako(selectedSembako.sembako_id);
-                    showNotif("Sembako berhasil dihapus!");
-                    setSelectedSembako(null);
-                    if (sembakoList.length === 1 && sembakoPage > 1) {
-                        const prevPage = sembakoPage - 1;
-                        setSembakoPage(prevPage);
-                        fetchSembako(sembakoFilterBank, prevPage);
+                    await BarangService.deleteBarang(selectedBarang.produk_id);
+                    showNotif("Barang berhasil dihapus!");
+                    setSelectedBarang(null);
+                    if (barangList.length === 1 && barangPage > 1) {
+                        const prevPage = barangPage - 1;
+                        setBarangPage(prevPage);
+                        fetchBarang(barangFilterBank, prevPage);
                     } else {
-                        fetchSembako(sembakoFilterBank, sembakoPage);
+                        fetchBarang(barangFilterBank, barangPage);
                     }
                 } catch (error) {
                     showNotif(getApiError(error, "Gagal menghapus."), "error");
@@ -221,7 +221,7 @@ export default function KatalogPage() {
     const distribusiColumns = useMemo(() => buildDistribusiColumns(isAdminBsi), [isAdminBsi]);
     const count = activeTab === "sampah"
         ? (sampahMeta?.total ?? filteredSampah.length)
-        : (sembakoMeta?.total ?? sembakoList.length);
+        : (barangMeta?.total ?? barangList.length);
 
     return (
         <div className="katalog-page">
@@ -239,15 +239,15 @@ export default function KatalogPage() {
                 />
             )}
 
-            <div className={`katalog-content-layout ${(activeTab === "sampah" || (isAdminBsi && activeTab === "sembako")) ? "has-sidebar" : ""}`}>
+            <div className={`katalog-content-layout ${(activeTab === "sampah" || (isAdminBsi && activeTab === "barang")) ? "has-sidebar" : ""}`}>
                 <div className="katalog-content-main">
                     <Tabs
                         tabs={[
                             { id: "sampah", label: "Katalog Sampah" },
-                            { id: "sembako", label: "Katalog Sembako" },
+                            { id: "barang", label: "Katalog Barang" },
                         ]}
                         activeTab={activeTab}
-                        onChange={(id) => { setActiveTab(id as "sampah" | "sembako"); setFilterKategori("all"); }}
+                        onChange={(id) => { setActiveTab(id as "sampah" | "barang"); setFilterKategori("all"); }}
                         style={{ marginBottom: '14px' }}
                     />
 
@@ -261,15 +261,15 @@ export default function KatalogPage() {
                         <div className="katalog-action-row">
                             <span className="katalog-count">{count} item</span>
                             <div style={{ display: "flex", gap: "8px" }}>
-                                {(isAdminBsi || isAdminBsu || isAdminBsm) && !(activeTab === "sembako" && isViewingBSU) && (
+                                {(isAdminBsi || isAdminBsu || isAdminBsm) && !(activeTab === "barang" && isViewingBSU) && (
                                     <Button icon={<FaFileExport />} color="secondary" variant="outline" size="small" isRounded disabled={isExporting} onClick={handleExport}>
                                         {isExporting ? "Mengunduh..." : "Ekspor Laporan"}
                                     </Button>
                                 )}
-                                {(activeTab === "sampah" ? canEdit : canEditSembako) && (
+                                {(activeTab === "sampah" ? canEdit : canEditBarang) && (
                                     <Button icon={<FaPlus />} color="secondary" size="small" isRounded
-                                        onClick={() => setFormMode(activeTab === "sampah" ? "add" : "add-sembako")}>
-                                        {activeTab === "sampah" ? "Tambah Katalog Sampah" : "Tambah Katalog Sembako"}
+                                        onClick={() => setFormMode(activeTab === "sampah" ? "add" : "add-barang")}>
+                                        {activeTab === "sampah" ? "Tambah Katalog Sampah" : "Tambah Katalog Barang"}
                                     </Button>
                                 )}
                             </div>
@@ -295,18 +295,18 @@ export default function KatalogPage() {
                                 )}
                             </>
                     ) : (
-                        sembakoList.length === 0
+                        barangList.length === 0
                             ? <div className="katalog-empty"><FaBasketShopping /><span>Tidak ada item ditemukan</span></div>
                             : <>
                                 <div className="katalog-grid">
-                                    {sembakoList.map(i => <SembakoCard key={i.sembako_id} item={i} onClick={() => handleViewSembakoDetail(i)} />)}
+                                    {barangList.map(i => <BarangCard key={i.produk_id} item={i} onClick={() => handleViewBarangDetail(i)} />)}
                                 </div>
-                                {sembakoMeta && sembakoMeta.total_pages > 1 && (
+                                {barangMeta && barangMeta.total_pages > 1 && (
                                     <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 0" }}>
                                         <Pagination
-                                            currentPage={sembakoPage}
-                                            totalPages={sembakoMeta.total_pages}
-                                            onPageChange={(p) => { setSembakoPage(p); fetchSembako(sembakoFilterBank, p); }}
+                                            currentPage={barangPage}
+                                            totalPages={barangMeta.total_pages}
+                                            onPageChange={(p) => { setBarangPage(p); fetchBarang(barangFilterBank, p); }}
                                         />
                                     </div>
                                 )}
@@ -346,21 +346,21 @@ export default function KatalogPage() {
                     </div>
                 )}
 
-                {/* Filter Sembako BSI */}
-                {activeTab === "sembako" && isAdminBsi && (
+                {/* Filter Barang BSI */}
+                {activeTab === "barang" && isAdminBsi && (
                     <div className="katalog-side-col">
                         <aside className="katalog-filter-sidebar">
                             <div className="kf-group">
                                 <span className="kf-group-label">Katalog</span>
                                 <FilterPill
                                     options={[{ label: "Katalog Saya", value: user?.bank_id ?? "" }]}
-                                    activeValue={sembakoFilterBank}
+                                    activeValue={barangFilterBank}
                                     onChange={(v) => {
                                         const bankId = v as string;
-                                        setSembakoFilterBank(bankId);
-                                        setSembakoPage(1);
-                                        setSelectedSembako(null);
-                                        fetchSembako(bankId, 1);
+                                        setBarangFilterBank(bankId);
+                                        setBarangPage(1);
+                                        setSelectedBarang(null);
+                                        fetchBarang(bankId, 1);
                                     }}
                                 />
                             </div>
@@ -371,12 +371,12 @@ export default function KatalogPage() {
                                         <span className="kf-group-label">Unit BSU</span>
                                         <FilterPill
                                             options={bsuList.map(b => ({ label: b.NamaBank, value: b.BankID }))}
-                                            activeValue={sembakoFilterBank}
+                                            activeValue={barangFilterBank}
                                             onChange={(v) => {
                                                 const bankId = v as string;
-                                                setSembakoFilterBank(bankId);
-                                                setSelectedSembako(null);
-                                                fetchSembako(bankId);
+                                                setBarangFilterBank(bankId);
+                                                setSelectedBarang(null);
+                                                fetchBarang(bankId);
                                             }}
                                         />
                                     </div>
@@ -388,15 +388,15 @@ export default function KatalogPage() {
             </div>
 
             {/* Distribusi Section */}
-            {activeTab === "sembako" && (isAdminBsi || isAdminBsu) && (
+            {activeTab === "barang" && (isAdminBsi || isAdminBsu) && (
                 <div className="katalog-distribusi-section">
                     <hr className="katalog-divider" style={{ marginTop: "24px", marginBottom: "24px" }} />
                     <div className="katalog-distribusi-header">
-                        <h3 className="katalog-distribusi-title">Riwayat Distribusi Sembako</h3>
+                        <h3 className="katalog-distribusi-title">Riwayat Distribusi Barang</h3>
                         <p className="katalog-distribusi-desc">
                             {isAdminBsi
-                                ? "Daftar seluruh distribusi sembako yang telah dikirimkan ke unit BSU."
-                                : "Daftar seluruh distribusi sembako yang telah diterima dari BSI."}
+                                ? "Daftar seluruh distribusi barang yang telah dikirimkan ke unit BSU."
+                                : "Daftar seluruh distribusi barang yang telah diterima dari BSI."}
                         </p>
                     </div>
                     <div className="katalog-distribusi-filter-row">
@@ -417,9 +417,9 @@ export default function KatalogPage() {
                         : <Table
                             columns={distribusiColumns}
                             data={filteredDistribusi}
-                            rowKey={(row) => row.disbako_id}
-                            emptyMessage="Belum ada riwayat distribusi sembako."
-                            onRowClick={(row) => navigate(`${isAdminBsi ? "/bsi" : "/bsu"}/distribusi-sembako/${row.disbako_id}`)}
+                            rowKey={(row) => row.disba_id}
+                            emptyMessage="Belum ada riwayat distribusi barang."
+                            onRowClick={(row) => navigate(`${isAdminBsi ? "/bsi" : "/bsu"}/distribusi-barang/${row.disba_id}`)}
                           />
                     }
                 </div>
@@ -456,32 +456,32 @@ export default function KatalogPage() {
                 />
             )}
 
-            {(formMode === "add-sembako" || formMode === "edit-sembako") && (
-                <KatalogSembakoFormModal
+            {(formMode === "add-barang" || formMode === "edit-barang") && (
+                <KatalogBarangFormModal
                     formMode={formMode}
-                    initialValues={formMode === "edit-sembako" && selectedSembako ? {
-                        nama_barang: selectedSembako.nama_barang,
-                        nilai_poin: selectedSembako.nilai_poin,
-                        photo_url: selectedSembako.photo_url,
+                    initialValues={formMode === "edit-barang" && selectedBarang ? {
+                        nama_barang: selectedBarang.nama_barang,
+                        nilai_poin: selectedBarang.nilai_poin,
+                        photo_url: selectedBarang.photo_url,
                     } : undefined}
                     isSubmitting={isSubmitting}
-                    onSubmit={handleSembakoSubmit}
+                    onSubmit={handleBarangSubmit}
                     onClose={() => setFormMode(null)}
                 />
             )}
 
-            {selectedSembako && !formMode && (
-                <KatalogSembakoDetailModal
-                    item={selectedSembako}
+            {selectedBarang && !formMode && (
+                <KatalogBarangDetailModal
+                    item={selectedBarang}
                     bsuRiwayat={bsuRiwayat}
-                    canEditSembako={canEditSembako}
+                    canEditBarang={canEditBarang}
                     isAdminBsi={isAdminBsi}
                     isAdminBsm={isAdminBsm}
-                    filterBankName={bsuList.find(b => b.BankID === sembakoFilterBank)?.NamaBank}
+                    filterBankName={bsuList.find(b => b.BankID === barangFilterBank)?.NamaBank}
                     isViewingBSU={isViewingBSU}
-                    onClose={() => { setSelectedSembako(null); setBsuRiwayat(null); }}
-                    onDelete={handleDeleteSembako}
-                    onEdit={() => setFormMode("edit-sembako")}
+                    onClose={() => { setSelectedBarang(null); setBsuRiwayat(null); }}
+                    onDelete={handleDeleteBarang}
+                    onEdit={() => setFormMode("edit-barang")}
                 />
             )}
         </div>

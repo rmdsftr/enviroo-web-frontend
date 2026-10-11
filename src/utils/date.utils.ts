@@ -1,5 +1,6 @@
 const BULAN_PENDEK = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
 const BULAN_PANJANG = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+const HARI_PANJANG = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 
 function parse(iso: string): Date {
     let s = iso.replace(" ", "T");
@@ -19,6 +20,12 @@ export function formatTanggal(iso: string): string {
 export function formatTanggalPanjang(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/** "Selasa, 25 Agustus 2026" */
+export function formatTanggalDenganHari(iso: string): string {
+    const d = parse(iso);
+    return `${HARI_PANJANG[d.getDay()]}, ${d.getDate()} ${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 /** "31 Mei" (no year) */

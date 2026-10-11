@@ -7,7 +7,7 @@ import "../styles/reward.css";
 
 const NAMA_REWARD_OPTIONS = [
     { label: "Uang", value: "Uang" },
-    { label: "Sembako", value: "Sembako" },
+    { label: "Barang", value: "Barang" },
 ];
 
 const SATUAN_OPTIONS = [

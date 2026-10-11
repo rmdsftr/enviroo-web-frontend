@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import {
     FaCalendarDays,
@@ -6,9 +7,11 @@ import {
     FaGift,
     FaMoneyBillWave,
     FaClock,
+    FaClockRotateLeft,
     FaImage,
     FaBoxOpen,
     FaBasketShopping,
+    FaXmark,
 } from "react-icons/fa6";
 import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
@@ -20,14 +23,29 @@ import {
 } from "../services/penarikan.service";
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
-import { formatTanggalPanjang, formatTanggalJam } from "../utils/date.utils";
+import "../styles/detail-pengangkutan.css";
+import { formatTanggalJam, formatTanggalJamBullet } from "../utils/date.utils";
 
-/* ── Status map ── */
+/* ── Status map (header pill) ── */
 const STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
-    pending:    { label: "Pending",    cls: "aktif"      },
-    berhasil:   { label: "Berhasil",   cls: "selesai"    },
-    kadaluarsa: { label: "Kadaluarsa", cls: "dibatalkan" },
-    dibatalkan: { label: "Dibatalkan", cls: "dibatalkan" },
+    pending:         { label: "Diajukan",              cls: "aktif"      },
+    approved:        { label: "Menunggu Dijemput",      cls: "aktif"      },
+    completed:       { label: "Selesai",                cls: "selesai"    },
+    canceled:        { label: "Dibatalkan",             cls: "dibatalkan" },
+    rejected:        { label: "Ditolak",                cls: "dibatalkan" },
+    request_expired: { label: "Pengajuan Kadaluarsa",   cls: "dibatalkan" },
+    pickup_expired:  { label: "Penjemputan Kadaluarsa", cls: "dibatalkan" },
+};
+
+/* ── Status map (riwayat timeline) ── */
+const RIWAYAT_STATUS_PENARIKAN: Record<string, { label: string; cls: string }> = {
+    pending:         { label: "Diajukan",              cls: "pending"  },
+    approved:        { label: "Menunggu Dijemput",      cls: "approved" },
+    completed:       { label: "Selesai",                cls: "completed" },
+    canceled:        { label: "Dibatalkan",             cls: "canceled" },
+    rejected:        { label: "Ditolak",                cls: "rejected" },
+    request_expired: { label: "Pengajuan Kadaluarsa",   cls: "expired"  },
+    pickup_expired:  { label: "Penjemputan Kadaluarsa", cls: "expired"  },
 };
 
 /* ── Helpers ── */
@@ -49,6 +67,7 @@ export default function DetailPenarikanPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [fotoOpen, setFotoOpen] = useState(false);
+    const [riwayatOpen, setRiwayatOpen] = useState(false);
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
     useEffect(() => {
@@ -61,17 +80,24 @@ export default function DetailPenarikanPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
+    useEffect(() => {
+        document.body.style.overflow = riwayatOpen ? "hidden" : "";
+        return () => { document.body.style.overflow = ""; };
+    }, [riwayatOpen]);
+
     const breadcrumbItems = [
         { label: "Riwayat", path: riwayatPath },
         { label: "Detail Penarikan" },
     ];
 
-    const statusConf = detail
-        ? (STATUS_PENARIKAN[detail.status_penarikan] ?? { label: detail.status_penarikan, cls: "" })
+    const header = detail?.header;
+
+    const statusConf = header
+        ? (STATUS_PENARIKAN[header.status_penarikan] ?? { label: header.status_penarikan, cls: "" })
         : null;
 
-    const isSembako = detail?.satuan_penarikan === "poin";
-    const hasBuktiFoto = !!detail?.bukti_foto;
+    const isBarang = header?.satuan_penarikan === "poin";
+    const hasBuktiFoto = !!header?.bukti_foto;
 
     return (
         <>
@@ -94,7 +120,7 @@ export default function DetailPenarikanPage() {
                     <div className="dp-error">Gagal memuat data. Silakan coba lagi.</div>
                 )}
 
-                {!loading && !error && detail && (
+                {!loading && !error && detail && header && (
                     <div className="dp-card">
 
                         {/* ── LEFT: Overview ── */}
@@ -103,7 +129,7 @@ export default function DetailPenarikanPage() {
                             <div className="dp-overview-header">
                                 <div>
                                     <p className="dp-overview-title">Informasi Penarikan</p>
-                                    <p className="dp-overview-subtitle">ID : {detail.penarikan_id}</p>
+                                    <p className="dp-overview-subtitle">ID : {header.penarikan_id}</p>
                                 </div>
                             </div>
 
@@ -121,7 +147,7 @@ export default function DetailPenarikanPage() {
                                     <div className="dp-info-icon-wrap"><FaUser /></div>
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Nama Nasabah</span>
-                                        <span className="dp-info-value">{detail.nama_nasabah}</span>
+                                        <span className="dp-info-value">{header.nama_nasabah}</span>
                                     </div>
                                 </div>
 
@@ -129,7 +155,7 @@ export default function DetailPenarikanPage() {
                                     <div className="dp-info-icon-wrap"><FaGift /></div>
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Jenis Reward</span>
-                                        <span className="dp-info-value">{detail.nama_reward}</span>
+                                        <span className="dp-info-value">{header.nama_reward}</span>
                                     </div>
                                 </div>
 
@@ -138,7 +164,7 @@ export default function DetailPenarikanPage() {
                                     <div className="dp-info-text">
                                         <span className="dp-info-label">Nominal Penarikan</span>
                                         <span className="dp-info-value">
-                                            {formatNominal(detail.nominal_penarikan, detail.satuan_penarikan)}
+                                            {formatNominal(header.nominal_penarikan, header.satuan_penarikan)}
                                         </span>
                                     </div>
                                 </div>
@@ -146,59 +172,64 @@ export default function DetailPenarikanPage() {
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaCalendarDays /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Tanggal Penarikan</span>
-                                        <span className="dp-info-value">{formatTanggalPanjang(detail.created_at)}</span>
+                                        <span className="dp-info-label">Batas Konfirmasi</span>
+                                        <span className="dp-info-value">{header.deadline_konfirmasi ? formatTanggalJam(header.deadline_konfirmasi) : "—"}</span>
                                     </div>
                                 </div>
 
                                 <div className="dp-info-row">
                                     <div className="dp-info-icon-wrap"><FaClock /></div>
                                     <div className="dp-info-text">
-                                        <span className="dp-info-label">Batas Kadaluarsa</span>
-                                        <span className="dp-info-value">{detail.kadaluarsa_at ? formatTanggalJam(detail.kadaluarsa_at) : "—"}</span>
+                                        <span className="dp-info-label">Batas Penjemputan</span>
+                                        <span className="dp-info-value">{header.deadline_jemput ? formatTanggalJam(header.deadline_jemput) : "—"}</span>
                                     </div>
                                 </div>
                             </div>
 
+                            <div className="dp-divider" />
+
+                            {/* Riwayat button */}
+                            <button className="dpg-sesi-btn" onClick={() => setRiwayatOpen(true)}>
+                                <FaClockRotateLeft />
+                                Riwayat Penarikan
+                            </button>
+
                             {hasBuktiFoto && (
-                                <>
-                                    <div className="dp-divider" />
-                                    <button className="dpj-foto-btn" onClick={() => setFotoOpen(true)}>
-                                        <FaImage />
-                                        Lihat Bukti Foto
-                                    </button>
-                                </>
+                                <button className="dpj-foto-btn" style={{ marginTop: "10px" }} onClick={() => setFotoOpen(true)}>
+                                    <FaImage />
+                                    Lihat Bukti Foto
+                                </button>
                             )}
                         </div>
 
                         {/* ── RIGHT: Detail Reward ── */}
                         <div className="dp-setoran-col">
-                            {isSembako ? (
+                            {isBarang ? (
                                 <>
                                     <div className="dp-setoran-header">
                                         <div>
-                                            <p className="dp-setoran-title">Rincian Sembako</p>
-                                            <p className="dp-setoran-subtitle">Daftar item sembako yang ditukarkan</p>
+                                            <p className="dp-setoran-title">Rincian Barang</p>
+                                            <p className="dp-setoran-subtitle">Daftar item barang yang ditukarkan</p>
                                         </div>
                                         <span className="dp-setoran-count-badge">
-                                            {detail.detail_sembako?.length ?? 0} item
+                                            {detail.detail_penarikan?.length ?? 0} item
                                         </span>
                                     </div>
 
-                                    {!detail.detail_sembako || detail.detail_sembako.length === 0 ? (
+                                    {!detail.detail_penarikan || detail.detail_penarikan.length === 0 ? (
                                         <div className="dp-setoran-empty">
                                             <FaBoxOpen />
-                                            <span>Belum ada rincian sembako.</span>
+                                            <span>Belum ada rincian barang.</span>
                                         </div>
                                     ) : (
                                         <div className="dpj-items-list">
-                                            {detail.detail_sembako.map((item) => (
-                                                <div key={item.sembako_id} className="dpj-item-row">
+                                            {detail.detail_penarikan.map((item) => (
+                                                <div key={item.produk_id} className="dpj-item-row">
                                                     <div className="dpj-item-icon">
                                                         <FaBasketShopping />
                                                     </div>
                                                     <div className="dpj-item-body">
-                                                        <span className="dpj-item-name">{item.nama_sembako}</span>
+                                                        <span className="dpj-item-name">{item.nama_barang}</span>
                                                         <span className="dpj-item-detail">
                                                             {item.qty} × {item.nilai_poin.toLocaleString("id-ID")} poin
                                                         </span>
@@ -218,13 +249,13 @@ export default function DetailPenarikanPage() {
                                     <div className="dp-stats-row">
                                         <div className="dp-stat-chip">
                                             <span className="dp-stat-chip-value">
-                                                {detail.detail_sembako?.length ?? 0}
+                                                {detail.detail_penarikan?.length ?? 0}
                                             </span>
                                             <span className="dp-stat-chip-label">Total Item</span>
                                         </div>
                                         <div className="dp-stat-chip">
                                             <span className="dp-stat-chip-value">
-                                                {detail.nominal_penarikan.toLocaleString("id-ID")}
+                                                {header.nominal_penarikan.toLocaleString("id-ID")}
                                             </span>
                                             <span className="dp-stat-chip-label">Total Poin</span>
                                         </div>
@@ -241,12 +272,12 @@ export default function DetailPenarikanPage() {
 
                                     <div className="dp-stat-chip" style={{ maxWidth: "240px" }}>
                                         <span className="dp-stat-chip-value">
-                                            Rp {detail.nominal_penarikan.toLocaleString("id-ID")}
+                                            Rp {header.nominal_penarikan.toLocaleString("id-ID")}
                                         </span>
                                         <span className="dp-stat-chip-label">Nominal Dicairkan</span>
                                     </div>
 
-                                    {!hasBuktiFoto && detail.status_penarikan === "pending" && (
+                                    {!hasBuktiFoto && header.status_penarikan === "pending" && (
                                         <p style={{
                                             fontFamily: "'Poppins', sans-serif",
                                             fontSize: "12px",
@@ -273,12 +304,63 @@ export default function DetailPenarikanPage() {
                 />
             )}
 
-            {fotoOpen && detail?.bukti_foto && (
+            {fotoOpen && header?.bukti_foto && (
                 <ViewPhoto
-                    src={detail.bukti_foto}
+                    src={header.bukti_foto}
                     alt="Bukti foto penarikan"
                     onClose={() => setFotoOpen(false)}
                 />
+            )}
+
+            {/* ── Riwayat Popup ── */}
+            {riwayatOpen && createPortal(
+                <div className="dpg-overlay" onClick={() => setRiwayatOpen(false)}>
+                    <div className="dpg-popup" onClick={(e) => e.stopPropagation()}>
+
+                        {/* Popup Header */}
+                        <div className="dpg-popup-header">
+                            <p className="dpg-popup-title">Riwayat Penarikan</p>
+                            <button className="dpg-popup-close" onClick={() => setRiwayatOpen(false)}>
+                                <FaXmark />
+                            </button>
+                        </div>
+
+                        {!detail || detail.riwayat.length === 0 ? (
+                            <div className="dpg-popup-loading">Belum ada riwayat penarikan.</div>
+                        ) : (
+                            <div className="dpg-timeline">
+                                {detail.riwayat.map((entry, i) => {
+                                    const st = RIWAYAT_STATUS_PENARIKAN[entry.status_penarikan] ?? { label: entry.status_penarikan, cls: "" };
+                                    return (
+                                        <div key={entry.riwayat_penarikan_id} className="dpg-timeline-item">
+                                            <div className="dpg-timeline-left">
+                                                <div className="dpg-timeline-dot" />
+                                                {detail && i < detail.riwayat.length - 1 && (
+                                                    <div className="dpg-timeline-line" />
+                                                )}
+                                            </div>
+                                            <div className="dpg-timeline-content">
+                                                <span className={`dpg-timeline-status dpg-status-${st.cls}`}>
+                                                    {st.label}
+                                                </span>
+                                                <span className="dpg-timeline-time">
+                                                    {entry.created_at ? formatTanggalJamBullet(entry.created_at) : "—"}
+                                                </span>
+                                                {entry.created_by && (
+                                                    <span className="dpg-timeline-by">{entry.created_by}</span>
+                                                )}
+                                                {entry.catatan && (
+                                                    <span className="dpg-timeline-note">{entry.catatan}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </div>,
+                document.body
             )}
         </>
     );

@@ -21,17 +21,17 @@ import type { KategoriSampah } from "../../types/katalog.type";
 import "../../styles/manajemen-reward.css";
 import "../../styles/table.css";
 
-function rewardVariant(nama: string): "uang" | "sembako" | "default" {
+function rewardVariant(nama: string): "uang" | "barang" | "default" {
     const lower = nama.toLowerCase();
     if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah")) return "uang";
-    if (lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return "sembako";
+    if (lower.includes("barang") || lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return "barang";
     return "default";
 }
 
 function RewardIcon({ nama }: { nama: string }) {
     const lower = nama.toLowerCase();
     if (lower.includes("uang") || lower.includes("tunai") || lower.includes("rupiah")) return <FaMoneyBillWave />;
-    if (lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return <FaBoxOpen />;
+    if (lower.includes("barang") || lower.includes("sembako") || lower.includes("bahan") || lower.includes("pangan")) return <FaBoxOpen />;
     return <FaGift />;
 }
 
@@ -46,8 +46,8 @@ export default function KonfigurasiPage() {
     const [editReward, setEditReward] = useState<RewardFormData | null>(null);
 
     const hasUang = rewards.some(r => rewardVariant(r.NamaReward) === "uang");
-    const hasSembako = rewards.some(r => rewardVariant(r.NamaReward) === "sembako");
-    const allRewardsPresent = hasUang && hasSembako;
+    const hasBarang = rewards.some(r => rewardVariant(r.NamaReward) === "barang");
+    const allRewardsPresent = hasUang && hasBarang;
 
     const fetchRewards = useCallback(async () => {
         setIsLoadingReward(true);
@@ -147,7 +147,7 @@ export default function KonfigurasiPage() {
                 <div className="mr-header-left">
                     <h2 className="mr-header-title">Konfigurasi</h2>
                     <p className="mr-header-desc">
-                        Kelola jenis-jenis reward yang tersedia. Sistem reward saat ini mendukung uang tunai dan sembako.
+                        Kelola jenis-jenis reward yang tersedia. Sistem reward saat ini mendukung uang tunai dan barang.
                     </p>
                 </div>
                 {!allRewardsPresent && (

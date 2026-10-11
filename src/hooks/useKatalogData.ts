@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { KatalogService } from "../services/katalog.service";
 import { RewardService } from "../services/reward.service";
-import { SembakoService } from "../services/sembako.service";
+import { BarangService } from "../services/barang.service";
 import { BsiService } from "../services/bsi.service";
 import { defaultMonthRange } from "../components/filter-range";
 import type {
@@ -12,11 +12,11 @@ import type {
 } from "../types/katalog.type";
 import type { Reward } from "../types/reward.type";
 import type {
-    KatalogSembakoItem,
+    KatalogBarangItem,
     RiwayatDistribusi,
-    DistribusiSembakoItem,
-    SembakoMeta,
-} from "../types/sembako.type";
+    DistribusiBarangItem,
+    BarangMeta,
+} from "../types/barang.type";
 import type { UnitBSI } from "../types/bsi.type";
 
 export function useKatalogData() {
@@ -29,15 +29,15 @@ export function useKatalogData() {
     const [categories, setCategories] = useState<KategoriSampahT[]>([]);
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [katalogList, setKatalogList] = useState<KatalogSampah[]>([]);
-    const [sembakoList, setSembakoList] = useState<KatalogSembakoItem[]>([]);
+    const [barangList, setBarangList] = useState<KatalogBarangItem[]>([]);
     const [sampahPage, setSampahPage] = useState(1);
     const [sampahMeta, setSampahMeta] = useState<KatalogSampahMeta | null>(null);
-    const [sembakoPage, setSembakoPage] = useState(1);
-    const [sembakoMeta, setSembakoMeta] = useState<SembakoMeta | null>(null);
-    const [sembakoFilterBank, setSembakoFilterBank] = useState<string>(user?.bank_id ?? "");
+    const [barangPage, setBarangPage] = useState(1);
+    const [barangMeta, setBarangMeta] = useState<BarangMeta | null>(null);
+    const [barangFilterBank, setBarangFilterBank] = useState<string>(user?.bank_id ?? "");
     const [bsuList, setBsuList] = useState<UnitBSI[]>([]);
     const [bsuRiwayat, setBsuRiwayat] = useState<RiwayatDistribusi[] | null>(null);
-    const [distribusiList, setDistribusiList] = useState<DistribusiSembakoItem[]>([]);
+    const [distribusiList, setDistribusiList] = useState<DistribusiBarangItem[]>([]);
     const [distribusiLoading, setDistribusiLoading] = useState(false);
     const [distribusiFrom, setDistribusiFrom] = useState(() => defaultMonthRange().from);
     const [distribusiTo, setDistribusiTo] = useState(() => defaultMonthRange().to);
@@ -46,8 +46,8 @@ export function useKatalogData() {
     const [filterSatuan, setFilterSatuan] = useState<"all" | "kg" | "pcs" | "liter">("all");
     const [filterReward, setFilterReward] = useState<number | "all">("all");
 
-    const isViewingBSU = isAdminBsi && !!sembakoFilterBank && sembakoFilterBank !== user?.bank_id;
-    const canEditSembako = canEdit && !isViewingBSU;
+    const isViewingBSU = isAdminBsi && !!barangFilterBank && barangFilterBank !== user?.bank_id;
+    const canEditBarang = canEdit && !isViewingBSU;
 
     const fetchKatalog = useCallback((page = 1) => {
         if (!user?.bank_id) return;
@@ -59,14 +59,14 @@ export function useKatalogData() {
             .catch(err => console.error("Failed to fetch katalog bank", err));
     }, [user?.bank_id]);
 
-    const fetchSembako = useCallback((bankId: string, page = 1) => {
+    const fetchBarang = useCallback((bankId: string, page = 1) => {
         if (!bankId) return;
-        SembakoService.getSembakoBank(bankId, page)
+        BarangService.getBarangBank(bankId, page)
             .then(res => {
-                setSembakoList(res.data || []);
-                setSembakoMeta(res.pagination ?? null);
+                setBarangList(res.data || []);
+                setBarangMeta(res.pagination ?? null);
             })
-            .catch(err => console.error("Failed to fetch sembako bank", err));
+            .catch(err => console.error("Failed to fetch barang bank", err));
     }, []);
 
     const fetchBsuList = useCallback(() => {
@@ -83,10 +83,10 @@ export function useKatalogData() {
             const startDate = startMonth + "-01";
             const [y, m] = endMonth.split("-").map(Number);
             const endDate = `${endMonth}-${new Date(y, m, 0).getDate()}`;
-            const res = await SembakoService.listDistribusiSembako(user.bank_id, startDate, endDate);
+            const res = await BarangService.listDistribusiBarang(user.bank_id, startDate, endDate);
             setDistribusiList(res.data || []);
         } catch {
-            console.error("Gagal memuat distribusi sembako");
+            console.error("Gagal memuat distribusi barang");
         } finally {
             setDistribusiLoading(false);
         }
@@ -106,9 +106,9 @@ export function useKatalogData() {
             .catch(err => console.error("Failed to fetch rewards", err));
 
         fetchKatalog();
-        if (user?.bank_id) fetchSembako(user.bank_id);
+        if (user?.bank_id) fetchBarang(user.bank_id);
         fetchBsuList();
-    }, [fetchKatalog, fetchSembako, fetchBsuList, user?.bank_id]);
+    }, [fetchKatalog, fetchBarang, fetchBsuList, user?.bank_id]);
 
     useEffect(() => { setSampahPage(1); }, [filterKategori, filterSatuan, filterReward]);
 
@@ -123,7 +123,7 @@ export function useKatalogData() {
         const q = distribusiSearch.toLowerCase();
         if (!q) return distribusiList;
         return distribusiList.filter(item =>
-            item.disbako_id.toLowerCase().includes(q) ||
+            item.disba_id.toLowerCase().includes(q) ||
             item.nama_bsu.toLowerCase().includes(q) ||
             item.nama_admin_bsi.toLowerCase().includes(q)
         );
@@ -131,12 +131,12 @@ export function useKatalogData() {
 
     return {
         user,
-        isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditSembako,
+        isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
         categories, rewards,
-        katalogList, sembakoList,
+        katalogList, barangList,
         sampahPage, setSampahPage, sampahMeta,
-        sembakoPage, setSembakoPage, sembakoMeta,
-        sembakoFilterBank, setSembakoFilterBank,
+        barangPage, setBarangPage, barangMeta,
+        barangFilterBank, setBarangFilterBank,
         bsuList, bsuRiwayat, setBsuRiwayat,
         distribusiLoading,
         distribusiFrom, setDistribusiFrom,
@@ -146,6 +146,6 @@ export function useKatalogData() {
         filterSatuan, setFilterSatuan,
         filterReward, setFilterReward,
         filteredSampah, filteredDistribusi,
-        fetchKatalog, fetchSembako,
+        fetchKatalog, fetchBarang,
     };
 }

@@ -1,5 +1,5 @@
 /* =========================================================
-   Katalog Page — Sampah & Sembako Catalog
+   Katalog Page — Sampah & Barang Catalog
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;700&display=swap');
@@ -756,7 +756,7 @@ input[type=number] {
 
 
 /* =========================================================
-   DISTRIBUSI SEMBAKO SECTION
+   DISTRIBUSI BARANG SECTION
    ========================================================= */
 .katalog-distribusi-section {
     margin-top: 8px;

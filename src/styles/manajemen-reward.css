@@ -164,7 +164,7 @@
     color: var(--c-warning-600, #b45309);
 }
 
-.mr-card-icon--sembako {
+.mr-card-icon--barang {
     background: rgba(249, 115, 22, 0.10);
     color: #ea580c;
 }
@@ -813,6 +813,64 @@
 
 .mr-input-override .input-field::placeholder {
     color: var(--c-text-subtle, #8aab97) !important;
+}
+
+/* ── Modern toggle switch (aktif/nonaktif) ── */
+.mr-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.mr-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.mr-toggle-track {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: #d1d9d4;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.mr-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(1, 50, 54, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.mr-toggle input:checked + .mr-toggle-track {
+    background: var(--c-primary, #4EA771);
+}
+
+.mr-toggle input:checked + .mr-toggle-track .mr-toggle-thumb {
+    transform: translateX(18px);
+}
+
+.mr-toggle input:focus-visible + .mr-toggle-track {
+    outline: 2px solid var(--c-primary, #4EA771);
+    outline-offset: 2px;
+}
+
+.mr-toggle-text {
+    font-family: var(--ff-sans, 'Poppins', sans-serif);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--c-secondary, #013236);
 }
 
 /* ── Animations ── */

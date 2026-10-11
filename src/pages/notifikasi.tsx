@@ -38,7 +38,7 @@ const ICON_BY_REF: Partial<Record<NonNullable<NotifRefType>, React.ReactNode>> =
     kontrak:                 <FaTriangleExclamation />,
     pengajuan:               <FaFileCircleCheck />,
     pengangkutan:            <FaTruck />,
-    distribusi_sembako:      <FaBoxOpen />,
+    distribusi_barang:       <FaBoxOpen />,
     jadwal_penimbangan:      <FaCalendarCheck />,
     jadwal_pengangkutan:     <FaCalendarCheck />,
     pengajuan_pengangkutan:  <FaFileCircleCheck />,

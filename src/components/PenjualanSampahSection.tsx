@@ -97,7 +97,7 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                         {[
                             ...(totalRp   > 0 ? [{ label: "Nilai Uang",    val: fmtNilai(totalRp,   "Rp")   }] : []),
-                            ...(totalPoin > 0 ? [{ label: "Nilai Sembako", val: fmtNilai(totalPoin, "poin") }] : []),
+                            ...(totalPoin > 0 ? [{ label: "Nilai Barang", val: fmtNilai(totalPoin, "poin") }] : []),
                         ].map(({ label, val }) => (
                             <div key={label} style={{
                                 background: "rgba(78,167,113,0.07)",
@@ -115,7 +115,7 @@ export default function PenjualanSampahSection({ bankId }: Props) {
                 <FilterPill
                     options={[
                         { label: "Uang",    value: "Rp"   },
-                        { label: "Sembako", value: "poin" },
+                        { label: "Barang", value: "poin" },
                     ]}
                     activeValue={filterSatuan}
                     onChange={(v) => setFilterSatuan(v as typeof filterSatuan)}

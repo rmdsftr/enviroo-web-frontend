@@ -296,6 +296,16 @@
     color: #6b7280;
 }
 
+.dpg-status-pending {
+    background: rgba(59, 130, 246, 0.10);
+    color: #2563eb;
+}
+
+.dpg-status-expired {
+    background: rgba(239, 68, 68, 0.10);
+    color: #ef4444;
+}
+
 .dpg-timeline-time {
     font-family: 'Poppins', sans-serif;
     font-size: 11px;

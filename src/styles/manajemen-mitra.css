@@ -1,0 +1,43 @@
+/* ══════════════════════════════════════════
+   Manajemen Mitra Pengepul — Section on Penjualan
+   ══════════════════════════════════════════ */
+
+.mm-card {
+    background: var(--c-surface, #ffffff);
+    border: 1px solid var(--c-border, #d6ded9);
+    border-radius: var(--r-xl, 16px);
+    box-shadow: var(--sh-sm, 0 2px 6px rgba(0, 0, 0, 0.05));
+    overflow: hidden;
+}
+
+.mm-card-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--c-border-soft, #e7edea);
+    flex-wrap: wrap;
+}
+
+/* Table already renders its own bordered wrapper; drop the duplicate
+   border/shadow/radius so it reads as one seamless card. */
+.mm-card .table-wrapper {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.mm-loading {
+    padding: 56px 16px;
+    text-align: center;
+    color: var(--c-text-faint, #9aaaa2);
+    font-family: var(--ff-sans, 'Poppins', sans-serif);
+    font-size: 13px;
+}
+
+@media (max-width: 640px) {
+    .mm-card-toolbar {
+        padding: 14px 16px;
+    }
+}

@@ -1,14 +1,14 @@
 import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { SembakoService } from "../services/sembako.service";
-import type { MasterSembako } from "../types/sembako.type";
+import { BarangService } from "../services/barang.service";
+import type { MasterBarang } from "../types/barang.type";
 import { FaCloudArrowUp, FaTrash } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import Input from "../components/input";
 import SearchableInput, { type SearchableOption } from "../components/searchable-input";
 
-export interface SembakoFormData {
+export interface BarangFormData {
     nama_barang: string;
     barang_id?: number;
     nilai_poin: number;
@@ -19,58 +19,58 @@ export interface SembakoFormData {
 }
 
 interface Props {
-    formMode: "add-sembako" | "edit-sembako";
+    formMode: "add-barang" | "edit-barang";
     initialValues?: {
         nama_barang: string;
         nilai_poin: number;
         photo_url?: string | null;
     };
     isSubmitting: boolean;
-    onSubmit: (data: SembakoFormData) => void;
+    onSubmit: (data: BarangFormData) => void;
     onClose: () => void;
 }
 
-export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting, onSubmit, onClose }: Props) {
-    const [sembakoNama, setSembakoNama] = useState(initialValues?.nama_barang ?? "");
-    const [sembakoBarangId, setSembakoBarangId] = useState<number | null>(null);
-    const [sembakoPoin, setSembakoPoin] = useState(initialValues?.nilai_poin?.toString() ?? "");
-    const [sembakoStok, setSembakoStok] = useState("");
-    const [sembakoTambahStok, setSembakoTambahStok] = useState("");
-    const [sembakoFoto, setSembakoFoto] = useState<File | null>(null);
-    const [sembakoFotoPreview, setSembakoFotoPreview] = useState<string | null>(initialValues?.photo_url ?? null);
-    const sembakoFileRef = useRef<HTMLInputElement>(null);
+export function KatalogBarangFormModal({ formMode, initialValues, isSubmitting, onSubmit, onClose }: Props) {
+    const [barangNama, setBarangNama] = useState(initialValues?.nama_barang ?? "");
+    const [barangBarangId, setBarangBarangId] = useState<number | null>(null);
+    const [barangPoin, setBarangPoin] = useState(initialValues?.nilai_poin?.toString() ?? "");
+    const [barangStok, setBarangStok] = useState("");
+    const [barangTambahStok, setBarangTambahStok] = useState("");
+    const [barangFoto, setBarangFoto] = useState<File | null>(null);
+    const [barangFotoPreview, setBarangFotoPreview] = useState<string | null>(initialValues?.photo_url ?? null);
+    const barangFileRef = useRef<HTMLInputElement>(null);
 
-    const handleSembakoFile = useCallback((file: File) => {
+    const handleBarangFile = useCallback((file: File) => {
         if (!file.type.startsWith("image/")) return;
-        setSembakoFoto(file);
+        setBarangFoto(file);
         const reader = new FileReader();
-        reader.onloadend = () => setSembakoFotoPreview(reader.result as string);
+        reader.onloadend = () => setBarangFotoPreview(reader.result as string);
         reader.readAsDataURL(file);
     }, []);
 
-    const searchMasterSembako = async (query: string): Promise<SearchableOption<number>[]> => {
-        const res = await SembakoService.getMasterSembako(query);
-        return (res.data ?? []).map((item: MasterSembako) => ({
+    const searchMasterBarang = async (query: string): Promise<SearchableOption<number>[]> => {
+        const res = await BarangService.getMasterBarang(query);
+        return (res.data ?? []).map((item: MasterBarang) => ({
             value: item.BarangID,
             label: item.NamaBarang,
             raw: item,
         }));
     };
 
-    const handleSelectMasterSembako = (option: SearchableOption<number> | null) => {
-        setSembakoBarangId(option ? (option.raw as MasterSembako).BarangID : null);
+    const handleSelectMasterBarang = (option: SearchableOption<number> | null) => {
+        setBarangBarangId(option ? (option.raw as MasterBarang).BarangID : null);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSubmit({
-            nama_barang: sembakoNama,
-            barang_id: sembakoBarangId ?? undefined,
-            nilai_poin: Number(sembakoPoin),
-            stok_awal: sembakoStok !== "" ? Number(sembakoStok) : undefined,
-            tambah_stok: sembakoTambahStok !== "" ? Number(sembakoTambahStok) : undefined,
-            stok: sembakoStok !== "" ? Number(sembakoStok) : undefined,
-            foto: sembakoFoto || undefined,
+            nama_barang: barangNama,
+            barang_id: barangBarangId ?? undefined,
+            nilai_poin: Number(barangPoin),
+            stok_awal: barangStok !== "" ? Number(barangStok) : undefined,
+            tambah_stok: barangTambahStok !== "" ? Number(barangTambahStok) : undefined,
+            stok: barangStok !== "" ? Number(barangStok) : undefined,
+            foto: barangFoto || undefined,
         });
     };
 
@@ -80,12 +80,12 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                 <div className="km-header">
                     <div>
                         <h3 className="km-title">
-                            {formMode === "add-sembako" ? "Tambah Katalog Sembako" : "Edit Sembako"}
+                            {formMode === "add-barang" ? "Tambah Katalog Barang" : "Edit Barang"}
                         </h3>
                         <p className="km-subtitle">
-                            {formMode === "add-sembako"
-                                ? "Tambahkan item sembako baru beserta harga poin dan stok awal."
-                                : "Perbarui detail, harga poin, atau stok item sembako."}
+                            {formMode === "add-barang"
+                                ? "Tambahkan item barang baru beserta harga poin dan stok awal."
+                                : "Perbarui detail, harga poin, atau stok item barang."}
                         </p>
                     </div>
                     <CloseButton onClick={onClose} />
@@ -101,16 +101,16 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                             </div>
 
                             <div className="km-group" style={{ margin: 0 }}>
-                                <label className="km-label">Nama Sembako <span className="km-req">*</span></label>
-                                {formMode === "add-sembako" ? (
+                                <label className="km-label">Nama Barang <span className="km-req">*</span></label>
+                                {formMode === "add-barang" ? (
                                     <SearchableInput<number>
-                                        value={sembakoNama}
+                                        value={barangNama}
                                         onChange={(text) => {
-                                            setSembakoNama(text);
-                                            if (sembakoBarangId !== null) setSembakoBarangId(null);
+                                            setBarangNama(text);
+                                            if (barangBarangId !== null) setBarangBarangId(null);
                                         }}
-                                        onSelect={handleSelectMasterSembako}
-                                        onSearch={searchMasterSembako}
+                                        onSelect={handleSelectMasterBarang}
+                                        onSearch={searchMasterBarang}
                                         placeholder="Contoh: Beras 5 kg"
                                         fullWidth
                                     />
@@ -119,8 +119,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                         className="km-input-neutral"
                                         placeholder="Contoh: Beras 5 kg"
                                         fullWidth
-                                        value={sembakoNama}
-                                        onChange={(e) => setSembakoNama(e.target.value)}
+                                        value={barangNama}
+                                        onChange={(e) => setBarangNama(e.target.value)}
                                         disabled
                                     />
                                 )}
@@ -134,8 +134,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                         type="number"
                                         placeholder="0"
                                         fullWidth
-                                        value={sembakoPoin}
-                                        onChange={e => setSembakoPoin(e.target.value)}
+                                        value={barangPoin}
+                                        onChange={e => setBarangPoin(e.target.value)}
                                         required
                                     />
                                     <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--k-green)', whiteSpace: 'nowrap', background: 'rgba(78,167,113,0.08)', padding: '8px 14px', borderRadius: '10px', border: '1px solid rgba(78,167,113,0.2)' }}>
@@ -144,7 +144,7 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                 </div>
                             </div>
 
-                            {formMode === "add-sembako" ? (
+                            {formMode === "add-barang" ? (
                                 <div className="km-group" style={{ margin: 0 }}>
                                     <label className="km-label">Stok Awal</label>
                                     <Input
@@ -152,8 +152,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                         type="number"
                                         placeholder="0"
                                         fullWidth
-                                        value={sembakoStok}
-                                        onChange={e => setSembakoStok(e.target.value)}
+                                        value={barangStok}
+                                        onChange={e => setBarangStok(e.target.value)}
                                     />
                                 </div>
                             ) : (
@@ -165,8 +165,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                             type="number"
                                             placeholder="0"
                                             fullWidth
-                                            value={sembakoTambahStok}
-                                            onChange={e => setSembakoTambahStok(e.target.value)}
+                                            value={barangTambahStok}
+                                            onChange={e => setBarangTambahStok(e.target.value)}
                                         />
                                     </div>
                                     <div className="km-group" style={{ margin: 0 }}>
@@ -176,8 +176,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                             type="number"
                                             placeholder="—"
                                             fullWidth
-                                            value={sembakoStok}
-                                            onChange={e => setSembakoStok(e.target.value)}
+                                            value={barangStok}
+                                            onChange={e => setBarangStok(e.target.value)}
                                         />
                                     </div>
                                 </div>
@@ -191,17 +191,17 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                             </div>
 
                             <div className="km-group" style={{ margin: 0 }}>
-                                <label className="km-label">Foto Sembako</label>
+                                <label className="km-label">Foto Barang</label>
                                 <div
-                                    className={`km-file-area ${sembakoFotoPreview ? "has-file" : ""}`}
-                                    onClick={() => !sembakoFotoPreview && sembakoFileRef.current?.click()}
+                                    className={`km-file-area ${barangFotoPreview ? "has-file" : ""}`}
+                                    onClick={() => !barangFotoPreview && barangFileRef.current?.click()}
                                     style={{ aspectRatio: '1 / 1', width: '100%', height: 'auto', borderRadius: '14px' }}
                                 >
-                                    {sembakoFotoPreview ? (
+                                    {barangFotoPreview ? (
                                         <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', borderRadius: '14px', overflow: 'hidden' }}>
-                                            <img src={sembakoFotoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                            <img src={barangFotoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                             <div className="km-preview-actions">
-                                                <button type="button" className="km-btn-remove" onClick={(e) => { e.stopPropagation(); setSembakoFoto(null); setSembakoFotoPreview(null); }}>
+                                                <button type="button" className="km-btn-remove" onClick={(e) => { e.stopPropagation(); setBarangFoto(null); setBarangFotoPreview(null); }}>
                                                     <FaTrash /> Hapus
                                                 </button>
                                             </div>
@@ -216,8 +216,8 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                                     <input
                                         type="file"
                                         accept="image/png, image/jpeg, image/jpg"
-                                        ref={sembakoFileRef}
-                                        onChange={(e) => { if (e.target.files?.[0]) handleSembakoFile(e.target.files[0]); }}
+                                        ref={barangFileRef}
+                                        onChange={(e) => { if (e.target.files?.[0]) handleBarangFile(e.target.files[0]); }}
                                         style={{ display: "none" }}
                                     />
                                 </div>
@@ -228,7 +228,7 @@ export function KatalogSembakoFormModal({ formMode, initialValues, isSubmitting,
                     <div className="km-footer">
                         <Button type="button" variant="outline" color="primary" onClick={onClose}>Batal</Button>
                         <Button type="submit" color="primary" disabled={isSubmitting}>
-                            {isSubmitting ? "Menyimpan..." : (formMode === "add-sembako" ? "Simpan Sembako" : "Simpan Perubahan")}
+                            {isSubmitting ? "Menyimpan..." : (formMode === "add-barang" ? "Simpan Barang" : "Simpan Perubahan")}
                         </Button>
                     </div>
                 </form>

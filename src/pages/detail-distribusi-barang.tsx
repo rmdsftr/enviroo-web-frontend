@@ -9,11 +9,11 @@ import {
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import BreadcrumbLayout from "../layouts/breadcrumb";
-import { SembakoService } from "../services/sembako.service";
-import type { DistribusiSembakoDetailData } from "../types/sembako.type";
+import { BarangService } from "../services/barang.service";
+import type { DistribusiBarangDetailData } from "../types/barang.type";
 import "../styles/detail-penimbangan.css";
 import "../styles/detail-penjualan.css";
-import "../styles/detail-distribusi-sembako.css";
+import "../styles/detail-distribusi-barang.css";
 import { formatTanggalPanjang } from "../utils/date.utils";
 
 const STATUS_DISTRIBUSI: Record<string, { label: string; cls: string }> = {
@@ -22,7 +22,7 @@ const STATUS_DISTRIBUSI: Record<string, { label: string; cls: string }> = {
     gagal:   { label: "Gagal",   cls: "dibatalkan" },
 };
 
-export default function DetailDistribusiSembakoPage() {
+export default function DetailDistribusiBarangPage() {
     const { id } = useParams<{ id: string }>();
     const { user } = useAuth();
 
@@ -30,7 +30,7 @@ export default function DetailDistribusiSembakoPage() {
     const rolePrefix = role === "admin_bsi" ? "/bsi" : "/bsu";
     const isBsi = role === "admin_bsi";
 
-    const [detail, setDetail] = useState<DistribusiSembakoDetailData | null>(null);
+    const [detail, setDetail] = useState<DistribusiBarangDetailData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -38,7 +38,7 @@ export default function DetailDistribusiSembakoPage() {
         if (!id) return;
         setLoading(true);
         setError(false);
-        SembakoService.getDetailDistribusiSembako(id)
+        BarangService.getDetailDistribusiBarang(id)
             .then((res) => setDetail(res.data))
             .catch(() => setError(true))
             .finally(() => setLoading(false));
@@ -46,7 +46,7 @@ export default function DetailDistribusiSembakoPage() {
 
     const breadcrumbItems = [
         { label: "Katalog", path: `${rolePrefix}/katalog` },
-        { label: "Detail Distribusi Sembako" },
+        { label: "Detail Distribusi Barang" },
     ];
 
     const statusConf = detail
@@ -62,11 +62,11 @@ export default function DetailDistribusiSembakoPage() {
                 {/* Hero */}
                 <div className="dp-hero">
                     <div className="dp-hero-left">
-                        <h1>Detail Distribusi Sembako</h1>
+                        <h1>Detail Distribusi Barang</h1>
                         <p>
                             {isBsi
-                                ? "Informasi lengkap distribusi sembako yang dikirimkan ke unit BSU"
-                                : "Informasi lengkap distribusi sembako yang diterima dari BSI"}
+                                ? "Informasi lengkap distribusi barang yang dikirimkan ke unit BSU"
+                                : "Informasi lengkap distribusi barang yang diterima dari BSI"}
                         </p>
                     </div>
                 </div>
@@ -87,8 +87,8 @@ export default function DetailDistribusiSembakoPage() {
 
                             <div className="dp-overview-header">
                                 <div>
-                                    <p className="dp-overview-title">Distribusi Sembako</p>
-                                    <p className="dp-overview-subtitle">ID : {detail.header.disbako_id}</p>
+                                    <p className="dp-overview-title">Distribusi Barang</p>
+                                    <p className="dp-overview-subtitle">ID : {detail.header.disba_id}</p>
                                 </div>
                             </div>
 
@@ -160,11 +160,11 @@ export default function DetailDistribusiSembakoPage() {
 
                         </div>
 
-                        {/* ── RIGHT: Daftar Sembako ── */}
+                        {/* ── RIGHT: Daftar Barang ── */}
                         <div className="dp-setoran-col">
                             <div className="dp-setoran-header">
                                 <div>
-                                    <p className="dp-setoran-title">Daftar Sembako Didistribusikan</p>
+                                    <p className="dp-setoran-title">Daftar Barang Didistribusikan</p>
                                     <p className="dp-setoran-subtitle">Rincian item, jumlah, dan perubahan stok</p>
                                 </div>
                                 <span className="dp-setoran-count-badge">{detail.items.length} jenis</span>
@@ -178,7 +178,7 @@ export default function DetailDistribusiSembakoPage() {
                             ) : (
                                 <div className="dpd-items-list">
                                     {detail.items.map((item) => (
-                                        <div key={item.sembako_id} className="dpd-item-row">
+                                        <div key={item.produk_id} className="dpd-item-row">
 
                                             {/* Thumbnail */}
                                             <div className="dpd-item-img">

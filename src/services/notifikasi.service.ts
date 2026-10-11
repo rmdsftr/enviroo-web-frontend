@@ -7,7 +7,7 @@ export type NotifRefType =
     | "kontrak"
     | "pengajuan"
     | "pengangkutan"
-    | "distribusi_sembako"
+    | "distribusi_barang"
     | "jadwal_penimbangan"
     | "jadwal_pengangkutan"
     | "pengajuan_pengangkutan"

@@ -38,7 +38,7 @@ export interface GetSuperadminRingkasanResponse {
 export interface TrenPenjualanBulan {
     bulan: number;
     uang: number;
-    sembako: number;
+    barang: number;
 }
 
 export interface TrenPenjualanSuperadminResponse {
@@ -81,7 +81,7 @@ export interface RankingBankItem {
     NamaBank: string;
     JenisBank: string;
     TotalUang: number;
-    TotalSembako: number;
+    TotalBarang: number;
     JumlahPenjualan: number;
 }
 

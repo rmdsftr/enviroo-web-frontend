@@ -157,9 +157,7 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
         const q = searchQuery.toLowerCase();
         if (!q) return penimbanganList;
         return penimbanganList.filter(item =>
-            item.penimbangan_id.toLowerCase().includes(q) ||
-            (item.started_by && item.started_by.toLowerCase().includes(q)) ||
-            (item.ended_by && item.ended_by.toLowerCase().includes(q))
+            item.penimbangan_id.toLowerCase().includes(q)
         );
     }, [penimbanganList, searchQuery]);
 
