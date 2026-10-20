@@ -3,14 +3,15 @@ import { FaRecycle, FaChevronDown } from "react-icons/fa6";
 import FilterPill, { type FilterOption } from "./filter-pill";
 import FilterRange, { defaultMonthRange } from "./filter-range";
 import { StatistikService, type StatistikSetoranItem } from "../services/statistik.service";
+import { KatalogService } from "../services/katalog.service";
+import type { SatuanSampah } from "../types/katalog.type";
 import { formatDecimal } from "../utils/number.utils";
+import { isSameSatuan } from "../utils/satuan.utils";
 import "../styles/setoran-dashboard.css";
 
 
 type GroupBy = "satuan" | "kategori" | "jenis_reward";
 type Orientation = "horizontal" | "vertical";
-
-const SATUAN_ORDER = ["kg", "pcs", "liter"];
 
 const MONTH_ID = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
@@ -95,36 +96,56 @@ function DonutChart({ slices, size = 160 }: { slices: DonutSlice[]; size?: numbe
     );
 }
 
-function PieCard({ title, satuan, slices }: { title: string; satuan: string; slices: DonutSlice[] }) {
-    const total = slices.reduce((s, i) => s + i.value, 0);
+interface SatuanPie {
+    satuan: string;
+    total: number;
+    slices: DonutSlice[];
+}
+
+function PieCard({ pies, active, onSelect }: { pies: SatuanPie[]; active: SatuanPie; onSelect: (satuan: string) => void }) {
+    const { satuan, total, slices } = active;
     return (
         <div className="ssd-chart-card">
             <div className="ssd-chart-card-header">
-                <span className="ssd-chart-card-title">{title}</span>
+                <span className="ssd-chart-card-title">Distribusi Kategori ({satuan})</span>
                 <span className="ssd-chart-total-badge">{formatDecimal(total)} {satuan}</span>
             </div>
-            <div className="ssd-pie-body">
-                <div className="ssd-pie-chart">
-                    <DonutChart slices={slices} size={160} />
-                    <div className="ssd-pie-center">
-                        <span className="ssd-pie-center-value">{formatDecimal(total)}</span>
-                        <span className="ssd-pie-center-label">{satuan}</span>
-                    </div>
+            <div className="ssd-pie-layout">
+                <div className="ssd-pie-satuan-list">
+                    {pies.map(p => (
+                        <button
+                            key={p.satuan}
+                            className={`ssd-pie-satuan-item${p.satuan === satuan ? " ssd-pie-satuan-item--active" : ""}`}
+                            onClick={() => onSelect(p.satuan)}
+                        >
+                            <span className="ssd-pie-satuan-name">{p.satuan}</span>
+                            <span className="ssd-pie-satuan-total">{formatDecimal(p.total)}</span>
+                        </button>
+                    ))}
                 </div>
-                <div className="ssd-pie-legend">
-                    {slices.map((s, idx) => {
-                        const pct = total === 0 ? 0 : (s.value / total) * 100;
-                        return (
-                            <div key={idx} className="ssd-pie-legend-item">
-                                <span className="ssd-pie-legend-dot" style={{ background: s.color }} />
-                                <span className="ssd-pie-legend-label" title={s.label}>{s.label}</span>
-                                <span className="ssd-pie-legend-value">
-                                    {formatDecimal(s.value)} {satuan}
-                                    <small>{pct.toFixed(0)}%</small>
-                                </span>
-                            </div>
-                        );
-                    })}
+                <div className="ssd-pie-body">
+                    <div className="ssd-pie-chart">
+                        <DonutChart slices={slices} size={160} />
+                        <div className="ssd-pie-center">
+                            <span className="ssd-pie-center-value">{formatDecimal(total)}</span>
+                            <span className="ssd-pie-center-label">{satuan}</span>
+                        </div>
+                    </div>
+                    <div className="ssd-pie-legend">
+                        {slices.map((s, idx) => {
+                            const pct = total === 0 ? 0 : (s.value / total) * 100;
+                            return (
+                                <div key={idx} className="ssd-pie-legend-item">
+                                    <span className="ssd-pie-legend-dot" style={{ background: s.color }} />
+                                    <span className="ssd-pie-legend-label" title={s.label}>{s.label}</span>
+                                    <span className="ssd-pie-legend-value">
+                                        {formatDecimal(s.value)} {satuan}
+                                        <small>{pct.toFixed(0)}%</small>
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
@@ -225,6 +246,19 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [expandedSatuans, setExpandedSatuans] = useState<Set<string>>(new Set());
+    const [satuanList, setSatuanList] = useState<SatuanSampah[]>([]);
+    const [selectedSatuan, setSelectedSatuan] = useState<string | null>(null);
+
+    useEffect(() => {
+        KatalogService.getSatuan()
+            .then(res => setSatuanList(res.data ?? []))
+            .catch(err => console.error("Failed to fetch satuan", err));
+    }, []);
+
+    const satuanOrder = (nama: string) => {
+        const idx = satuanList.findIndex(s => isSameSatuan(s.Satuan, nama));
+        return idx === -1 ? satuanList.length : idx;
+    };
 
     const toggleSatuan = (s: string) =>
         setExpandedSatuans(prev => {
@@ -263,7 +297,7 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
         return map;
     }, [data, groupBy]);
 
-    const piesPerSatuan = useMemo(() => {
+    const piesPerSatuan = useMemo((): SatuanPie[] | null => {
         if (groupBy !== "kategori") return null;
         const bySatuan = new Map<string, Map<string, number>>();
         data.forEach(item => {
@@ -278,17 +312,26 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
                 kategoriColorIdx.set(item.kategori, cIdx++);
             }
         });
-        return Array.from(bySatuan.entries()).map(([satuan, kMap]) => ({
-            satuan,
-            slices: Array.from(kMap.entries())
-                .map(([kategori, value]) => ({
-                    label: kategori,
-                    value,
-                    color: colorAt(kategoriColorIdx.get(kategori) ?? 0).fill,
-                }))
-                .sort((a, b) => b.value - a.value),
-        }));
-    }, [data, groupBy]);
+        const order = (nama: string) => {
+            const idx = satuanList.findIndex(s => isSameSatuan(s.Satuan, nama));
+            return idx === -1 ? satuanList.length : idx;
+        };
+        return Array.from(bySatuan.entries())
+            .map(([satuan, kMap]) => ({
+                satuan,
+                total: Array.from(kMap.values()).reduce((s, v) => s + v, 0),
+                slices: Array.from(kMap.entries())
+                    .map(([kategori, value]) => ({
+                        label: kategori,
+                        value,
+                        color: colorAt(kategoriColorIdx.get(kategori) ?? 0).fill,
+                    }))
+                    .sort((a, b) => b.value - a.value),
+            }))
+            .sort((a, b) => order(a.satuan) - order(b.satuan));
+    }, [data, groupBy, satuanList]);
+
+    const activePie = piesPerSatuan?.find(p => p.satuan === selectedSatuan) ?? piesPerSatuan?.[0];
 
     const periodLabel = from === to
         ? `${MONTH_ID[fromMonth - 1]} ${fromYear}`
@@ -330,25 +373,12 @@ export default function SetoranSampahDashboard({ bankId }: Props) {
                         <FaRecycle className="ssd-state-icon" />
                         <span>Belum ada data setoran untuk periode ini.</span>
                     </div>
-                ) : groupBy === "kategori" && piesPerSatuan ? (
-                    <div className="ssd-charts-grid">
-                        {piesPerSatuan.map(({ satuan, slices }) => (
-                            <PieCard
-                                key={satuan}
-                                title={`Distribusi Kategori (${satuan})`}
-                                satuan={satuan}
-                                slices={slices}
-                            />
-                        ))}
-                    </div>
+                ) : groupBy === "kategori" && piesPerSatuan && activePie ? (
+                    <PieCard pies={piesPerSatuan} active={activePie} onSelect={setSelectedSatuan} />
                 ) : groupBy === "satuan" ? (
                     <div className="ssd-satuan-accordion">
                         {[...grouped.entries()]
-                            .sort(([a], [b]) => {
-                                const ai = SATUAN_ORDER.indexOf(a);
-                                const bi = SATUAN_ORDER.indexOf(b);
-                                return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-                            })
+                            .sort(([a], [b]) => satuanOrder(a) - satuanOrder(b))
                             .map(([satuan, items]) => {
                                 const total = items.reduce((s, i) => s + i.total_qty, 0);
                                 const isOpen = expandedSatuans.has(satuan);

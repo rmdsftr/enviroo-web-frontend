@@ -21,7 +21,7 @@ import { KatalogSampahDetailModal } from "../modals/KatalogSampahDetailModal";
 import { KatalogBarangFormModal, type BarangFormData } from "../modals/KatalogBarangFormModal";
 import { KatalogBarangDetailModal } from "../modals/KatalogBarangDetailModal";
 import { useKatalogData } from "../hooks/useKatalogData";
-import { SATUAN_OPTIONS, buildDistribusiColumns } from "../constants/katalog.constants";
+import { buildDistribusiColumns } from "../constants/katalog.constants";
 import { getApiError } from "../utils/error.utils";
 import "../styles/katalog.css";
 import "../styles/jadwal-bsu.css";
@@ -33,7 +33,7 @@ export default function KatalogPage() {
     const {
         user,
         isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
-        categories, rewards,
+        categories, satuanList, rewards,
         sampahPage, setSampahPage, sampahTotalPages, pagedSampah,
         barangPage, setBarangPage, barangTotalPages, pagedBarang,
         barangFilterBank, setBarangFilterBank,
@@ -341,9 +341,9 @@ export default function KatalogPage() {
                                 <div className="kf-group">
                                     <span className="kf-group-label">Jenis Satuan</span>
                                     <FilterPill
-                                        options={SATUAN_OPTIONS}
+                                        options={[{ label: "Semua", value: "all" }, ...satuanList.map(s => ({ label: s.Satuan, value: s.Satuan }))]}
                                         activeValue={filterSatuan}
-                                        onChange={(v) => setFilterSatuan(v as "all" | "kg" | "pcs" | "liter")}
+                                        onChange={(v) => setFilterSatuan(v)}
                                     />
                                 </div>
                                 <div className="kf-group">
@@ -439,6 +439,7 @@ export default function KatalogPage() {
                 <KatalogSampahFormModal
                     formMode={formMode}
                     categories={categories}
+                    satuanList={satuanList}
                     rewards={rewards}
                     initialValues={formMode === "edit-item" && selectedItem ? {
                         nama_sampah: selectedItem.nama_sampah,

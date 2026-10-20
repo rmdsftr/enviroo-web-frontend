@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { KatalogService } from "../services/katalog.service";
-import type { KategoriSampah as KategoriSampahT, SatuanEnum, MasterSampah } from "../types/katalog.type";
+import type { KategoriSampah as KategoriSampahT, SatuanSampah, MasterSampah } from "../types/katalog.type";
 import type { Reward } from "../types/reward.type";
 import { FaCloudArrowUp, FaTrash } from "react-icons/fa6";
 import Button from "../components/button";
@@ -9,11 +9,12 @@ import CloseButton from "../components/close-button";
 import Input from "../components/input";
 import Dropdown from "../components/dropdown";
 import SearchableInput, { type SearchableOption } from "../components/searchable-input";
+import { findSatuanByNama } from "../utils/satuan.utils";
 
 export interface SampahFormData {
     nama_sampah: string;
     sarok_id?: number;
-    satuan: SatuanEnum;
+    satuan_id: number;
     kategori_id: number;
     reward_id: number;
     syarat_pemilahan?: string;
@@ -22,6 +23,7 @@ export interface SampahFormData {
 interface Props {
     formMode: "add" | "edit-item";
     categories: KategoriSampahT[];
+    satuanList: SatuanSampah[];
     rewards: Reward[];
     initialValues?: {
         nama_sampah: string;
@@ -36,10 +38,14 @@ interface Props {
     onClose: () => void;
 }
 
-export function KatalogSampahFormModal({ formMode, categories, rewards, initialValues, isSubmitting, onSubmit, onClose }: Props) {
+export function KatalogSampahFormModal({ formMode, categories, satuanList, rewards, initialValues, isSubmitting, onSubmit, onClose }: Props) {
     const [addNama, setAddNama] = useState(initialValues?.nama_sampah ?? "");
     const [addSarokId, setAddSarokId] = useState<number | null>(null);
-    const [addSatuan, setAddSatuan] = useState(initialValues?.satuan ?? "kg");
+    const [addSatuanId, setAddSatuanId] = useState(
+        initialValues
+            ? (findSatuanByNama(satuanList, initialValues.satuan)?.SatuanID ?? 0)
+            : (satuanList[0]?.SatuanID ?? 0)
+    );
     const [addKategori, setAddKategori] = useState(initialValues?.kategori_id ?? (categories[0]?.KategoriID ?? 0));
     const [addRewardId, setAddRewardId] = useState(initialValues?.reward_id ?? (rewards[0]?.reward_id ?? 0));
     const [addSyaratPemilahan, setAddSyaratPemilahan] = useState(initialValues?.syarat_pemilahan ?? "");
@@ -81,7 +87,7 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
         if (option) {
             const master = option.raw as MasterSampah;
             setAddSarokId(master.SarokID);
-            setAddSatuan(master.Satuan);
+            setAddSatuanId(master.SatuanID);
         } else {
             setAddSarokId(null);
         }
@@ -89,10 +95,11 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (formMode === "add" && !addSatuanId) return;
         onSubmit({
             nama_sampah: addNama,
             sarok_id: addSarokId ?? undefined,
-            satuan: addSatuan as SatuanEnum,
+            satuan_id: addSatuanId,
             kategori_id: addKategori,
             reward_id: addRewardId,
             syarat_pemilahan: addSyaratPemilahan || undefined,
@@ -160,13 +167,19 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
                                             </span>
                                         )}
                                     </label>
-                                    <Dropdown
-                                        fullWidth
-                                        options={[{ label: "Kg", value: "kg" }, { label: "Pcs", value: "pcs" }, { label: "Liter", value: "liter" }]}
-                                        value={addSatuan}
-                                        onChange={(e) => setAddSatuan(e.target.value)}
-                                        disabled={formMode === "edit-item"}
-                                    />
+                                    {formMode === "add" && satuanList.length === 0 ? (
+                                        <div style={{ fontSize: "12px", color: "var(--c-danger)", lineHeight: 1.4 }}>
+                                            Belum ada satuan sampah. Hubungi superadmin untuk menambahkan satuan terlebih dahulu.
+                                        </div>
+                                    ) : (
+                                        <Dropdown
+                                            fullWidth
+                                            options={satuanList.map(s => ({ label: s.Satuan, value: s.SatuanID }))}
+                                            value={addSatuanId}
+                                            onChange={(e) => setAddSatuanId(Number(e.target.value))}
+                                            disabled={formMode === "edit-item"}
+                                        />
+                                    )}
                                 </div>
                                 <div className="km-group">
                                     <label className="km-label">Kategori <span className="km-req">*</span></label>
@@ -247,7 +260,7 @@ export function KatalogSampahFormModal({ formMode, categories, rewards, initialV
 
                     <div className="km-footer">
                         <Button type="button" variant="outline" color="primary" onClick={onClose}>Batal</Button>
-                        <Button type="submit" color="primary" disabled={isSubmitting}>
+                        <Button type="submit" color="primary" disabled={isSubmitting || (formMode === "add" && !addSatuanId)}>
                             {isSubmitting ? "Menyimpan..." : (formMode === "add" ? "Simpan Katalog" : "Simpan Perubahan")}
                         </Button>
                     </div>

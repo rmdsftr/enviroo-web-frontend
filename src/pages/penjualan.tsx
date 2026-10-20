@@ -1,5 +1,6 @@
 import ManajemenRewardSection from "../components/ManajemenRewardSection";
 import ManajemenMitraSection from "../components/ManajemenMitraSection";
+import SyaratPenarikanSection from "../components/SyaratPenarikanSection";
 import KonfigurasiBagiHasilSection from "../layouts/konfigurasi_bagi_hasil";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/layout.css";
@@ -9,11 +10,18 @@ export default function PenjualanPage() {
     const { user } = useAuth();
     const role = (user?.role || "").toLowerCase();
     const isAdminBSI = role === "admin_bsi";
+    const isAdminBSM = role === "admin_bsm";
     const canManageMitra = role === "admin_bsi" || role === "admin_bsm";
 
     return (
         <>
             <ManajemenRewardSection />
+            {isAdminBSM && (
+                <>
+                    <div className="penjualan-section-divider" />
+                    <SyaratPenarikanSection />
+                </>
+            )}
             {canManageMitra && (
                 <>
                     <div className="penjualan-section-divider" />

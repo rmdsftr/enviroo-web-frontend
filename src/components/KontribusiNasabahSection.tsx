@@ -1,22 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { FaUsers } from "react-icons/fa6";
 import FilterRange from "./filter-range";
 import Dropdown from "./dropdown";
 import Pagination from "./pagination";
 import { StatistikService, type KontribusiNasabahItem } from "../services/statistik.service";
+import { KatalogService } from "../services/katalog.service";
+import type { SatuanSampah } from "../types/katalog.type";
 import { formatDecimal, formatQty } from "../utils/number.utils";
 import "../styles/setoran-dashboard.css";
 
 const MONTH_ID = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-];
-
-const SORT_OPTIONS = [
-    { label: "Banyak Setoran", value: "setoran" },
-    { label: "Banyak kg",      value: "kg"      },
-    { label: "Banyak pcs",     value: "pcs"     },
-    { label: "Banyak liter",   value: "liter"   },
 ];
 
 const LIMIT = 10;
@@ -42,13 +37,7 @@ function RankLabel({ from, to }: { from: number; to: number }) {
 function NasabahRow({ item, rank, sortBy }: { item: KontribusiNasabahItem; rank: number; sortBy: string }) {
     const rankCls = rank <= 3 ? `kns-rank--${rank}` : "kns-rank--other";
 
-    const statLabel = sortBy === "kg"
-        ? formatQty(item.total_kg, "kg")
-        : sortBy === "pcs"
-        ? formatQty(item.total_pcs, "pcs")
-        : sortBy === "liter"
-        ? formatQty(item.total_liter, "liter")
-        : null;
+    const statLabel = sortBy !== "setoran" ? formatQty(item.total_qty, sortBy) : null;
 
     return (
         <div className="kns-row">
@@ -85,6 +74,18 @@ export default function KontribusiNasabahSection({ bankId }: Props) {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error,   setError]   = useState<string | null>(null);
+    const [satuanList, setSatuanList] = useState<SatuanSampah[]>([]);
+
+    useEffect(() => {
+        KatalogService.getSatuan()
+            .then(res => setSatuanList(res.data ?? []))
+            .catch(err => console.error("Failed to fetch satuan", err));
+    }, []);
+
+    const sortOptions = useMemo(() => [
+        { label: "Banyak Setoran", value: "setoran" },
+        ...satuanList.map(s => ({ label: "Banyak " + s.Satuan, value: s.Satuan })),
+    ], [satuanList]);
 
     const [fromYear, fromMonth] = from.split("-").map(Number);
     const [toYear,   toMonth]   = to.split("-").map(Number);
@@ -163,7 +164,7 @@ export default function KontribusiNasabahSection({ bankId }: Props) {
                         <RankLabel from={globalOffset + 1} to={globalOffset + data.length} />
                         <div style={{ minWidth: "180px" }}>
                             <Dropdown
-                                options={SORT_OPTIONS}
+                                options={sortOptions}
                                 value={sortBy}
                                 onChange={handleSortChange}
                                 dropdownSize="small"

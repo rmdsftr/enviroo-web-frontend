@@ -5,9 +5,11 @@ import { RewardService } from "../services/reward.service";
 import { BarangService } from "../services/barang.service";
 import { BsiService } from "../services/bsi.service";
 import { defaultMonthRange } from "../components/filter-range";
+import { isSameSatuan } from "../utils/satuan.utils";
 import type {
     KategoriSampah as KategoriSampahT,
     KatalogSampah,
+    SatuanSampah,
 } from "../types/katalog.type";
 import type { Reward } from "../types/reward.type";
 import type {
@@ -27,6 +29,7 @@ export function useKatalogData() {
     const canEdit = isAdminBsi || isAdminBsm;
 
     const [categories, setCategories] = useState<KategoriSampahT[]>([]);
+    const [satuanList, setSatuanList] = useState<SatuanSampah[]>([]);
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [katalogList, setKatalogList] = useState<KatalogSampah[]>([]);
     const [barangList, setBarangList] = useState<KatalogBarangItem[]>([]);
@@ -41,7 +44,7 @@ export function useKatalogData() {
     const [distribusiTo, setDistribusiTo] = useState(() => defaultMonthRange().to);
     const [distribusiSearch, setDistribusiSearch] = useState("");
     const [filterKategori, setFilterKategori] = useState<number | "all">("all");
-    const [filterSatuan, setFilterSatuan] = useState<"all" | "kg" | "pcs" | "liter">("all");
+    const [filterSatuan, setFilterSatuan] = useState<string>("all");
     const [filterReward, setFilterReward] = useState<number | "all">("all");
     const [sampahSearch, setSampahSearch] = useState("");
     const [barangSearch, setBarangSearch] = useState("");
@@ -95,6 +98,10 @@ export function useKatalogData() {
             .then(res => setCategories(res.data || []))
             .catch(err => console.error("Failed to fetch kategori", err));
 
+        KatalogService.getSatuan()
+            .then(res => setSatuanList(res.data || []))
+            .catch(err => console.error("Failed to fetch satuan", err));
+
         RewardService.getRewards()
             .then(res => setRewards(res.data || []))
             .catch(err => console.error("Failed to fetch rewards", err));
@@ -111,7 +118,7 @@ export function useKatalogData() {
         const q = sampahSearch.trim().toLowerCase();
         return katalogList.filter(i =>
             (filterKategori === "all" || i.kategori_id === filterKategori) &&
-            (filterSatuan === "all" || i.satuan.toLowerCase() === filterSatuan) &&
+            (filterSatuan === "all" || isSameSatuan(i.satuan, filterSatuan)) &&
             (filterReward === "all" || i.reward_id === filterReward) &&
             (!q || i.sampah_id.toLowerCase().includes(q) || i.nama_sampah.toLowerCase().includes(q))
         );
@@ -157,7 +164,7 @@ export function useKatalogData() {
     return {
         user,
         isAdminBsi, isAdminBsu, isAdminBsm, canEdit, isViewingBSU, canEditBarang,
-        categories, rewards,
+        categories, satuanList, rewards,
         katalogList, barangList,
         sampahPage, setSampahPage, sampahTotalPages, pagedSampah,
         barangPage, setBarangPage, barangTotalPages, pagedBarang,

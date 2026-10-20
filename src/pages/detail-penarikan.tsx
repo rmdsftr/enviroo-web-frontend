@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import {
     FaCalendarDays,
     FaUser,
@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa6";
 import ViewPhoto from "../components/view-photo";
 import { useAuth } from "../contexts/AuthContext";
-import BreadcrumbLayout from "../layouts/breadcrumb";
+import BreadcrumbLayout, { type BreadcrumbItem } from "../layouts/breadcrumb";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
 import {
     PenarikanService,
@@ -50,6 +50,7 @@ const RIWAYAT_STATUS_PENARIKAN: Record<string, { label: string; cls: string }> =
 
 export default function DetailPenarikanPage() {
     const { id } = useParams<{ id: string }>();
+    const location = useLocation();
     const { user } = useAuth();
 
     const role = user?.role?.toLowerCase();
@@ -78,8 +79,9 @@ export default function DetailPenarikanPage() {
         return () => { document.body.style.overflow = ""; };
     }, [riwayatOpen]);
 
+    const breadcrumbTrail: BreadcrumbItem[] | undefined = location.state?.breadcrumbTrail;
     const breadcrumbItems = [
-        { label: "Riwayat", path: riwayatPath },
+        ...(breadcrumbTrail ?? [{ label: "Riwayat", path: riwayatPath }]),
         { label: "Detail Penarikan" },
     ];
 

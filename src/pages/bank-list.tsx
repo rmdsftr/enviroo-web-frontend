@@ -495,7 +495,7 @@ export default function BankListPage({ type }: BankListPageProps) {
                 )}
             </div>
 
-            {!isAdminBsi && superadminTotalPages > 1 && (
+            {!isAdminBsi && (
                 <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
                     <Pagination
                         currentPage={currentPage}

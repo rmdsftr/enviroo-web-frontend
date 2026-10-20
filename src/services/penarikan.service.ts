@@ -87,6 +87,36 @@ export interface PenarikanDetail {
     detail_penarikan: DetailBarang[];
 }
 
+export type SatuanWaktuPenarikan = "minggu" | "bulan";
+
+export interface SettingPenarikan {
+    setting_id: string;
+    bank_id: string;
+    min_waktu: number | null;
+    satuan_waktu: SatuanWaktuPenarikan | null;
+    min_rupiah: number | null;
+    min_poin: number | null;
+    created_at: string;
+    created_by: string;
+    updated_at: string;
+    updated_by: string;
+}
+
+export interface SettingWaktuRequest {
+    min_waktu: number;
+    satuan_waktu: SatuanWaktuPenarikan;
+}
+
+export interface SettingSaldoRequest {
+    min_rupiah?: number;
+    min_poin?: number;
+}
+
+interface SettingPenarikanResponse {
+    message: string;
+    data: SettingPenarikan;
+}
+
 export const PenarikanService = {
     async getListByBank(bankId: string, params?: PenarikanQueryParams): Promise<PenarikanListResponse> {
         const response = await api.get<PenarikanListResponse>(`/penarikan/list-bank/${bankId}`, { params });
@@ -109,5 +139,20 @@ export const PenarikanService = {
             responseType: "blob",
         });
         return response.data as Blob;
+    },
+
+    async getSetting(bankId: string): Promise<SettingPenarikan> {
+        const response = await api.get<SettingPenarikanResponse>(`/penarikan/setting/${bankId}`);
+        return response.data.data;
+    },
+
+    async saveSettingWaktu(bankId: string, payload: SettingWaktuRequest): Promise<SettingPenarikan> {
+        const response = await api.put<SettingPenarikanResponse>(`/penarikan/setting-waktu/${bankId}`, payload);
+        return response.data.data;
+    },
+
+    async saveSettingSaldo(bankId: string, payload: SettingSaldoRequest): Promise<SettingPenarikan> {
+        const response = await api.put<SettingPenarikanResponse>(`/penarikan/setting-saldo/${bankId}`, payload);
+        return response.data.data;
     },
 };

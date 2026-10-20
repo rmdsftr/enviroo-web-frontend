@@ -126,7 +126,7 @@ export default function InformasiPage() {
                 </div>
             )}
 
-            {pagination && pagination.total_pages > 1 && (
+            {pagination && (
                 <Pagination
                     currentPage={pagination.page}
                     totalPages={pagination.total_pages}

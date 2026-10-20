@@ -107,7 +107,7 @@ export const ADMIN_BSM_MENU: SidebarEntry[] = [
     { groupLabel: "Konfigurasi", items: [
         { icon: FaBoxOpen,  menu: "Katalog", id: "bsm/katalog"    },
         { icon: FaCalendar, menu: "Jadwal",  id: "bsm/jadwal"     },
-        { icon: FaGear,     menu: "Reward",  id: "bsm/penjualan"  },
+        { icon: FaGear,     menu: "Transaksi", id: "bsm/penjualan"  },
     ]},
     { groupLabel: "Pencatatan", items: [
         { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },

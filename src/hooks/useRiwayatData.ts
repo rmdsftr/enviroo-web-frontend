@@ -16,6 +16,18 @@ interface Props {
     isBsi: boolean;
 }
 
+const RIWAYAT_PER_PAGE = 10;
+
+function paginate<T>(list: T[], page: number) {
+    const totalPages = Math.max(1, Math.ceil(list.length / RIWAYAT_PER_PAGE));
+    const currentPage = Math.min(page, totalPages);
+    return {
+        items: list.slice((currentPage - 1) * RIWAYAT_PER_PAGE, currentPage * RIWAYAT_PER_PAGE),
+        currentPage,
+        totalPages,
+    };
+}
+
 const toStartDate = (ym: string) => `${ym}-01`;
 const toEndDate = (ym: string) => {
     const [y, m] = ym.split("-").map(Number);
@@ -27,6 +39,7 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
     const hasPenjualan = isBsi || (!isBsi && !isBsu);
 
     const [searchQuery, setSearchQuery] = useState("");
+    const [page, setPage] = useState(1);
 
     const [penimbanganList, setPenimbanganList] = useState<PenimbanganItem[]>([]);
     const [penimbanganLoading, setPenimbanganLoading] = useState(false);
@@ -198,26 +211,34 @@ export function useRiwayatData({ bankId, isBsu, isBsi }: Props) {
         );
     }, [penarikanList, searchQuery]);
 
+    const pagedPenimbangan = useMemo(() => paginate(filteredPenimbangan, page), [filteredPenimbangan, page]);
+    const pagedAngkut = useMemo(() => paginate(filteredAngkut, page), [filteredAngkut, page]);
+    const pagedPenjualan = useMemo(() => paginate(filteredPenjualan, page), [filteredPenjualan, page]);
+    const pagedBagiHasil = useMemo(() => paginate(filteredBagiHasil, page), [filteredBagiHasil, page]);
+    const pagedBagiHasilBsu = useMemo(() => paginate(filteredBagiHasilBsu, page), [filteredBagiHasilBsu, page]);
+    const pagedPenarikan = useMemo(() => paginate(filteredPenarikan, page), [filteredPenarikan, page]);
+
     return {
         hasAngkut, hasPenjualan,
         searchQuery, setSearchQuery,
+        setPage,
         penimbanganLoading,
         penimbanganFrom, setPenimbanganFrom, penimbanganTo, setPenimbanganTo,
-        filteredPenimbangan,
+        pagedPenimbangan,
         angkutLoading, angkutColumns,
         angkutFrom, setAngkutFrom, angkutTo, setAngkutTo,
-        filteredAngkut,
+        pagedAngkut,
         penjualanLoading,
         penjualanFrom, setPenjualanFrom, penjualanTo, setPenjualanTo,
-        filteredPenjualan,
+        pagedPenjualan,
         bagiHasilLoading,
         bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo,
-        filteredBagiHasil,
+        pagedBagiHasil,
         bagiHasilBsuLoading,
         bagiHasilBsuFrom, setBagiHasilBsuFrom, bagiHasilBsuTo, setBagiHasilBsuTo,
-        filteredBagiHasilBsu,
+        pagedBagiHasilBsu,
         penarikanLoading,
         penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo,
-        filteredPenarikan,
+        pagedPenarikan,
     };
 }

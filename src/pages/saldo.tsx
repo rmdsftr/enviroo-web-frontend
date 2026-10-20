@@ -281,11 +281,8 @@ export default function SaldoPage() {
                     />
                 )}
 
-                {!isSearching && meta && meta.total_pages > 1 && (
-                    <div className="nasabah-pagination-row">
-                        <span className="nasabah-pagination-info">
-                            Halaman {currentPage} dari {meta.total_pages} · {meta.total} nasabah
-                        </span>
+                {!isSearching && meta && (
+                    <div className="nasabah-pagination-row" style={{ justifyContent: "flex-end" }}>
                         <Pagination
                             currentPage={currentPage}
                             totalPages={meta.total_pages}

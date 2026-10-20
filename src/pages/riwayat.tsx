@@ -4,6 +4,7 @@ import { FaFileExport } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import Tabs from "../components/tabs";
 import Table from "../components/table";
+import Pagination from "../components/pagination";
 import FilterRange from "../components/filter-range";
 import SearchBar from "../components/search";
 import Button from "../components/button";
@@ -68,16 +69,31 @@ export default function RiwayatPage() {
 
     const {
         hasAngkut, hasPenjualan,
-        searchQuery, setSearchQuery,
-        penimbanganLoading, penimbanganFrom, setPenimbanganFrom, penimbanganTo, setPenimbanganTo, filteredPenimbangan,
-        angkutLoading, angkutColumns, angkutFrom, setAngkutFrom, angkutTo, setAngkutTo, filteredAngkut,
-        penjualanLoading, penjualanFrom, setPenjualanFrom, penjualanTo, setPenjualanTo, filteredPenjualan,
-        bagiHasilLoading, bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo, filteredBagiHasil,
-        bagiHasilBsuLoading, bagiHasilBsuFrom, setBagiHasilBsuFrom, bagiHasilBsuTo, setBagiHasilBsuTo, filteredBagiHasilBsu,
-        penarikanLoading, penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo, filteredPenarikan,
+        searchQuery, setSearchQuery, setPage,
+        penimbanganLoading, penimbanganFrom, setPenimbanganFrom, penimbanganTo, setPenimbanganTo, pagedPenimbangan,
+        angkutLoading, angkutColumns, angkutFrom, setAngkutFrom, angkutTo, setAngkutTo, pagedAngkut,
+        penjualanLoading, penjualanFrom, setPenjualanFrom, penjualanTo, setPenjualanTo, pagedPenjualan,
+        bagiHasilLoading, bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo, pagedBagiHasil,
+        bagiHasilBsuLoading, bagiHasilBsuFrom, setBagiHasilBsuFrom, bagiHasilBsuTo, setBagiHasilBsuTo, pagedBagiHasilBsu,
+        penarikanLoading, penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo, pagedPenarikan,
     } = useRiwayatData({ bankId: user?.bank_id, isBsu, isBsi });
 
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : "/bsm";
+
+    const handleSearch = (value: string) => {
+        setSearchQuery(value);
+        setPage(1);
+    };
+
+    const renderPagination = (paged: { currentPage: number; totalPages: number }) => (
+        <div className="riwayat-pagination-row">
+            <Pagination
+                currentPage={paged.currentPage}
+                totalPages={paged.totalPages}
+                onPageChange={setPage}
+            />
+        </div>
+    );
 
     const defaultExportEnd = new Date().toISOString().slice(0, 10);
     const defaultExportStart = (() => {
@@ -117,7 +133,7 @@ export default function RiwayatPage() {
             <Tabs
                 tabs={tabs}
                 activeTab={activeTab}
-                onChange={setActiveTab}
+                onChange={(id) => { setActiveTab(id); setPage(1); }}
                 style={{ alignSelf: "flex-start" }}
             />
 
@@ -127,14 +143,14 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID Penimbangan"
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         <div className="riwayat-filter-right">
                             <FilterRange
                                 from={penimbanganFrom}
                                 to={penimbanganTo}
-                                onChange={(f, t) => { setPenimbanganFrom(f); setPenimbanganTo(t); }}
+                                onChange={(f, t) => { setPenimbanganFrom(f); setPenimbanganTo(t); setPage(1); }}
                             />
                             <Button
                                 icon={<FaFileExport />}
@@ -152,12 +168,13 @@ export default function RiwayatPage() {
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<PenimbanganItem>
                             columns={PENIMBANGAN_COLUMNS}
-                            data={filteredPenimbangan}
+                            data={pagedPenimbangan.items}
                             rowKey={(row) => row.penimbangan_id}
                             emptyMessage="Belum ada riwayat penimbangan."
                             onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penimbangan/${row.penimbangan_id}`)}
                           />
                     }
+                    {!penimbanganLoading && renderPagination(pagedPenimbangan)}
                 </>
             )}
 
@@ -167,25 +184,26 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID Pengangkutan..."
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         <FilterRange
                             from={angkutFrom}
                             to={angkutTo}
-                            onChange={(f, t) => { setAngkutFrom(f); setAngkutTo(t); }}
+                            onChange={(f, t) => { setAngkutFrom(f); setAngkutTo(t); setPage(1); }}
                         />
                     </div>
                     {angkutLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<PengangkutanItem>
                             columns={angkutColumns}
-                            data={filteredAngkut}
+                            data={pagedAngkut.items}
                             rowKey={(row) => row.pengangkutan_id}
                             emptyMessage="Belum ada riwayat pengangkutan."
                             onRowClick={(row) => navigate(`${rolePrefix}/riwayat/pengangkutan/${row.pengangkutan_id}`)}
                           />
                     }
+                    {!angkutLoading && renderPagination(pagedAngkut)}
                 </>
             )}
 
@@ -195,14 +213,14 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID, pembeli, atau reward..."
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         <div className="riwayat-filter-right">
                             <FilterRange
                                 from={penjualanFrom}
                                 to={penjualanTo}
-                                onChange={(f, t) => { setPenjualanFrom(f); setPenjualanTo(t); }}
+                                onChange={(f, t) => { setPenjualanFrom(f); setPenjualanTo(t); setPage(1); }}
                             />
                             <Button
                                 icon={<FaFileExport />}
@@ -220,12 +238,13 @@ export default function RiwayatPage() {
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<PenjualanExternalItem>
                             columns={PENJUALAN_COLUMNS}
-                            data={filteredPenjualan}
+                            data={pagedPenjualan.items}
                             rowKey={(row) => row.penjualan_id}
                             emptyMessage="Belum ada riwayat penjualan."
                             onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penjualan/${row.penjualan_id}`)}
                           />
                     }
+                    {!penjualanLoading && renderPagination(pagedPenjualan)}
                 </>
             )}
 
@@ -235,7 +254,7 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID atau nama reward..."
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         {isBsm ? (
@@ -243,7 +262,7 @@ export default function RiwayatPage() {
                                 <FilterRange
                                     from={bagiHasilFrom}
                                     to={bagiHasilTo}
-                                    onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
+                                    onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); setPage(1); }}
                                 />
                                 <Button
                                     icon={<FaFileExport />}
@@ -260,7 +279,7 @@ export default function RiwayatPage() {
                             <FilterRange
                                 from={bagiHasilFrom}
                                 to={bagiHasilTo}
-                                onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }}
+                                onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); setPage(1); }}
                             />
                         )}
                     </div>
@@ -268,7 +287,7 @@ export default function RiwayatPage() {
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<RiwayatBagiHasilItem>
                             columns={BAGI_HASIL_COLUMNS}
-                            data={filteredBagiHasil}
+                            data={pagedBagiHasil.items}
                             rowKey={(row) => row.bagi_hasil_id}
                             emptyMessage="Belum ada riwayat bagi hasil."
                             onRowClick={(row) => {
@@ -277,6 +296,7 @@ export default function RiwayatPage() {
                             }}
                           />
                     }
+                    {!bagiHasilLoading && renderPagination(pagedBagiHasil)}
                 </>
             )}
 
@@ -286,25 +306,26 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID bagi hasil atau distribusi..."
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         <FilterRange
                             from={bagiHasilBsuFrom}
                             to={bagiHasilBsuTo}
-                            onChange={(f, t) => { setBagiHasilBsuFrom(f); setBagiHasilBsuTo(t); }}
+                            onChange={(f, t) => { setBagiHasilBsuFrom(f); setBagiHasilBsuTo(t); setPage(1); }}
                         />
                     </div>
                     {bagiHasilBsuLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<BagiHasilBsuItem>
                             columns={BAGI_HASIL_BSU_COLUMNS}
-                            data={filteredBagiHasilBsu}
+                            data={pagedBagiHasilBsu.items}
                             rowKey={(row) => row.penerima_sisa_id}
                             emptyMessage="Belum ada riwayat bagi hasil."
                             onRowClick={(row) => navigate(`/bsu/distribusi-sisa/${row.penerima_sisa_id}`)}
                           />
                     }
+                    {!bagiHasilBsuLoading && renderPagination(pagedBagiHasilBsu)}
                 </>
             )}
 
@@ -314,14 +335,14 @@ export default function RiwayatPage() {
                         <SearchBar
                             placeholder="Cari ID, nasabah, atau reward..."
                             value={searchQuery}
-                            onChange={setSearchQuery}
+                            onChange={handleSearch}
                             width="300px"
                         />
                         <div className="riwayat-filter-right">
                             <FilterRange
                                 from={penarikanFrom}
                                 to={penarikanTo}
-                                onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }}
+                                onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); setPage(1); }}
                             />
                             <Button
                                 icon={<FaFileExport />}
@@ -339,12 +360,13 @@ export default function RiwayatPage() {
                         ? <div className="riwayat-loading">Memuat data...</div>
                         : <Table<PenarikanItem>
                             columns={PENARIKAN_COLUMNS}
-                            data={filteredPenarikan}
+                            data={pagedPenarikan.items}
                             rowKey={(row) => row.penarikan_id}
                             emptyMessage="Belum ada riwayat penarikan."
                             onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penarikan/${row.penarikan_id}`)}
                           />
                     }
+                    {!penarikanLoading && renderPagination(pagedPenarikan)}
                 </>
             )}
 

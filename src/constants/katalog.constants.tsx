@@ -4,13 +4,6 @@ import { FaEye } from "react-icons/fa6";
 import { formatTanggal } from "../utils/date.utils";
 import { formatDecimal } from "../utils/number.utils";
 
-export const SATUAN_OPTIONS: { value: "all" | "kg" | "pcs" | "liter"; label: string }[] = [
-    { value: "all", label: "Semua" },
-    { value: "kg", label: "Kg" },
-    { value: "pcs", label: "Pcs" },
-    { value: "liter", label: "Liter" },
-];
-
 export const STATUS_DISTRIBUSI: Record<string, { label: string; cls: string }> = {
     pending: { label: "Pending", cls: "mendatang" },
     selesai: { label: "Selesai", cls: "selesai" },

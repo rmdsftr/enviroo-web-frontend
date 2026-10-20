@@ -15,9 +15,7 @@ export interface KontribusiNasabahItem {
     bank_id: string;
     nama_bank: string;
     jumlah_setoran: number;
-    total_kg: number;
-    total_pcs: number;
-    total_liter: number;
+    total_qty: number;
 }
 
 export interface KontribusiNasabahResponse {
@@ -28,7 +26,7 @@ export interface KontribusiNasabahResponse {
         jenis_bank: string;
     };
     sort_by: string;
-    totals: { total_kg: number; total_pcs: number; total_liter: number };
+    totals: Record<string, number>;
     pagination: { page: number; limit: number; total: number; total_pages: number };
     data: KontribusiNasabahItem[];
 }

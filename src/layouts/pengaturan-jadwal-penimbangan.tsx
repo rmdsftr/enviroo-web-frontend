@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { FaGear, FaPen, FaTrash, FaCalendarXmark } from "react-icons/fa6";
+import { FaGear, FaPen, FaTrash, FaCalendarXmark, FaChevronDown } from "react-icons/fa6";
 import FilterPill from "../components/filter-pill";
 import type { JadwalMasterPenimbangan, JadwalMasterRutinItem, JadwalMasterKhususItem, JadwalEditSeed } from "../types/jadwal.type";
 import { HARI_DISPLAY, HARI_ORDER } from "../constants/jadwal.constants";
@@ -45,6 +45,7 @@ interface Props {
 
 export default function PengaturanJadwalPenimbangan({ data, loading, onEdit, onDelete }: Props) {
     const [filter, setFilter] = useState<"rutin" | "khusus">("rutin");
+    const [openWeeks, setOpenWeeks] = useState<Set<number> | null>(null);
 
     const rutinGrouped = useMemo(() => {
         const groups = new Map<number, JadwalMasterRutinItem[]>();
@@ -64,6 +65,35 @@ export default function PengaturanJadwalPenimbangan({ data, loading, onEdit, onD
     const khususSorted = useMemo(
         () => [...data.khusus].sort((a, b) => a.tanggal.localeCompare(b.tanggal)),
         [data.khusus]
+    );
+
+    const effectiveOpenWeeks = openWeeks ?? new Set(rutinGrouped.slice(0, 1).map(([mingguKe]) => mingguKe));
+
+    const toggleWeek = (mingguKe: number) => {
+        const next = new Set(effectiveOpenWeeks);
+        if (next.has(mingguKe)) next.delete(mingguKe);
+        else next.add(mingguKe);
+        setOpenWeeks(next);
+    };
+
+    const renderRutinItem = (item: JadwalMasterRutinItem) => (
+        <div key={item.jadwal_id} className={`jadwal-cal-detail-item rutin${!item.is_active ? " dead" : ""}`}>
+            <span className="jadwal-cal-detail-time">
+                {formatTime(item.jam_mulai)}–{formatTime(item.jam_selesai)}
+            </span>
+            <span className="jadwal-cal-detail-name">
+                {HARI_DISPLAY[item.hari] || item.hari}
+                {!item.is_active && " (nonaktif)"}
+            </span>
+            <div className="jadwal-cal-detail-actions">
+                <button className="jbsu-row-btn edit" title="Edit" onClick={() => onEdit(rutinToSeed(item))}>
+                    <FaPen />
+                </button>
+                <button className="jbsu-row-btn delete" title="Hapus" onClick={() => onDelete(item.jadwal_id)}>
+                    <FaTrash />
+                </button>
+            </div>
+        </div>
     );
 
     return (
@@ -92,30 +122,29 @@ export default function PengaturanJadwalPenimbangan({ data, loading, onEdit, onD
                             <span>Belum ada jadwal rutin.</span>
                         </div>
                     ) : (
-                        rutinGrouped.map(([mingguKe, items]) => (
-                            <div key={mingguKe} className="pjp-week-group">
-                                <p className="pjp-week-heading">{weekLabel(mingguKe)}</p>
-                                {items.map(item => (
-                                    <div key={item.jadwal_id} className={`jadwal-cal-detail-item rutin${!item.is_active ? " dead" : ""}`}>
-                                        <span className="jadwal-cal-detail-time">
-                                            {formatTime(item.jam_mulai)}–{formatTime(item.jam_selesai)}
-                                        </span>
-                                        <span className="jadwal-cal-detail-name">
-                                            {HARI_DISPLAY[item.hari] || item.hari}
-                                            {!item.is_active && " (nonaktif)"}
-                                        </span>
-                                        <div className="jadwal-cal-detail-actions">
-                                            <button className="jbsu-row-btn edit" title="Edit" onClick={() => onEdit(rutinToSeed(item))}>
-                                                <FaPen />
-                                            </button>
-                                            <button className="jbsu-row-btn delete" title="Hapus" onClick={() => onDelete(item.jadwal_id)}>
-                                                <FaTrash />
-                                            </button>
+                        rutinGrouped.map(([mingguKe, items]) => {
+                            const isOpen = effectiveOpenWeeks.has(mingguKe);
+                            const half = Math.ceil(items.length / 2);
+                            const cardColumns = [items.slice(0, half), items.slice(half)];
+                            return (
+                                <div key={mingguKe} className="pjp-week-group">
+                                    <button className="pjp-week-row" onClick={() => toggleWeek(mingguKe)} aria-expanded={isOpen}>
+                                        <span className="pjp-week-heading">{weekLabel(mingguKe)}</span>
+                                        <span className="pjp-week-count">{items.length} jadwal</span>
+                                        <FaChevronDown className={`pjp-week-chevron${isOpen ? " pjp-week-chevron--open" : ""}`} />
+                                    </button>
+                                    {isOpen && (
+                                        <div className="pjp-week-cards">
+                                            {cardColumns.map((col, idx) => (
+                                                <div key={idx} className="pjp-week-cards-col">
+                                                    {col.map(renderRutinItem)}
+                                                </div>
+                                            ))}
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ))
+                                    )}
+                                </div>
+                            );
+                        })
                     )
                 ) : (
                     khususSorted.length === 0 ? (

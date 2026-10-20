@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { KatalogSampah, KatalogDetail } from "../types/katalog.type";
-import { FaCoins, FaBoxOpen, FaBuilding, FaTrash, FaPen } from "react-icons/fa6";
+import { FaCoins, FaBoxOpen, FaTrash, FaPen, FaChartLine, FaUsers } from "react-icons/fa6";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
 import ViewPhoto from "../components/view-photo";
-import { formatTanggalJam } from "../utils/date.utils";
+import { RiwayatHargaModal } from "./RiwayatHargaModal";
+import { AntrianPencairanModal } from "./AntrianPencairanModal";
 import { formatNominal } from "../utils/number.utils";
 
 interface Props {
@@ -19,8 +20,11 @@ interface Props {
 
 export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDelete, onEdit }: Props) {
     const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [antrianOpen, setAntrianOpen] = useState(false);
 
     return createPortal(
+        <>
         <div className="katalog-modal-overlay" onClick={onClose}>
             <div className="katalog-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '720px', overflow: 'hidden' }}>
                 <div className="km-header">
@@ -57,22 +61,15 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                             </div>
 
                             {item.syarat_pemilahan && (
-                                <div style={{ fontSize: '12px', color: 'var(--k-muted)', marginBottom: '12px', padding: '8px 10px', background: '#f8faf9', borderRadius: '8px', border: '1px solid var(--k-border)' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--k-muted)', padding: '8px 10px', background: '#f8faf9', borderRadius: '8px', border: '1px solid var(--k-border)' }}>
                                     <strong>Syarat:</strong> {item.syarat_pemilahan}
                                 </div>
                             )}
-
-                            <div className="kd-stat-card" style={{ padding: '14px', gap: '8px' }}>
-                                <div className="kd-stat-row" style={{ fontSize: '12.5px' }}>
-                                    <span className="kd-stat-label">Stok</span>
-                                    <span style={{ fontWeight: 600 }}>{detail?.stok ?? item.stok ?? 0} {item.satuan}</span>
-                                </div>
-                            </div>
                         </div>
 
                         <div>
                             <h4 style={{ fontSize: '14.5px', color: 'var(--k-dark)', marginBottom: '12px' }}>Harga Sampah Saat Ini</h4>
-                            <div className="kd-stat-card" style={{ padding: '14px', gap: '8px', marginBottom: '20px' }}>
+                            <div className="kd-stat-card" style={{ padding: '14px', gap: '8px', marginBottom: '14px' }}>
                                 {detail === null ? (
                                     <div style={{ fontSize: '12px', color: 'var(--k-muted)', textAlign: 'center', padding: '8px 0' }}>Memuat harga...</div>
                                 ) : (detail.harga_per_level?.length ?? 0) === 0 ? (
@@ -89,45 +86,39 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
                                 )}
                             </div>
 
-                            <h4 style={{ fontSize: '14.5px', color: 'var(--k-dark)', marginBottom: '16px' }}>Riwayat Perubahan Harga</h4>
-                            <div className="kd-timeline-wrap">
-                                {detail === null ? (
-                                    <div className="kd-timeline-empty" style={{ fontSize: '12.5px', padding: '24px 0', color: 'var(--k-muted)', textAlign: 'center', background: '#fcfdfc', borderRadius: '12px', border: '1px dashed var(--k-border)' }}>
-                                        Memuat riwayat...
-                                    </div>
-                                ) : (() => {
-                                    const historyList = detail.history_harga ?? [];
-                                    if (historyList.length === 0) {
-                                        return (
-                                            <div className="kd-timeline-empty" style={{ fontSize: '12.5px', padding: '24px 0', color: 'var(--k-muted)', textAlign: 'center', background: '#fcfdfc', borderRadius: '12px', border: '1px dashed var(--k-border)' }}>
-                                                Belum ada riwayat perubahan harga.
-                                            </div>
-                                        );
-                                    }
-                                    return (
-                                        <div className="kd-timeline" style={{ gap: '14px' }}>
-                                            {historyList.map((rw, idx) => {
-                                                const satuanReward = detail.harga_per_level?.find(h => h.schema_id === rw.schema_id)?.satuan_reward ?? "";
-                                                return (
-                                                    <div className="kd-timeline-item" key={idx}>
-                                                        <div className="kd-timeline-dot" style={{ top: 4, width: '8px', height: '8px', left: '-23px' }} />
-                                                        <span className="kd-timeline-date" style={{ fontSize: '10.5px' }}>{formatTanggalJam(rw.changed_at)}</span>
-                                                        <div className="kd-timeline-content" style={{ padding: '10px 12px' }}>
-                                                            <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--k-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{rw.level_user === 'eksternal' ? 'Pengepul' : rw.level_user}</div>
-                                                            <div className="kd-timeline-price" style={{ fontSize: '12.5px' }}>
-                                                                <s>{formatNominal(rw.harga_lama, satuanReward)}</s>
-                                                                {formatNominal(rw.harga_baru, satuanReward)}
-                                                            </div>
-                                                            <div className="kd-timeline-admin" style={{ fontSize: '10.5px' }}>
-                                                                <FaBuilding size={9} /> Oleh {rw.changed_by_nama}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    );
-                                })()}
+                            <div className="kd-stat-card" style={{ padding: '14px', gap: '8px', marginBottom: '14px' }}>
+                                <div className="kd-stat-row" style={{ fontSize: '12.5px' }}>
+                                    <span className="kd-stat-label">Stok</span>
+                                    <span style={{ fontWeight: 600 }}>{detail?.stok ?? item.stok ?? 0} {item.satuan}</span>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    color="primary"
+                                    size="small"
+                                    isRounded
+                                    fullWidth
+                                    icon={<FaChartLine />}
+                                    onClick={() => setHistoryOpen(true)}
+                                    disabled={detail === null}
+                                >
+                                    Lihat riwayat perubahan harga
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    color="primary"
+                                    size="small"
+                                    isRounded
+                                    fullWidth
+                                    icon={<FaUsers />}
+                                    onClick={() => setAntrianOpen(true)}
+                                >
+                                    Lihat antrian pencairan tabungan
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -147,7 +138,14 @@ export function KatalogSampahDetailModal({ item, detail, canEdit, onClose, onDel
             {lightboxOpen && item.photo_url && (
                 <ViewPhoto src={item.photo_url} alt={item.nama_sampah} onClose={() => setLightboxOpen(false)} />
             )}
-        </div>,
+        </div>
+        {historyOpen && detail && (
+            <RiwayatHargaModal item={item} detail={detail} onClose={() => setHistoryOpen(false)} />
+        )}
+        {antrianOpen && (
+            <AntrianPencairanModal item={item} onClose={() => setAntrianOpen(false)} />
+        )}
+        </>,
         document.body
     );
 }

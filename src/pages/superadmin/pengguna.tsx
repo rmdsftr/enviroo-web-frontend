@@ -240,15 +240,13 @@ export default function SuperadminPenggunaPage() {
                     </table>
                 </div>
 
-                {totalPages > 1 && (
-                    <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={setCurrentPage}
-                        />
-                    </div>
-                )}
+                <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 24px" }}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
             </div>
             <br /><br />
         </>

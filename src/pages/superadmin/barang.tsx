@@ -202,14 +202,12 @@ export default function BarangPage() {
                 </table>
             </div>
 
-            {totalPages > 1 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
-                    <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
-                        {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalItems)} dari {totalItems} item
-                    </span>
-                    <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-                </div>
-            )}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
+                <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
+                    {totalItems === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalItems)} dari {totalItems} item
+                </span>
+                <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
 
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 

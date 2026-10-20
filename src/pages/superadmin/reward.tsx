@@ -12,12 +12,14 @@ import Button from "../../components/button";
 import RewardModal from "../../modals/RewardModal";
 import type { RewardFormData } from "../../modals/RewardModal";
 import KategoriFormModal from "../../modals/KategoriFormModal";
+import SatuanFormModal from "../../modals/SatuanFormModal";
 import PopupConfirmation from "../../layouts/popup-confirmation";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import { RewardService } from "../../services/reward.service";
 import { KatalogService } from "../../services/katalog.service";
 import type { Reward } from "../../types/reward.type";
-import type { KategoriSampah } from "../../types/katalog.type";
+import type { KategoriSampah, SatuanSampah } from "../../types/katalog.type";
+import { getApiError } from "../../utils/error.utils";
 import "../../styles/manajemen-reward.css";
 import "../../styles/table.css";
 
@@ -126,13 +128,61 @@ export default function KonfigurasiPage() {
         }
     };
 
+    const [satuans, setSatuans] = useState<SatuanSampah[]>([]);
+    const [isLoadingSatuan, setIsLoadingSatuan] = useState(true);
+    const [satuanModalOpen, setSatuanModalOpen] = useState(false);
+    const [editSatuan, setEditSatuan] = useState<SatuanSampah | null>(null);
+    const [deleteSatuanTarget, setDeleteSatuanTarget] = useState<SatuanSampah | null>(null);
+    const [isDeletingSatuan, setIsDeletingSatuan] = useState(false);
+
+    const fetchSatuans = useCallback(async () => {
+        setIsLoadingSatuan(true);
+        try {
+            const res = await KatalogService.getSatuan();
+            setSatuans(Array.isArray(res.data) ? res.data : []);
+        } catch {
+            showNotif("Gagal memuat data satuan sampah.", "error");
+        } finally {
+            setIsLoadingSatuan(false);
+        }
+    }, []);
+
+    const handleSatuanSubmit = async (nama: string) => {
+        if (editSatuan) {
+            await KatalogService.updateSatuan(editSatuan.SatuanID, nama);
+            showNotif("Satuan berhasil diperbarui.", "success");
+        } else {
+            await KatalogService.addSatuan(nama);
+            showNotif("Satuan berhasil ditambahkan.", "success");
+        }
+        setSatuanModalOpen(false);
+        setEditSatuan(null);
+        fetchSatuans();
+    };
+
+    const handleSatuanDelete = async () => {
+        if (!deleteSatuanTarget) return;
+        setIsDeletingSatuan(true);
+        try {
+            await KatalogService.deleteSatuan(deleteSatuanTarget.SatuanID);
+            showNotif("Satuan berhasil dihapus.", "success");
+            setDeleteSatuanTarget(null);
+            fetchSatuans();
+        } catch (err) {
+            showNotif(getApiError(err, "Gagal menghapus satuan."), "error");
+        } finally {
+            setIsDeletingSatuan(false);
+        }
+    };
+
     const [popupNotif, setPopupNotif] = useState<{ message: string; type: "success" | "error" } | null>(null);
     const showNotif = (message: string, type: "success" | "error") => setPopupNotif({ message, type });
 
     useEffect(() => {
         fetchRewards();
         fetchKategoris();
-    }, [fetchRewards, fetchKategoris]);
+        fetchSatuans();
+    }, [fetchRewards, fetchKategoris, fetchSatuans]);
 
     return (
         <section className="mr-section">
@@ -272,6 +322,71 @@ export default function KonfigurasiPage() {
                 </table>
             </div>
 
+            {DIVIDER}
+
+            <div className="mr-header" style={{ paddingTop: 0 }}>
+                <div className="mr-header-left">
+                    <h2 className="mr-header-title">Satuan Sampah</h2>
+                    <p className="mr-header-desc">Kelola satuan sampah yang tersedia sebagai referensi pada master sampah dan katalog bank sampah.</p>
+                </div>
+                <Button
+                    color="secondary"
+                    variant="solid"
+                    isRounded
+                    icon={<FaPlus />}
+                    onClick={() => { setEditSatuan(null); setSatuanModalOpen(true); }}
+                >
+                    Tambah Satuan
+                </Button>
+            </div>
+
+            <div className="table-wrapper">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: "56px" }}>No</th>
+                            <th style={{ width: "80px" }}>ID</th>
+                            <th>Nama Satuan</th>
+                            <th style={{ width: "100px", textAlign: "center" }}>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoadingSatuan ? (
+                            <tr><td colSpan={4} className="table-empty">Memuat data...</td></tr>
+                        ) : satuans.length === 0 ? (
+                            <tr><td colSpan={4} className="table-empty">Belum ada data satuan sampah.</td></tr>
+                        ) : (
+                            satuans.map((sat, idx) => (
+                                <tr key={sat.SatuanID}>
+                                    <td style={{ color: "var(--c-text-muted)", fontSize: "12px" }}>{idx + 1}</td>
+                                    <td className="table-id" style={{ fontWeight: 600 }}>{sat.SatuanID}</td>
+                                    <td>{sat.Satuan}</td>
+                                    <td>
+                                        <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Edit satuan"
+                                                onClick={() => { setEditSatuan(sat); setSatuanModalOpen(true); }}
+                                            >
+                                                <FaPenToSquare />
+                                            </button>
+                                            <button
+                                                className="table-action-btn"
+                                                title="Hapus satuan"
+                                                style={{ color: "var(--c-danger, #ef4444)", borderColor: "rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.06)" }}
+                                                onClick={() => setDeleteSatuanTarget(sat)}
+                                            >
+                                                <FaTrashCan />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
             <br /><br /><br /><br />
 
             <KategoriFormModal
@@ -279,6 +394,13 @@ export default function KonfigurasiPage() {
                 onClose={() => { setKategoriModalOpen(false); setEditKategori(null); }}
                 onSubmit={handleKategoriSubmit}
                 initialData={editKategori}
+            />
+
+            <SatuanFormModal
+                isOpen={satuanModalOpen}
+                onClose={() => { setSatuanModalOpen(false); setEditSatuan(null); }}
+                onSubmit={handleSatuanSubmit}
+                initialData={editSatuan}
             />
 
             <RewardModal
@@ -299,6 +421,17 @@ export default function KonfigurasiPage() {
                 cancelText="Batal"
                 onConfirm={handleKategoriDelete}
                 onCancel={() => setDeleteKategoriTarget(null)}
+            />
+
+            <PopupConfirmation
+                isOpen={!!deleteSatuanTarget}
+                type="danger"
+                title="Hapus Satuan?"
+                message={`Satuan "${deleteSatuanTarget?.Satuan || ""}" akan dihapus. Satuan yang masih digunakan oleh data sampah tidak dapat dihapus.`}
+                confirmText={isDeletingSatuan ? "Menghapus..." : "Ya, Hapus"}
+                cancelText="Batal"
+                onConfirm={handleSatuanDelete}
+                onCancel={() => setDeleteSatuanTarget(null)}
             />
 
             {popupNotif && (

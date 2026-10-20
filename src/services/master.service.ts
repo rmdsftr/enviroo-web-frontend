@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { MasterSampah, MasterSampahPaginatedResponse, SatuanEnum, StatistikSampahResponse, SampahFavoritResponse, SampahPerKategoriResponse, MasterBarang, MasterBarangPaginatedResponse, StatistikBarangResponse, BarangFavoritResponse } from "../types/katalog.type";
+import type { MasterSampah, MasterSampahPaginatedResponse, StatistikSampahResponse, SampahFavoritResponse, SampahPerKategoriResponse, MasterBarang, MasterBarangPaginatedResponse, StatistikBarangResponse, BarangFavoritResponse } from "../types/katalog.type";
 
 export const MasterService = {
     getSampah: async (params?: { q?: string; page?: number; limit?: number }): Promise<MasterSampahPaginatedResponse> => {
@@ -7,12 +7,12 @@ export const MasterService = {
         return res.data;
     },
 
-    createSampah: async (data: { nama_sampah: string; satuan: SatuanEnum }): Promise<{ message: string; data: MasterSampah }> => {
+    createSampah: async (data: { nama_sampah: string; satuan_id: number }): Promise<{ message: string; data: MasterSampah }> => {
         const res = await api.post("/master/sampah", data);
         return res.data;
     },
 
-    updateSampah: async (sarokId: number, data: { nama_sampah?: string; satuan?: SatuanEnum }): Promise<{ message: string; data: MasterSampah }> => {
+    updateSampah: async (sarokId: number, data: { nama_sampah?: string; satuan_id?: number }): Promise<{ message: string; data: MasterSampah }> => {
         const res = await api.patch(`/master/sampah/${sarokId}`, data);
         return res.data;
     },

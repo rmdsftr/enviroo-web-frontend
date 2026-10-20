@@ -10,8 +10,10 @@ import type { SampahMasterFormData } from "../../modals/SampahMasterModal";
 import PopupConfirmation from "../../layouts/popup-confirmation";
 import PopupNotifikasi from "../../layouts/popup-notifikasi";
 import { MasterService } from "../../services/master.service";
-import type { MasterSampah, StatistikSampahItem, SampahFavoritItem, KategoriSampahGroup } from "../../types/katalog.type";
+import { KatalogService } from "../../services/katalog.service";
+import type { MasterSampah, StatistikSampahItem, SampahFavoritItem, KategoriSampahGroup, SatuanSampah } from "../../types/katalog.type";
 import { formatCompact, formatNominal } from "../../utils/number.utils";
+import { getSatuanColor } from "../../utils/satuan.utils";
 import "../../styles/manajemen-reward.css";
 import "../../styles/table.css";
 
@@ -43,6 +45,8 @@ export default function SampahPage() {
     const [favoritMetric, setFavoritMetric]   = useState<"total_qty" | "jumlah_nasabah" | "jumlah_setoran">("total_qty");
     const [favoritFrom, setFavoritFrom] = useState(() => defaultMonthRange().from);
     const [favoritTo, setFavoritTo]     = useState(() => defaultMonthRange().to);
+
+    const [satuanList, setSatuanList] = useState<SatuanSampah[]>([]);
 
     const [modalOpen, setModalOpen]               = useState(false);
     const [editTarget, setEditTarget]             = useState<MasterSampah | null>(null);
@@ -115,6 +119,17 @@ export default function SampahPage() {
     }, []);
 
     useEffect(() => { fetchPerKategori(); }, [fetchPerKategori]);
+
+    const fetchSatuan = useCallback(async () => {
+        try {
+            const res = await KatalogService.getSatuan();
+            setSatuanList(res.data ?? []);
+        } catch {
+            showNotif("Gagal memuat data satuan sampah.", "error");
+        }
+    }, []);
+
+    useEffect(() => { fetchSatuan(); }, [fetchSatuan]);
 
     const toggleKategori = (id: number) => {
         setOpenKategoriIds(prev => {
@@ -214,7 +229,7 @@ export default function SampahPage() {
                                             fontSize: "11px", fontWeight: 700, letterSpacing: "0.4px",
                                             textTransform: "uppercase", color: "var(--c-text-muted)",
                                         }}>
-                                            {item.Satuan}
+                                            {item.Satuan?.Satuan}
                                         </span>
                                     </td>
                                     <td>
@@ -243,14 +258,12 @@ export default function SampahPage() {
                 </table>
             </div>
 
-            {totalPages > 1 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
-                    <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
-                        {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalItems)} dari {totalItems} item
-                    </span>
-                    <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-                </div>
-            )}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
+                <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
+                    {totalItems === 0 ? 0 : (page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalItems)} dari {totalItems} item
+                </span>
+                <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
 
             <div style={{ height: "1px", background: "var(--c-border-soft)", margin: "32px 0" }} />
 
@@ -273,7 +286,6 @@ export default function SampahPage() {
                 <div style={{ background: "#fff", borderRadius: "16px", border: "1px solid #e8f0eb", overflow: "hidden" }}>
                     {perKategori.map((kat, idx) => {
                         const isOpen = openKategoriIds.has(kat.kategori_id);
-                        const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
                         return (
                             <div key={kat.kategori_id} style={{ borderBottom: idx < perKategori.length - 1 ? "1px solid #e8f0eb" : "none" }}>
                                 <button
@@ -305,7 +317,7 @@ export default function SampahPage() {
                                 {isOpen && (
                                     <div style={{ padding: "0 20px 16px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
                                         {kat.sampah.map(item => {
-                                            const color = SATUAN_COLOR[item.satuan] ?? "#a0b5a8";
+                                            const color = getSatuanColor(satuanList, item.satuan);
                                             return (
                                                 <div key={item.sarok_id} style={{
                                                     display: "flex", alignItems: "center", gap: "6px",
@@ -352,7 +364,6 @@ export default function SampahPage() {
                     Memuat statistik...
                 </div>
             ) : (() => {
-                const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
                 const isUang = statsFilter === "Uang";
                 const fmt = (n: number) => formatNominal(n, isUang ? "Rp" : "poin");
                 const sorted = [...stats]
@@ -407,7 +418,7 @@ export default function SampahPage() {
                             </div>
                             {(statsExpanded ? sorted : sorted.slice(0, STATS_PREVIEW)).map((item) => {
                                 const pct = item.rata_rata_harga > 0 ? (item.rata_rata_harga / maxHarga) * 100 : 0;
-                                const barColor = SATUAN_COLOR[item.satuan] ?? "#a0b5a8";
+                                const barColor = getSatuanColor(satuanList, item.satuan);
                                 return (
                                     <div key={item.sarok_id} style={{ display: "grid", gridTemplateColumns: "180px 1fr 130px", gap: "12px", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #f4f7f5" }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
@@ -468,7 +479,6 @@ export default function SampahPage() {
                     Belum ada data sampah favorit.
                 </div>
             ) : (() => {
-                const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
                 const getValue = (d: SampahFavoritItem) => d[favoritMetric];
                 const maxVal = Math.max(...favorit.map(getValue), 1);
                 const metricLabel = favoritMetric === "total_qty" ? "qty" : favoritMetric === "jumlah_nasabah" ? "nasabah" : "setoran";
@@ -505,7 +515,7 @@ export default function SampahPage() {
                                 const barH = Math.max((val / maxVal) * chartH, val > 0 ? 3 : 0);
                                 const x = padL + i * slotW + (slotW - barW) / 2;
                                 const y = padTop + chartH - barH;
-                                const color = SATUAN_COLOR[item.satuan] ?? "#a0b5a8";
+                                const color = getSatuanColor(satuanList, item.satuan);
                                 const labelX = padL + i * slotW + slotW / 2;
 
                                 return (
@@ -548,10 +558,10 @@ export default function SampahPage() {
                         </svg>
 
                         <div style={{ display: "flex", gap: "16px", justifyContent: "center", marginTop: "8px" }}>
-                            {[["kg", "#013236"], ["pcs", "#94DF0C"], ["liter", "#4EA771"]].map(([sat, color]) => (
-                                <div key={sat} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                                    <span style={{ width: 10, height: 10, borderRadius: "3px", background: color, display: "inline-block" }} />
-                                    <span style={{ fontSize: "12px", color: "#4a5f52", fontFamily: "Poppins, sans-serif" }}>{sat}</span>
+                            {satuanList.map(sat => (
+                                <div key={sat.SatuanID} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                                    <span style={{ width: 10, height: 10, borderRadius: "3px", background: getSatuanColor(satuanList, sat.Satuan), display: "inline-block" }} />
+                                    <span style={{ fontSize: "12px", color: "#4a5f52", fontFamily: "Poppins, sans-serif" }}>{sat.Satuan}</span>
                                 </div>
                             ))}
                             <div style={{ display: "flex", alignItems: "center", gap: "5px", marginLeft: "8px", paddingLeft: "12px", borderLeft: "1px solid #e8f0eb" }}>
@@ -567,6 +577,7 @@ export default function SampahPage() {
                 onClose={() => { setModalOpen(false); setEditTarget(null); }}
                 onSubmit={handleSubmit}
                 initialData={editTarget}
+                satuanList={satuanList}
             />
 
             <PopupConfirmation

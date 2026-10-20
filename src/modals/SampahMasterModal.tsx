@@ -4,18 +4,12 @@ import Input from "../components/input";
 import Dropdown from "../components/dropdown";
 import Button from "../components/button";
 import CloseButton from "../components/close-button";
-import type { MasterSampah, SatuanEnum } from "../types/katalog.type";
+import type { MasterSampah, SatuanSampah } from "../types/katalog.type";
 import "../styles/manajemen-reward.css";
-
-const SATUAN_OPTIONS = [
-    { label: "kg",    value: "kg"    },
-    { label: "pcs",   value: "pcs"   },
-    { label: "liter", value: "liter" },
-];
 
 export interface SampahMasterFormData {
     nama_sampah: string;
-    satuan: SatuanEnum;
+    satuan_id: number;
 }
 
 interface SampahMasterModalProps {
@@ -23,12 +17,13 @@ interface SampahMasterModalProps {
     onClose: () => void;
     onSubmit: (data: SampahMasterFormData) => Promise<void>;
     initialData?: MasterSampah | null;
+    satuanList: SatuanSampah[];
 }
 
-export default function SampahMasterModal({ isOpen, onClose, onSubmit, initialData }: SampahMasterModalProps) {
+export default function SampahMasterModal({ isOpen, onClose, onSubmit, initialData, satuanList }: SampahMasterModalProps) {
     const isEdit = !!initialData;
     const [namaSampah, setNamaSampah] = useState("");
-    const [satuan, setSatuan]         = useState<SatuanEnum>("kg");
+    const [satuanId, setSatuanId]     = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -36,18 +31,18 @@ export default function SampahMasterModal({ isOpen, onClose, onSubmit, initialDa
         if (!isOpen) return;
         setError(null);
         setNamaSampah(initialData?.NamaSampah || "");
-        setSatuan(initialData?.Satuan || "kg");
-    }, [isOpen, initialData]);
+        setSatuanId(initialData?.SatuanID ?? satuanList[0]?.SatuanID ?? 0);
+    }, [isOpen, initialData, satuanList]);
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!namaSampah.trim()) return;
+        if (!namaSampah.trim() || !satuanId) return;
         setError(null);
         setIsSubmitting(true);
         try {
-            await onSubmit({ nama_sampah: namaSampah.trim(), satuan });
+            await onSubmit({ nama_sampah: namaSampah.trim(), satuan_id: satuanId });
         } catch (err: any) {
             setError(err?.response?.data?.error || err?.message || "Terjadi kesalahan.");
         } finally {
@@ -85,18 +80,24 @@ export default function SampahMasterModal({ isOpen, onClose, onSubmit, initialDa
                         <label className="mr-form-label">
                             Satuan <span style={{ color: "var(--c-danger)" }}>*</span>
                         </label>
-                        <Dropdown
-                            options={SATUAN_OPTIONS}
-                            value={satuan}
-                            onChange={e => setSatuan(e.target.value as SatuanEnum)}
-                            fullWidth
-                        />
+                        {satuanList.length === 0 ? (
+                            <div className="mr-form-error">
+                                Belum ada satuan sampah. Tambahkan satuan terlebih dahulu di menu Operasional.
+                            </div>
+                        ) : (
+                            <Dropdown
+                                options={satuanList.map(s => ({ label: s.Satuan, value: s.SatuanID }))}
+                                value={satuanId}
+                                onChange={e => setSatuanId(Number(e.target.value))}
+                                fullWidth
+                            />
+                        )}
                     </div>
                     <div className="mr-modal-actions">
                         <Button type="button" variant="outline" color="primary" onClick={onClose} disabled={isSubmitting}>
                             Batal
                         </Button>
-                        <Button type="submit" color="primary" disabled={isSubmitting}>
+                        <Button type="submit" color="primary" disabled={isSubmitting || !satuanId}>
                             {isSubmitting ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Tambah"}
                         </Button>
                     </div>

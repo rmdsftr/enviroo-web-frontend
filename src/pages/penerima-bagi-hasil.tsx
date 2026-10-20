@@ -7,7 +7,7 @@ import {
     FaBoxOpen,
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
-import BreadcrumbLayout from "../layouts/breadcrumb";
+import BreadcrumbLayout, { type BreadcrumbItem } from "../layouts/breadcrumb";
 import {
     BagiHasilService,
     type PenerimaBagiHasilDetail,
@@ -32,6 +32,7 @@ export default function PenerimaBagiHasilPage() {
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : role === "admin_bsm" ? "/bsm" : "/superadmin";
 
     const bagiHasilId: string | undefined = location.state?.bagiHasilId;
+    const breadcrumbTrail: BreadcrumbItem[] | undefined = location.state?.breadcrumbTrail;
 
     const [detail, setDetail] = useState<PenerimaBagiHasilDetail | null>(null);
     const [loading, setLoading] = useState(true);
@@ -47,14 +48,16 @@ export default function PenerimaBagiHasilPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    const breadcrumbItems = [
-        { label: "Riwayat", path: `${rolePrefix}/riwayat` },
-        {
-            label: "Detail Bagi Hasil",
-            path: bagiHasilId ? `${rolePrefix}/riwayat/bagi-hasil/${bagiHasilId}` : undefined,
-        },
-        { label: "Detail Penerima" },
-    ];
+    const breadcrumbItems = breadcrumbTrail
+        ? [...breadcrumbTrail, { label: "Detail Bagi Hasil" }]
+        : [
+            { label: "Riwayat", path: `${rolePrefix}/riwayat` },
+            {
+                label: "Detail Bagi Hasil",
+                path: bagiHasilId ? `${rolePrefix}/riwayat/bagi-hasil/${bagiHasilId}` : undefined,
+            },
+            { label: "Detail Penerima" },
+        ];
 
     return (
         <>

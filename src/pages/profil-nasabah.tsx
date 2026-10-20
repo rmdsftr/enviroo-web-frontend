@@ -19,7 +19,7 @@ import {
     type StatusNasabah,
 } from "../constants/profil-nasabah.constants";
 
-import BreadcrumbLayout from "../layouts/breadcrumb";
+import BreadcrumbLayout, { type BreadcrumbItem } from "../layouts/breadcrumb";
 import PopupAktivasiResult from "../layouts/popup-aktivasi-result";
 import PopupConfirmation from "../layouts/popup-confirmation";
 import PopupNotifikasi from "../layouts/popup-notifikasi";
@@ -104,6 +104,11 @@ export default function ProfilNasabahPage() {
 
     const statusConf = STATUS_CONFIG[(nasabah.status_nasabah as StatusNasabah) || "aktif"];
     const initials = nasabah.nama.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+
+    const breadcrumbTrail: BreadcrumbItem[] = [
+        { label: "Nasabah", path: `${rolePrefix}/nasabah` },
+        { label: nasabah.nama, path: `${rolePrefix}/nasabah/${id}` },
+    ];
 
     const INFO_ITEMS = [
         { icon: <FaIdCard />,       label: "ID Pengguna",     value: nasabah.user_id },
@@ -254,7 +259,7 @@ export default function ProfilNasabahPage() {
                             data={filteredSetoran}
                             rowKey={(row) => row.setoran_id}
                             emptyMessage="Belum ada riwayat setoran."
-                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/setoran/${row.setoran_id}`)}
+                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/setoran/${row.setoran_id}`, { state: { breadcrumbTrail } })}
                           />
                     }
                 </div>
@@ -273,7 +278,7 @@ export default function ProfilNasabahPage() {
                             data={filteredBagiHasil}
                             rowKey={(row) => row.penerima_id}
                             emptyMessage="Belum ada riwayat bagi hasil."
-                            onRowClick={(row) => navigate(`${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`, { state: { bagiHasilId: row.bagi_hasil_id } })}
+                            onRowClick={(row) => navigate(`${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`, { state: { bagiHasilId: row.bagi_hasil_id, breadcrumbTrail } })}
                           />
                     }
                 </div>
@@ -292,7 +297,7 @@ export default function ProfilNasabahPage() {
                             data={filteredPenarikan}
                             rowKey={(row) => row.penarikan_id}
                             emptyMessage="Belum ada riwayat penarikan."
-                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penarikan/${row.penarikan_id}`)}
+                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penarikan/${row.penarikan_id}`, { state: { breadcrumbTrail } })}
                           />
                     }
                 </div>

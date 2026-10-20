@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { StatistikService } from "../../services/statistik.service";
+import { KatalogService } from "../../services/katalog.service";
 import type { GetSuperadminRingkasanResponse, TrenPenjualanBulan, RankingBankItem, VolumeSampahItem } from "../../types/statistik.type";
+import type { SatuanSampah } from "../../types/katalog.type";
 import FilterPill from "../../components/filter-pill";
 import Dropdown from "../../components/dropdown";
 import { formatCompact, formatDecimal, formatNominal, formatQty } from "../../utils/number.utils";
+import { getSatuanColor, isSameSatuan } from "../../utils/satuan.utils";
 import "../../styles/layout.css";
 import "../../styles/setoran-dashboard.css";
 
@@ -286,7 +289,18 @@ export default function DashboardSuperadminPage() {
 
     const [volumeData, setVolumeData] = useState<VolumeSampahItem[]>([]);
     const [volumeYear, setVolumeYear] = useState(currentYear);
-    const [volumeSatuan, setVolumeSatuan] = useState<"kg" | "pcs" | "liter">("kg");
+    const [volumeSatuan, setVolumeSatuan] = useState<string>("");
+    const [satuanList, setSatuanList] = useState<SatuanSampah[]>([]);
+
+    useEffect(() => {
+        KatalogService.getSatuan()
+            .then(res => {
+                const list = res.data ?? [];
+                setSatuanList(list);
+                setVolumeSatuan(prev => prev || (list[0]?.Satuan ?? ""));
+            })
+            .catch(err => console.error("Failed to fetch satuan", err));
+    }, []);
 
     useEffect(() => {
         StatistikService.getSuperadminRingkasan()
@@ -473,13 +487,9 @@ export default function DashboardSuperadminPage() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                         <FilterPill
-                            options={[
-                                { label: "kg",    value: "kg"    },
-                                { label: "pcs",   value: "pcs"   },
-                                { label: "liter", value: "liter" },
-                            ]}
+                            options={satuanList.map(s => ({ label: s.Satuan, value: s.Satuan }))}
                             activeValue={volumeSatuan}
-                            onChange={(v) => setVolumeSatuan(v as "kg" | "pcs" | "liter")}
+                            onChange={(v) => setVolumeSatuan(v)}
                         />
                         <Dropdown
                             options={[currentYear - 1, currentYear].map(y => ({ label: String(y), value: y }))}
@@ -492,9 +502,8 @@ export default function DashboardSuperadminPage() {
                 </div>
 
                 {(() => {
-                    const SATUAN_COLOR: Record<string, string> = { kg: "#013236", pcs: "#94DF0C", liter: "#4EA771" };
-                    const color = SATUAN_COLOR[volumeSatuan] ?? "#a0b5a8";
-                    const filtered = volumeData.filter(d => d.satuan === volumeSatuan);
+                    const color = getSatuanColor(satuanList, volumeSatuan);
+                    const filtered = volumeData.filter(d => isSameSatuan(d.satuan, volumeSatuan));
                     const filled: number[] = Array.from({ length: 12 }, (_, i) =>
                         filtered.find(d => d.bulan === i + 1)?.total_qty ?? 0
                     );

@@ -21,10 +21,21 @@ export interface GetKategoriResponse {
     message: string;
 }
 
+export interface SatuanSampah {
+    SatuanID: number;
+    Satuan: string;
+}
+
+export interface GetSatuanResponse {
+    data: SatuanSampah[];
+    message: string;
+}
+
 export interface MasterSampah{
     SarokID : number;
     NamaSampah : string;
-    Satuan : SatuanEnum;
+    SatuanID : number;
+    Satuan : SatuanSampah;
 }
 
 export interface MasterSampahResponse{
@@ -117,7 +128,6 @@ export interface MasterBarangPaginatedResponse {
     limit: number;
 }
 
-export type SatuanEnum = "kg" | "pcs" | "liter";
 export type LevelUser = "nasabah" | "eksternal";
 export type SatuanReward = "Rp" | "poin";
 
@@ -129,8 +139,8 @@ export interface HargaPerLevel {
 }
 
 export interface KatalogHistoryItem {
-    history_id: number;
-    schema_id: number;
+    history_id: string;
+    schema_id: string;
     level_user: LevelUser;
     harga_lama: number;
     harga_baru: number;
@@ -143,7 +153,7 @@ export interface KatalogSampah {
     sampah_id: string;
     nama_sampah: string;
     photo_url: string;
-    satuan: SatuanEnum;
+    satuan: string;
     bank_id: string;
     kategori_id: number;
     reward_id: number;
@@ -157,14 +167,13 @@ export interface KatalogDetail {
     sampah_id: string;
     nama_sampah: string;
     photo_url: string;
-    satuan: SatuanEnum;
+    satuan: string;
     bank_id: string;
     syarat_pemilahan: string;
     kategori: KategoriSampah;
     reward: KatalogReward;
     stok: number;
     harga_per_level: HargaPerLevel[];
-    history_harga: KatalogHistoryItem[];
 }
 
 export interface GetKatalogResponse {
@@ -190,10 +199,15 @@ export interface GetKatalogDetailResponse {
     message: string;
 }
 
+export interface GetHistoryHargaResponse {
+    data: KatalogHistoryItem[];
+    message: string;
+}
+
 export interface AddKatalogRequest {
     nama_sampah: string;
     sarok_id? : number;
-    satuan: SatuanEnum;
+    satuan_id: number;
     kategori_id: number;
     reward_id: number;
     syarat_pemilahan?: string;

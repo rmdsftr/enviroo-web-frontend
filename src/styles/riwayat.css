@@ -73,9 +73,22 @@
     color: #94a3b8;
 }
 
+.riwayat-pagination-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.riwayat-pagination-row .pagination {
+    padding-top: 0;
+}
+
 @media (max-width: 900px) {
     .riwayat-hero-right {
         width: 100%;
         justify-content: flex-start;
+    }
+
+    .riwayat-pagination-row {
+        justify-content: center;
     }
 }

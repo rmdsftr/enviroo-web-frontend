@@ -7,7 +7,7 @@ import {
     FaBoxOpen,
 } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
-import BreadcrumbLayout from "../layouts/breadcrumb";
+import BreadcrumbLayout, { type BreadcrumbItem } from "../layouts/breadcrumb";
 import { SetoranService, type SetoranDetail } from "../services/setoran.service";
 import ViewPhoto from "../components/view-photo";
 import "../styles/detail-penyetoran.css";
@@ -32,6 +32,7 @@ export default function DetailPenyetoranPage() {
     const rolePrefix = role === "admin_bsi" ? "/bsi" : role === "admin_bsu" ? "/bsu" : "/bsm";
 
     const penimbanganId: string | undefined = location.state?.penimbanganId;
+    const breadcrumbTrail: BreadcrumbItem[] | undefined = location.state?.breadcrumbTrail;
 
     const [detail, setDetail] = useState<SetoranDetail | null>(null);
     const [loading, setLoading] = useState(true);
@@ -48,16 +49,18 @@ export default function DetailPenyetoranPage() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    const breadcrumbItems = [
-        { label: "Riwayat", path: `${rolePrefix}/riwayat` },
-        {
-            label: "Detail Penimbangan",
-            path: penimbanganId
-                ? `${rolePrefix}/riwayat/penimbangan/${penimbanganId}`
-                : undefined,
-        },
-        { label: "Detail Setoran" },
-    ];
+    const breadcrumbItems = breadcrumbTrail
+        ? [...breadcrumbTrail, { label: "Detail Setoran" }]
+        : [
+            { label: "Riwayat", path: `${rolePrefix}/riwayat` },
+            {
+                label: "Detail Penimbangan",
+                path: penimbanganId
+                    ? `${rolePrefix}/riwayat/penimbangan/${penimbanganId}`
+                    : undefined,
+            },
+            { label: "Detail Setoran" },
+        ];
 
     return (
         <>

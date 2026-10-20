@@ -10,6 +10,10 @@ function parse(iso: string): Date {
     return new Date(s);
 }
 
+export function toTimestamp(iso: string): number {
+    return parse(iso).getTime();
+}
+
 export function formatTanggal(iso: string): string {
     const d = parse(iso);
     return `${d.getDate()} ${BULAN_PENDEK[d.getMonth()]} ${d.getFullYear()}`;

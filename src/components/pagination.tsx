@@ -16,18 +16,18 @@ export default function Pagination({
     siblingCount = 1,
     variant = "default",
 }: PaginationProps) {
-    if (totalPages <= 1) return null;
+    const pageCount = Math.max(1, totalPages);
 
     const buildPages = (): (number | "...")[] => {
         const pages: (number | "...")[] = [];
         const left = Math.max(2, currentPage - siblingCount);
-        const right = Math.min(totalPages - 1, currentPage + siblingCount);
+        const right = Math.min(pageCount - 1, currentPage + siblingCount);
 
         pages.push(1);
         if (left > 2) pages.push("...");
         for (let i = left; i <= right; i++) pages.push(i);
-        if (right < totalPages - 1) pages.push("...");
-        if (totalPages > 1) pages.push(totalPages);
+        if (right < pageCount - 1) pages.push("...");
+        if (pageCount > 1) pages.push(pageCount);
 
         return pages;
     };
@@ -65,7 +65,7 @@ export default function Pagination({
             <button
                 className="pagination__btn pagination__arrow"
                 onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                disabled={currentPage >= pageCount}
                 aria-label="Halaman berikutnya"
             >
                 <FaChevronRight />

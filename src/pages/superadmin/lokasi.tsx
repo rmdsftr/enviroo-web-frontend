@@ -298,18 +298,16 @@ export default function LokasiPage() {
                 </table>
             </div>
 
-            {kelTotalPages > 1 && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
-                    <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
-                        {(kelPage - 1) * KEL_LIMIT + 1}–{Math.min(kelPage * KEL_LIMIT, kelTotalItems)} dari {kelTotalItems} kelurahan
-                    </span>
-                    <Pagination
-                        currentPage={kelPage}
-                        totalPages={kelTotalPages}
-                        onPageChange={setKelPage}
-                    />
-                </div>
-            )}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 4px 0" }}>
+                <span style={{ fontSize: "12px", color: "var(--c-text-muted)" }}>
+                    {kelTotalItems === 0 ? 0 : (kelPage - 1) * KEL_LIMIT + 1}–{Math.min(kelPage * KEL_LIMIT, kelTotalItems)} dari {kelTotalItems} kelurahan
+                </span>
+                <Pagination
+                    currentPage={kelPage}
+                    totalPages={kelTotalPages}
+                    onPageChange={setKelPage}
+                />
+            </div>
             <br /><br /><br /><br />
 
             <KecamatanFormModal

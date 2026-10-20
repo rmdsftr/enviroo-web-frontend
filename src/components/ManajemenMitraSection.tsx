@@ -5,6 +5,7 @@ import { MitraService } from "../services/mitra.service";
 import type { MitraPengepul } from "../types/mitra.type";
 import Button from "../components/button";
 import FilterPill from "../components/filter-pill";
+import Pagination from "../components/pagination";
 import Table, { TableBadge, TableActionBtn, type ColumnDef } from "../components/table";
 import MitraFormModal, { type MitraFormData } from "../modals/MitraFormModal";
 import PopupConfirmation from "../layouts/popup-confirmation";
@@ -21,6 +22,8 @@ const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
     { label: "Tidak Aktif", value: "nonaktif" },
 ];
 
+const MITRA_PER_PAGE = 5;
+
 export default function ManajemenMitraSection() {
     const { user } = useAuth();
     const bankId = user?.bank_id || "";
@@ -29,6 +32,7 @@ export default function ManajemenMitraSection() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("aktif");
+    const [page, setPage] = useState(1);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<MitraPengepul | null>(null);
@@ -63,6 +67,13 @@ export default function ManajemenMitraSection() {
     const filteredMitra = useMemo(() => {
         return mitraList.filter(m => (statusFilter === "aktif" ? m.is_active : !m.is_active));
     }, [mitraList, statusFilter]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredMitra.length / MITRA_PER_PAGE));
+    const currentPage = Math.min(page, totalPages);
+    const pagedMitra = useMemo(
+        () => filteredMitra.slice((currentPage - 1) * MITRA_PER_PAGE, currentPage * MITRA_PER_PAGE),
+        [filteredMitra, currentPage],
+    );
 
     const openAdd = () => { setEditTarget(null); setFormOpen(true); };
     const openEdit = (mitra: MitraPengepul) => { setEditTarget(mitra); setFormOpen(true); };
@@ -150,7 +161,7 @@ export default function ManajemenMitraSection() {
         <section className="mr-section">
             <div className="mr-header">
                 <div className="mr-header-left">
-                    <h2 className="mr-header-title">Kelola Mitra Pengepul</h2>
+                    <h2 className="mr-header-title">Mitra Pengepul</h2>
                     <p className="mr-header-desc">
                         Kelola pengepul yang bermitra dengan bank sampah. Petugas juga bisa menambah mitra saat melakukan penjualan.
                     </p>
@@ -167,23 +178,33 @@ export default function ManajemenMitraSection() {
                     <FilterPill
                         options={STATUS_FILTER_OPTIONS}
                         activeValue={statusFilter}
-                        onChange={(val) => setStatusFilter(val)}
+                        onChange={(val) => { setStatusFilter(val); setPage(1); }}
                     />
                 </div>
 
                 {isLoading ? (
                     <div className="mm-loading">Memuat data...</div>
                 ) : (
-                    <Table
-                        columns={columns}
-                        data={filteredMitra}
-                        rowKey={(row) => row.mitra_id}
-                        emptyMessage={
-                            mitraList.length === 0
-                                ? "Belum ada mitra pengepul. Tambahkan mitra baru menggunakan tombol di atas."
-                                : `Tidak ada mitra dengan status "${statusFilter === "aktif" ? "Aktif" : "Tidak Aktif"}".`
-                        }
-                    />
+                    <>
+                        <Table
+                            columns={columns}
+                            data={pagedMitra}
+                            rowKey={(row) => row.mitra_id}
+                            emptyMessage={
+                                mitraList.length === 0
+                                    ? "Belum ada mitra pengepul. Tambahkan mitra baru menggunakan tombol di atas."
+                                    : `Tidak ada mitra dengan status "${statusFilter === "aktif" ? "Aktif" : "Tidak Aktif"}".`
+                            }
+                        />
+                        <div className="mm-card-pagination">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setPage}
+                                variant="compact"
+                            />
+                        </div>
+                    </>
                 )}
             </div>
 
