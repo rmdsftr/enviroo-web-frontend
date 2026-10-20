@@ -64,3 +64,8 @@ export function formatBulanTahun(iso: string): string {
     const d = parse(iso);
     return `${BULAN_PANJANG[d.getMonth()]} ${d.getFullYear()}`;
 }
+
+export function getWeekOfMonth(date: Date): number {
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return Math.ceil((date.getDate() + firstDay) / 7);
+}

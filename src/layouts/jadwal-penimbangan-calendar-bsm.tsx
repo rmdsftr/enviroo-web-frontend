@@ -15,8 +15,17 @@ const STATUS_JADWAL: Record<string, { label: string; cls: string }> = {
     upcoming:   { label: "Perkiraan",  cls: "berlangsung" },
 };
 
+const STATUS_TERLEWAT = { label: "Terlewat", cls: "mendatang" };
+
+function isTerlewat(item: JadwalPenimbanganOccurrence): boolean {
+    if (item.status_jadwal !== "upcoming") return false;
+    const end = new Date(`${item.tanggal}T${formatTime(item.jam_selesai).replace(".", ":")}`);
+    const batas = isNaN(end.getTime()) ? new Date(`${item.tanggal}T23:59:59`) : end;
+    return batas < new Date();
+}
+
 function isDead(item: JadwalPenimbanganOccurrence): boolean {
-    return !item.is_active || item.status_jadwal === "dibatalkan" || item.status_jadwal === "selesai";
+    return !item.is_active || item.status_jadwal === "dibatalkan" || item.status_jadwal === "selesai" || isTerlewat(item);
 }
 
 function getMondayFirstCol(date: Date): number {
@@ -169,7 +178,9 @@ export default function JadwalPenimbanganCalendarBsm({ jadwalList, loading, onMo
                     <div className="jadwal-cal-detail-list">
                         {selectedItems.map(item => {
                             const dead = isDead(item);
-                            const st   = STATUS_JADWAL[item.status_jadwal] ?? { label: item.status_jadwal, cls: "" };
+                            const st   = isTerlewat(item)
+                                ? STATUS_TERLEWAT
+                                : STATUS_JADWAL[item.status_jadwal] ?? { label: item.status_jadwal, cls: "" };
                             return (
                                 <div key={item.jadwal_id + item.tanggal} className={`jadwal-cal-detail-item rutin${dead ? " dead" : ""}`}>
                                     <span className="jadwal-cal-detail-time">

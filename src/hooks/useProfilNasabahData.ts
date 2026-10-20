@@ -6,6 +6,18 @@ import { PenarikanService, type PenarikanNasabahItem } from "../services/penarik
 import { defaultMonthRange } from "../components/filter-range";
 import type { ProfilNasabah, SaldoNasabah } from "../types/profil.type";
 
+const RIWAYAT_PER_PAGE = 10;
+
+function paginate<T>(list: T[], page: number) {
+    const totalPages = Math.max(1, Math.ceil(list.length / RIWAYAT_PER_PAGE));
+    const currentPage = Math.min(page, totalPages);
+    return {
+        items: list.slice((currentPage - 1) * RIWAYAT_PER_PAGE, currentPage * RIWAYAT_PER_PAGE),
+        currentPage,
+        totalPages,
+    };
+}
+
 export function useProfilNasabahData(id: string | undefined) {
     const [nasabah, setNasabah] = useState<ProfilNasabah | null>(null);
     const [saldo, setSaldo] = useState<SaldoNasabah | null>(null);
@@ -16,18 +28,21 @@ export function useProfilNasabahData(id: string | undefined) {
     const [setoranSearch, setSetoranSearch] = useState("");
     const [setoranFrom, setSetoranFrom] = useState(() => defaultMonthRange().from);
     const [setoranTo, setSetoranTo] = useState(() => defaultMonthRange().to);
+    const [setoranPage, setSetoranPage] = useState(1);
 
     const [bagiHasilList, setBagiHasilList] = useState<RiwayatBagiHasilNasabahItem[]>([]);
     const [bagiHasilLoading, setBagiHasilLoading] = useState(false);
     const [bagiHasilSearch, setBagiHasilSearch] = useState("");
     const [bagiHasilFrom, setBagiHasilFrom] = useState(() => defaultMonthRange().from);
     const [bagiHasilTo, setBagiHasilTo] = useState(() => defaultMonthRange().to);
+    const [bagiHasilPage, setBagiHasilPage] = useState(1);
 
     const [penarikanList, setPenarikanList] = useState<PenarikanNasabahItem[]>([]);
     const [penarikanLoading, setPenarikanLoading] = useState(false);
     const [penarikanSearch, setPenarikanSearch] = useState("");
     const [penarikanFrom, setPenarikanFrom] = useState(() => defaultMonthRange().from);
     const [penarikanTo, setPenarikanTo] = useState(() => defaultMonthRange().to);
+    const [penarikanPage, setPenarikanPage] = useState(1);
 
     useEffect(() => {
         if (!id) return;
@@ -117,16 +132,26 @@ export function useProfilNasabahData(id: string | undefined) {
         });
     }, [penarikanList, penarikanFrom, penarikanTo, penarikanSearch]);
 
+    const pagedSetoran = useMemo(() => paginate(filteredSetoran, setoranPage), [filteredSetoran, setoranPage]);
+    const pagedBagiHasil = useMemo(() => paginate(filteredBagiHasil, bagiHasilPage), [filteredBagiHasil, bagiHasilPage]);
+    const pagedPenarikan = useMemo(() => paginate(filteredPenarikan, penarikanPage), [filteredPenarikan, penarikanPage]);
+
     return {
         nasabah, setNasabah, saldo, loading,
-        setoranLoading, setoranSearch, setSetoranSearch,
-        setoranFrom, setSetoranFrom, setoranTo, setSetoranTo,
-        filteredSetoran,
-        bagiHasilLoading, bagiHasilSearch, setBagiHasilSearch,
-        bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo,
-        filteredBagiHasil,
-        penarikanLoading, penarikanSearch, setPenarikanSearch,
-        penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo,
-        filteredPenarikan,
+        setoranLoading, setoranSearch,
+        setSetoranSearch: (v: string) => { setSetoranSearch(v); setSetoranPage(1); },
+        setoranFrom, setoranTo,
+        setSetoranRange: (f: string, t: string) => { setSetoranFrom(f); setSetoranTo(t); setSetoranPage(1); },
+        pagedSetoran, setSetoranPage,
+        bagiHasilLoading, bagiHasilSearch,
+        setBagiHasilSearch: (v: string) => { setBagiHasilSearch(v); setBagiHasilPage(1); },
+        bagiHasilFrom, bagiHasilTo,
+        setBagiHasilRange: (f: string, t: string) => { setBagiHasilFrom(f); setBagiHasilTo(t); setBagiHasilPage(1); },
+        pagedBagiHasil, setBagiHasilPage,
+        penarikanLoading, penarikanSearch,
+        setPenarikanSearch: (v: string) => { setPenarikanSearch(v); setPenarikanPage(1); },
+        penarikanFrom, penarikanTo,
+        setPenarikanRange: (f: string, t: string) => { setPenarikanFrom(f); setPenarikanTo(t); setPenarikanPage(1); },
+        pagedPenarikan, setPenarikanPage,
     };
 }

@@ -4,7 +4,7 @@ import {
     FaScaleBalanced, FaPen, FaTrash,
 } from "react-icons/fa6";
 import type { JadwalItem } from "../types/jadwal.type";
-import { formatTime } from "../utils/date.utils";
+import { formatTime, getWeekOfMonth } from "../utils/date.utils";
 import "../styles/jadwal-bsu.css";
 
 const HARI_MAP: Record<string, string> = {
@@ -36,11 +36,6 @@ function buildCalendarWeeks(year: number, month: number): (Date | null)[][] {
 
 function getLocalISODate(d: Date): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function getWeekOfMonth(date: Date): number {
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-    return Math.ceil((date.getDate() + firstDay) / 7);
 }
 
 export { formatTime };

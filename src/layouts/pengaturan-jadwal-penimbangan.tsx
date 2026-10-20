@@ -4,7 +4,7 @@ import FilterPill from "../components/filter-pill";
 import type { JadwalMasterPenimbangan, JadwalMasterRutinItem, JadwalMasterKhususItem, JadwalEditSeed } from "../types/jadwal.type";
 import { HARI_DISPLAY, HARI_ORDER } from "../constants/jadwal.constants";
 import { formatTime } from "./jadwal-penimbangan-calendar";
-import { formatTanggal } from "../utils/date.utils";
+import { formatTanggal, getWeekOfMonth } from "../utils/date.utils";
 import "../styles/jadwal-bsu.css";
 
 function weekLabel(mingguKe: number): string {
@@ -67,7 +67,15 @@ export default function PengaturanJadwalPenimbangan({ data, loading, onEdit, onD
         [data.khusus]
     );
 
-    const effectiveOpenWeeks = openWeeks ?? new Set(rutinGrouped.slice(0, 1).map(([mingguKe]) => mingguKe));
+    const defaultOpenWeek = useMemo(() => {
+        const weeks = rutinGrouped.map(([mingguKe]) => mingguKe);
+        const current = getWeekOfMonth(new Date());
+        if (weeks.includes(current)) return current;
+        if (weeks.includes(0)) return 0;
+        return weeks[0];
+    }, [rutinGrouped]);
+
+    const effectiveOpenWeeks = openWeeks ?? new Set(defaultOpenWeek === undefined ? [] : [defaultOpenWeek]);
 
     const toggleWeek = (mingguKe: number) => {
         const next = new Set(effectiveOpenWeeks);

@@ -29,6 +29,7 @@ import Tabs from "../components/tabs";
 import Table from "../components/table";
 import FilterRange from "../components/filter-range";
 import SearchBar from "../components/search";
+import Pagination from "../components/pagination";
 
 import {
     FaUser, FaIdCard, FaEnvelope, FaWhatsapp, FaCreditCard, FaBuilding,
@@ -50,11 +51,11 @@ export default function ProfilNasabahPage() {
     const {
         nasabah, setNasabah, saldo, loading,
         setoranLoading, setoranSearch, setSetoranSearch,
-        setoranFrom, setSetoranFrom, setoranTo, setSetoranTo, filteredSetoran,
+        setoranFrom, setoranTo, setSetoranRange, pagedSetoran, setSetoranPage,
         bagiHasilLoading, bagiHasilSearch, setBagiHasilSearch,
-        bagiHasilFrom, setBagiHasilFrom, bagiHasilTo, setBagiHasilTo, filteredBagiHasil,
+        bagiHasilFrom, bagiHasilTo, setBagiHasilRange, pagedBagiHasil, setBagiHasilPage,
         penarikanLoading, penarikanSearch, setPenarikanSearch,
-        penarikanFrom, setPenarikanFrom, penarikanTo, setPenarikanTo, filteredPenarikan,
+        penarikanFrom, penarikanTo, setPenarikanRange, pagedPenarikan, setPenarikanPage,
     } = useProfilNasabahData(id);
 
     const [showSaldo, setShowSaldo] = useState(false);
@@ -250,17 +251,22 @@ export default function ProfilNasabahPage() {
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
                         <SearchBar placeholder="Cari ID atau nama petugas..." value={setoranSearch} onChange={setSetoranSearch} width="300px" />
-                        <FilterRange from={setoranFrom} to={setoranTo} onChange={(f, t) => { setSetoranFrom(f); setSetoranTo(t); }} />
+                        <FilterRange from={setoranFrom} to={setoranTo} onChange={setSetoranRange} />
                     </div>
                     {setoranLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
-                        : <Table<RiwayatSetoranNasabahItem>
-                            columns={SETORAN_COLUMNS}
-                            data={filteredSetoran}
-                            rowKey={(row) => row.setoran_id}
-                            emptyMessage="Belum ada riwayat setoran."
-                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/setoran/${row.setoran_id}`, { state: { breadcrumbTrail } })}
-                          />
+                        : <>
+                            <Table<RiwayatSetoranNasabahItem>
+                                columns={SETORAN_COLUMNS}
+                                data={pagedSetoran.items}
+                                rowKey={(row) => row.setoran_id}
+                                emptyMessage="Belum ada riwayat setoran."
+                                onRowClick={(row) => navigate(`${rolePrefix}/riwayat/setoran/${row.setoran_id}`, { state: { breadcrumbTrail } })}
+                            />
+                            <div className="riwayat-pagination-row">
+                                <Pagination currentPage={pagedSetoran.currentPage} totalPages={pagedSetoran.totalPages} onPageChange={setSetoranPage} variant="compact" />
+                            </div>
+                          </>
                     }
                 </div>
             )}
@@ -269,17 +275,22 @@ export default function ProfilNasabahPage() {
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
                         <SearchBar placeholder="Cari ID atau nama reward..." value={bagiHasilSearch} onChange={setBagiHasilSearch} width="300px" />
-                        <FilterRange from={bagiHasilFrom} to={bagiHasilTo} onChange={(f, t) => { setBagiHasilFrom(f); setBagiHasilTo(t); }} />
+                        <FilterRange from={bagiHasilFrom} to={bagiHasilTo} onChange={setBagiHasilRange} />
                     </div>
                     {bagiHasilLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
-                        : <Table<RiwayatBagiHasilNasabahItem>
-                            columns={BAGI_HASIL_COLUMNS}
-                            data={filteredBagiHasil}
-                            rowKey={(row) => row.penerima_id}
-                            emptyMessage="Belum ada riwayat bagi hasil."
-                            onRowClick={(row) => navigate(`${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`, { state: { bagiHasilId: row.bagi_hasil_id, breadcrumbTrail } })}
-                          />
+                        : <>
+                            <Table<RiwayatBagiHasilNasabahItem>
+                                columns={BAGI_HASIL_COLUMNS}
+                                data={pagedBagiHasil.items}
+                                rowKey={(row) => row.penerima_id}
+                                emptyMessage="Belum ada riwayat bagi hasil."
+                                onRowClick={(row) => navigate(`${rolePrefix}/bagi-hasil/penerima/${row.penerima_id}`, { state: { bagiHasilId: row.bagi_hasil_id, breadcrumbTrail } })}
+                            />
+                            <div className="riwayat-pagination-row">
+                                <Pagination currentPage={pagedBagiHasil.currentPage} totalPages={pagedBagiHasil.totalPages} onPageChange={setBagiHasilPage} variant="compact" />
+                            </div>
+                          </>
                     }
                 </div>
             )}
@@ -288,17 +299,22 @@ export default function ProfilNasabahPage() {
                 <div style={{ margin: "0 24px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div className="riwayat-filter-row">
                         <SearchBar placeholder="Cari ID atau nama reward..." value={penarikanSearch} onChange={setPenarikanSearch} width="300px" />
-                        <FilterRange from={penarikanFrom} to={penarikanTo} onChange={(f, t) => { setPenarikanFrom(f); setPenarikanTo(t); }} />
+                        <FilterRange from={penarikanFrom} to={penarikanTo} onChange={setPenarikanRange} />
                     </div>
                     {penarikanLoading
                         ? <div className="riwayat-loading">Memuat data...</div>
-                        : <Table<PenarikanNasabahItem>
-                            columns={PENARIKAN_COLUMNS}
-                            data={filteredPenarikan}
-                            rowKey={(row) => row.penarikan_id}
-                            emptyMessage="Belum ada riwayat penarikan."
-                            onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penarikan/${row.penarikan_id}`, { state: { breadcrumbTrail } })}
-                          />
+                        : <>
+                            <Table<PenarikanNasabahItem>
+                                columns={PENARIKAN_COLUMNS}
+                                data={pagedPenarikan.items}
+                                rowKey={(row) => row.penarikan_id}
+                                emptyMessage="Belum ada riwayat penarikan."
+                                onRowClick={(row) => navigate(`${rolePrefix}/riwayat/penarikan/${row.penarikan_id}`, { state: { breadcrumbTrail } })}
+                            />
+                            <div className="riwayat-pagination-row">
+                                <Pagination currentPage={pagedPenarikan.currentPage} totalPages={pagedPenarikan.totalPages} onPageChange={setPenarikanPage} variant="compact" />
+                            </div>
+                          </>
                     }
                 </div>
             )}

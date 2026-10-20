@@ -3,8 +3,10 @@
     border-radius: var(--r-xl);
     border: 1px solid var(--c-border);
     box-shadow: var(--sh-sm);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     width: 100%;
+    max-width: 100%;
 }
 
 .table {
@@ -172,10 +174,6 @@
 }
 
 @media (max-width: 640px) {
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
     .table th,
     .table td {
         padding: 12px 14px;
