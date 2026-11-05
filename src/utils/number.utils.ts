@@ -90,3 +90,10 @@ export function parseDecimalInput(raw: string): number | null {
     const n = Number(normalized);
     return Number.isFinite(n) ? roundToPrecision(n) : null;
 }
+
+export function formatUkuranFile(bytes: number | null | undefined): string {
+    const n = toFiniteNumber(bytes);
+    if (n <= 0) return "-";
+    const mb = n / (1024 * 1024);
+    return `${formatDecimal(mb, mb >= 10 ? 0 : 1)} MB`;
+}

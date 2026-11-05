@@ -1,11 +1,14 @@
-version: '3.8'
+# Deploy baru (admin.enviroo.tech). Berjalan berdampingan dengan deploy lama
+# (enviroo-fe-frontend-1 di :3000), jadi nama project dan port host dibuat berbeda.
+name: enviroo-admin
 
 services:
   frontend:
     build:
       context: .
       args:
-        VITE_API_URL: https://api.enviroo.tech
+        VITE_API_URL: ${VITE_API_URL:-https://svc.enviroo.tech}
+    # Diakses publik lewat nginx (admin.enviroo.tech -> localhost:3001).
     ports:
-      - "3000:80"
+      - "127.0.0.1:3001:80"
     restart: always

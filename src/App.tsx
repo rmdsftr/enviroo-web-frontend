@@ -26,6 +26,7 @@ import UnggahKontenPage from './pages/unggah_konten';
 import OpenKontenPage from './pages/open_konten';
 import RewardPage from './pages/superadmin/reward';
 import LokasiPage from './pages/superadmin/lokasi';
+import AplikasiPage from './pages/superadmin/aplikasi';
 import SampahPage from './pages/superadmin/sampah';
 import BarangPage from './pages/superadmin/barang';
 import SuperadminPenggunaPage from './pages/superadmin/pengguna';
@@ -85,6 +86,7 @@ function App() {
           <Route path='barang' element={<BarangPage />} />
           <Route path='reward' element={<RewardPage />} />
           <Route path='lokasi' element={<LokasiPage />} />
+          <Route path='aplikasi' element={<AplikasiPage />} />
           <Route path='profil-dlh' element={<ProfilDlhPage />} />
           <Route path='informasi' element={<InformasiPage />} />
           <Route path='informasi/new' element={<UnggahKontenPage />} />

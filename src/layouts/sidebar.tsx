@@ -13,6 +13,7 @@ import {
     FaClockRotateLeft,
     FaGear,
     FaWallet,
+    FaMobileScreenButton,
 } from "react-icons/fa6";
 import "../styles/sidebar.css";
 import photo from "../assets/enviroo-pfp.png";
@@ -49,8 +50,9 @@ export const SUPERADMIN_MENU: SidebarEntry[] = [
         { icon: FaBasketShopping,  menu: "Barang",      id: "superadmin/barang"      },
     ]},
     { groupLabel: "Konfigurasi", items: [
-        { icon: FaGear,        menu: "Operasional", id: "superadmin/reward"  },
-        { icon: FaLocationDot, menu: "Lokasi",      id: "superadmin/lokasi"  },
+        { icon: FaGear,               menu: "Operasional", id: "superadmin/reward"   },
+        { icon: FaLocationDot,        menu: "Lokasi",      id: "superadmin/lokasi"   },
+        { icon: FaMobileScreenButton, menu: "Aplikasi",    id: "superadmin/aplikasi" },
     ]},
     { groupLabel: "Media", items: [
         { icon: FaCircleInfo, menu: "Informasi", id: "superadmin/informasi" },
@@ -110,7 +112,8 @@ export const ADMIN_BSM_MENU: SidebarEntry[] = [
         { icon: FaGear,     menu: "Transaksi", id: "bsm/penjualan"  },
     ]},
     { groupLabel: "Pencatatan", items: [
-        { icon: FaClockRotateLeft, menu: "Riwayat", id: "bsm/riwayat" },
+        { icon: FaClockRotateLeft, menu: "Riwayat",   id: "bsm/riwayat" },
+        { icon: FaCircleInfo,      menu: "Informasi", id: "bsm/konten"  },
     ]},
 ];
 

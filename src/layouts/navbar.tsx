@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo, type KeyboardEvent } from "react";
-import { FaBell, FaChevronDown, FaRightFromBracket, FaUser } from "react-icons/fa6";
+import { FaBell, FaChevronDown, FaRightFromBracket, FaUser, FaMobileScreenButton } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import "../styles/navbar.css";
 import ava from "../assets/profile.png";
 import SearchBar from "../components/search";
 import { useAuth } from "../contexts/AuthContext";
 import { NotifikasiService } from "../services/notifikasi.service";
+import AplikasiMobileModal from "../modals/AplikasiMobileModal";
 import {
     SUPERADMIN_MENU, ADMIN_BSI_MENU, ADMIN_BSU_MENU, ADMIN_BSM_MENU,
     isGroup,
@@ -20,6 +21,7 @@ export default function NavbarLayout() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchOpen, setSearchOpen] = useState(false);
     const [focusedIndex, setFocusedIndex] = useState(-1);
+    const [aplikasiOpen, setAplikasiOpen] = useState(false);
 
     const searchRef = useRef<HTMLDivElement>(null);
 
@@ -140,6 +142,17 @@ export default function NavbarLayout() {
                 {isAdmin && (
                     <button
                         className="nav-icon-btn"
+                        aria-label="Aplikasi Mobile"
+                        title="Aplikasi Mobile"
+                        onClick={() => setAplikasiOpen(true)}
+                    >
+                        <FaMobileScreenButton />
+                    </button>
+                )}
+
+                {isAdmin && (
+                    <button
+                        className="nav-icon-btn"
                         aria-label="Notifikasi"
                         onClick={() => navigate("/notifikasi")}
                     >
@@ -199,6 +212,8 @@ export default function NavbarLayout() {
                     )}
                 </div>
             </div>
+
+            {aplikasiOpen && <AplikasiMobileModal onClose={() => setAplikasiOpen(false)} />}
         </header>
     );
 }
