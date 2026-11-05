@@ -81,7 +81,7 @@ export default function InformasiPage() {
                         )}
                     </div>
                     <p className="deskripsi">
-                        Pada menu ini, BSI dapat memposting konten edukasi dan informasi terkait bank sampah dan pemilahan sampah
+                        Posting konten edukasi dan informasi seputar bank sampah dan pemilahan sampah untuk nasabah.
                     </p>
                 </div>
                 <div className="info-header__right">
@@ -126,7 +126,7 @@ export default function InformasiPage() {
                 </div>
             )}
 
-            {pagination && (
+            {!isLoading && kontenList.length > 0 && pagination && (
                 <Pagination
                     currentPage={pagination.page}
                     totalPages={pagination.total_pages}
