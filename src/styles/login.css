@@ -103,12 +103,24 @@
     margin: 24px 0 14px;
 }
 
+.login-hero-partners {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.login-hero-partner-logo {
+    display: block;
+    height: 40px;
+    width: auto;
+}
+
 .login-hero-caption {
     font-size: 12px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.55);
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    letter-spacing: 0.4px;
     margin: 0;
 }
 
@@ -282,6 +294,23 @@
     .login-hero-desc {
         font-size: 12px;
         line-height: 1.55;
+    }
+
+    .login-hero-divider {
+        margin: 14px 0 10px;
+    }
+
+    .login-hero-partners {
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .login-hero-partner-logo {
+        height: 30px;
+    }
+
+    .login-hero-caption {
+        font-size: 11px;
     }
 
     .login-right {

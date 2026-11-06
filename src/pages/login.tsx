@@ -4,6 +4,8 @@ import "../styles/login.css";
 import Button from "../components/button";
 import Input from "../components/input";
 import logo from "../assets/logo-enviroo.png";
+import logoUnand from "../assets/logo-unand.webp";
+import logoPslh from "../assets/logo-pslh.webp";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { useAuth } from "../contexts/AuthContext";
 import { AUTH_NOTICE_KEY } from "../services/api";
@@ -19,6 +21,12 @@ const LoginHero = memo(() => (
             <p className="login-hero-desc">
                 Platform pengelolaan bank sampah dengan model hierarki multi-level yang mempermudah operasional organisasi Anda.
             </p>
+            <div className="login-hero-divider" />
+            <div className="login-hero-partners">
+                <img src={logoUnand} alt="Logo Universitas Andalas" className="login-hero-partner-logo" />
+                <img src={logoPslh} alt="Logo PSLH Universitas Andalas" className="login-hero-partner-logo" />
+            </div>
+            <p className="login-hero-caption">by PSLH Universitas Andalas</p>
         </div>
     </div>
 ));
